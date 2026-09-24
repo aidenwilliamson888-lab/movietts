@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Movie TTS Podcast Generator V2.5.1</title>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <title>Movie Podcast Generator V2.5.2</title>
 
   <style>
     * {
@@ -16,49 +14,57 @@
     body {
       margin: 0;
       background: #0b1020;
-      color: #e8edf7;
+      color: #e5e7eb;
       font-family:
         Inter,
-        Arial,
-        Helvetica,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         sans-serif;
     }
 
     .container {
-      width: min(1180px, calc(100% - 30px));
+      width: min(1180px, calc(100% - 32px));
       margin: 30px auto 60px;
     }
 
     h1 {
-      margin: 0;
+      margin: 0 0 8px;
       font-size: 30px;
-      font-weight: 800;
+      color: #ffffff;
     }
 
     .subtitle {
-      margin-top: 8px;
-      color: #8994aa;
-      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 28px;
     }
 
     .card {
-      margin-top: 20px;
-      background: #11182a;
-      border: 1px solid #202a40;
+      background: #111827;
+      border: 1px solid #263244;
       border-radius: 16px;
-      padding: 20px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     }
 
-    .section-title {
-      font-size: 17px;
-      font-weight: 800;
-      margin-bottom: 15px;
+    .card h2 {
+      margin: 0 0 16px;
+      font-size: 19px;
+      color: #ffffff;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 15px;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
     }
 
     .full {
@@ -67,48 +73,52 @@
 
     label {
       display: block;
-      font-size: 13px;
-      color: #aeb8cc;
       margin-bottom: 7px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
     }
 
-    textarea,
     input,
+    textarea,
     select {
       width: 100%;
-      border: 1px solid #2a3550;
-      background: #0b1120;
-      color: #f1f5fb;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #f8fafc;
       border-radius: 10px;
       padding: 11px 12px;
       outline: none;
-      font-size: 14px;
+      font: inherit;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     }
 
     textarea {
-      min-height: 115px;
       resize: vertical;
-      line-height: 1.5;
+      min-height: 120px;
     }
 
-    textarea:focus,
-    input:focus,
-    select:focus {
-      border-color: #6578ff;
+    textarea.small {
+      min-height: 80px;
     }
 
     .hint {
       margin-top: 6px;
-      color: #77839b;
+      color: #64748b;
       font-size: 12px;
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
     .template-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 9px;
+      margin-bottom: 10px;
     }
 
     .template-row input {
@@ -118,202 +128,202 @@
     button {
       border: 0;
       border-radius: 10px;
-      padding: 11px 16px;
+      padding: 11px 15px;
       cursor: pointer;
-      color: white;
-      font-weight: 800;
-      background: #5865f2;
+      font-weight: 700;
+      color: #ffffff;
+      background: #4f46e5;
     }
 
     button:hover {
-      opacity: 0.9;
+      background: #4338ca;
+    }
+
+    button.secondary {
+      background: #334155;
+    }
+
+    button.secondary:hover {
+      background: #475569;
+    }
+
+    button.danger {
+      background: #991b1b;
+    }
+
+    button.danger:hover {
+      background: #b91c1c;
+    }
+
+    button.success {
+      background: #047857;
+    }
+
+    button.success:hover {
+      background: #059669;
     }
 
     button:disabled {
-      opacity: 0.45;
+      opacity: 0.5;
       cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: #263149;
-    }
-
-    .btn-danger {
-      background: #8b3030;
-    }
-
-    .btn-success {
-      background: #24734d;
     }
 
     .actions {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
+      gap: 10px;
       margin-top: 18px;
     }
 
     .status-box {
-      display: none;
-      margin-top: 20px;
+      background: #020617;
+      border: 1px solid #1e293b;
       border-radius: 12px;
-      padding: 14px;
-      background: #0b1120;
-      border: 1px solid #263149;
-    }
-
-    .status-box.show {
-      display: block;
-    }
-
-    .status-main {
-      font-size: 15px;
-      font-weight: 800;
-    }
-
-    .progress-wrap {
-      margin-top: 12px;
-      height: 10px;
-      border-radius: 99px;
-      background: #1c2538;
-      overflow: hidden;
+      padding: 15px;
+      margin-top: 15px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      max-height: 380px;
+      overflow-y: auto;
     }
 
     .progress {
+      height: 10px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .progress-bar {
       height: 100%;
       width: 0%;
-      background: #6578ff;
-      transition: width 0.2s ease;
+      background: #6366f1;
+      transition: width 0.25s ease;
     }
 
-    .stats {
+    .movie-list {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 15px;
+      gap: 12px;
+      margin-top: 16px;
     }
 
-    .stat {
-      background: #0b1120;
-      border: 1px solid #202a40;
-      border-radius: 10px;
+    .movie-item {
+      display: grid;
+      grid-template-columns: 70px 1fr auto;
+      gap: 14px;
+      align-items: center;
       padding: 12px;
-    }
-
-    .stat-label {
-      color: #77839b;
-      font-size: 11px;
-    }
-
-    .stat-value {
-      margin-top: 4px;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .results {
-      margin-top: 20px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .episode {
-      background: #0b1120;
-      border: 1px solid #202a40;
       border-radius: 12px;
-      padding: 14px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
     }
 
-    .episode-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
+    .movie-item img {
+      width: 70px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #020617;
     }
 
-    .episode-title {
-      font-weight: 800;
-      font-size: 15px;
+    .movie-title {
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 5px;
     }
 
-    .episode-meta {
-      margin-top: 5px;
-      color: #7e8aa1;
+    .movie-meta {
+      color: #94a3b8;
       font-size: 12px;
+      line-height: 1.5;
     }
 
     .badge {
+      display: inline-flex;
+      align-items: center;
       padding: 5px 9px;
       border-radius: 999px;
       font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
+      font-weight: 700;
+      background: #1e293b;
+      color: #cbd5e1;
     }
 
-    .badge-success {
-      background: #174b35;
-      color: #75e5b1;
+    .badge.success {
+      background: #064e3b;
+      color: #a7f3d0;
     }
 
-    .badge-error {
-      background: #532222;
-      color: #ff9999;
+    .badge.error {
+      background: #7f1d1d;
+      color: #fecaca;
     }
 
-    .badge-working {
-      background: #293a66;
-      color: #9db1ff;
+    .badge.pending {
+      background: #713f12;
+      color: #fde68a;
     }
 
-    .error-text {
-      margin-top: 9px;
-      color: #ff8f8f;
+    .counter {
+      margin-top: 7px;
       font-size: 12px;
-      line-height: 1.5;
-      white-space: pre-wrap;
+      color: #64748b;
     }
 
-    .success-text {
-      margin-top: 9px;
-      color: #79dfad;
+    .remove-btn {
+      padding: 8px 10px;
       font-size: 12px;
-      line-height: 1.5;
     }
 
-    .small {
-      font-size: 12px;
-      color: #77839b;
+    .notice {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #172554;
+      border: 1px solid #1d4ed8;
+      color: #bfdbfe;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 12px;
     }
 
-    .loading {
-      display: inline-block;
-      width: 13px;
-      height: 13px;
-      border: 2px solid #6578ff;
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: -2px;
-      margin-right: 5px;
+    .warning {
+      background: #422006;
+      border-color: #92400e;
+      color: #fde68a;
     }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    .success-box {
+      background: #052e16;
+      border-color: #166534;
+      color: #bbf7d0;
+    }
+
+    .divider {
+      height: 1px;
+      background: #1e293b;
+      margin: 20px 0;
     }
 
     @media (max-width: 800px) {
-      .grid {
+      .grid,
+      .grid-3 {
         grid-template-columns: 1fr;
       }
 
-      .full {
-        grid-column: auto;
+      .movie-item {
+        grid-template-columns: 55px 1fr;
       }
 
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
+      .movie-item > :last-child {
+        grid-column: 1 / -1;
+      }
+
+      .movie-item img {
+        width: 55px;
+        height: 80px;
       }
     }
   </style>
@@ -323,49 +333,72 @@
 
 <div class="container">
 
-  <h1>Movie TTS Podcast Generator</h1>
+  <h1>🎬 Movie Podcast Generator V2.5.2</h1>
 
   <div class="subtitle">
-    V2.5.1 — TMDB → ElevenLabs → MP3 → R2/RSS Package
+    TMDB Metadata → Random SEO Title → Custom Description → TTS MP3 → JSON → ZIP
   </div>
 
   <!-- TMDB -->
   <div class="card">
 
-    <div class="section-title">
-      1. TMDB Settings
-    </div>
+    <h2>1. TMDB Movies</h2>
 
     <div class="grid">
 
       <div class="full">
-        <label>TMDB IDs</label>
+        <label for="tmdbIds">
+          TMDB IDs
+        </label>
 
         <textarea
           id="tmdbIds"
-          placeholder="550
-680
-13
-238"
+          placeholder="Example:
+550
+603
+157336
+27205"
         ></textarea>
 
         <div class="hint">
-          Satu ID per baris atau pisahkan dengan koma/spasi.
-          Maksimal 100 ID.
+          Paste one TMDB ID per line, comma separated, or space separated.
+          Maximum 100 IDs.
+        </div>
+
+        <div class="counter">
+          IDs: <span id="idCounter">0</span> / 100
         </div>
       </div>
 
       <div>
-        <label>TMDB Language</label>
+        <label for="language">
+          TMDB Language
+        </label>
 
         <select id="language">
           <option value="en-US">
-            Loading languages...
+            English (United States)
           </option>
         </select>
 
-        <div class="hint" id="languageStatus">
-          Loading TMDB languages...
+        <div class="hint">
+          Movie title, overview, genres and other metadata will use this language when available.
+        </div>
+      </div>
+
+      <div>
+        <label for="voiceId">
+          ElevenLabs Voice ID
+        </label>
+
+        <input
+          id="voiceId"
+          type="text"
+          placeholder="Enter your ElevenLabs Voice ID"
+        />
+
+        <div class="hint">
+          Use the Voice ID that already works in your ElevenLabs account.
         </div>
       </div>
 
@@ -377,25 +410,29 @@
   <!-- TITLE -->
   <div class="card">
 
-    <div class="section-title">
-      2. Title Templates
-    </div>
+    <h2>2. Random Title Templates</h2>
 
     <div id="titleTemplates"></div>
 
-    <div class="actions">
-      <button
-        type="button"
-        class="btn-secondary"
-        id="addTemplateBtn"
-      >
-        + Add Template
-      </button>
-    </div>
+    <button
+      type="button"
+      class="secondary"
+      id="addTitleTemplate"
+    >
+      + Add Title Template
+    </button>
 
     <div class="hint">
-      Setiap film hanya menggunakan SATU template secara random.
-      Contoh: 100 film = 100 title, bukan 500 title.
+      Available variables:
+      <strong>{TITLE}</strong>,
+      <strong>{YEAR}</strong>,
+      <strong>{ID}</strong>,
+      <strong>{ORIGINAL_TITLE}</strong>
+    </div>
+
+    <div class="notice">
+      Each movie will randomly receive only ONE title template.
+      The generator will not use all templates for the same movie.
     </div>
 
   </div>
@@ -404,28 +441,25 @@
   <!-- DESCRIPTION -->
   <div class="card">
 
-    <div class="section-title">
-      3. Description
-    </div>
+    <h2>3. Description Template</h2>
 
-    <div>
-      <label>Description Template</label>
+    <textarea
+      id="descriptionTemplate"
+      class="small"
+    >Watch {TITLE} ({YEAR}) and discover more information about this movie. Get the latest movie details, cast, genres, rating and more.</textarea>
 
-      <textarea id="descriptionTemplate"></textarea>
-
-      <div class="hint">
-        Variables:
-        {TITLE},
-        {YEAR},
-        {ID},
-        {GENRE},
-        {DIRECTOR},
-        {RATING},
-        {OVERVIEW},
-        {CTA_URL},
-        {CTA1},
-        {CTA2}
-      </div>
+    <div class="hint">
+      Variables:
+      <strong>{TITLE}</strong>,
+      <strong>{YEAR}</strong>,
+      <strong>{ID}</strong>,
+      <strong>{ORIGINAL_TITLE}</strong>,
+      <strong>{OVERVIEW}</strong>,
+      <strong>{GENRES}</strong>,
+      <strong>{DIRECTOR}</strong>,
+      <strong>{RATING}</strong>,
+      <strong>{RUNTIME}</strong>,
+      <strong>{CAST}</strong>
     </div>
 
   </div>
@@ -434,56 +468,127 @@
   <!-- CTA -->
   <div class="card">
 
-    <div class="section-title">
-      4. CTA
-    </div>
+    <h2>4. CTA Settings</h2>
 
     <div class="grid">
 
-      <div class="full">
-        <label>CTA Base URL</label>
+      <!-- CTA 1 -->
+      <div>
+        <label for="cta1Text">
+          CTA 1 Text
+        </label>
 
         <input
-          id="ctaBaseUrl"
-          type="text"
-          placeholder="https://example.pages.dev/"
+          id="cta1Text"
+          value="Watch Now"
+          placeholder="Example: Watch Now"
         />
 
         <div class="hint">
-          TMDB ID otomatis ditambahkan.
-          Contoh:
-          https://example.pages.dev/550
+          This is the visible text shown inside the CTA link/button.
         </div>
       </div>
 
       <div>
-        <label>CTA Button 1</label>
+        <label for="cta1Template">
+          CTA 1 HTML Template
+        </label>
 
         <input
           id="cta1Template"
-          type="text"
+          value='<a href="{CTA_URL}" target="_blank" rel="noopener">{CTA_TEXT}</a>'
+          placeholder="CTA HTML template"
         />
 
         <div class="hint">
           Variables:
-          {CTA_URL}, {CTA_TEXT}, {ID}
+          <strong>{CTA_URL}</strong>,
+          <strong>{CTA_TEXT}</strong>,
+          <strong>{ID}</strong>
+        </div>
+      </div>
+
+
+      <!-- CTA 2 -->
+      <div>
+        <label for="cta2Text">
+          CTA 2 Text
+        </label>
+
+        <input
+          id="cta2Text"
+          value="More Details"
+          placeholder="Example: More Details"
+        />
+
+        <div class="hint">
+          Visible text for CTA 2.
         </div>
       </div>
 
       <div>
-        <label>CTA Button 2</label>
+        <label for="cta2Template">
+          CTA 2 HTML Template
+        </label>
 
         <input
           id="cta2Template"
-          type="text"
+          value='<a href="{CTA_URL}" target="_blank" rel="noopener">{CTA_TEXT}</a>'
+          placeholder="CTA HTML template"
         />
 
         <div class="hint">
           Variables:
-          {CTA_URL}, {CTA_TEXT}, {ID}
+          <strong>{CTA_URL}</strong>,
+          <strong>{CTA_TEXT}</strong>,
+          <strong>{ID}</strong>
         </div>
       </div>
 
+    </div>
+
+
+    <div class="divider"></div>
+
+
+    <div class="grid">
+
+      <div>
+        <label for="cta1Url">
+          CTA 1 URL
+        </label>
+
+        <input
+          id="cta1Url"
+          placeholder="https://example.com/watch/{ID}"
+        />
+
+        <div class="hint">
+          You can use <strong>{ID}</strong> inside the URL.
+        </div>
+      </div>
+
+      <div>
+        <label for="cta2Url">
+          CTA 2 URL
+        </label>
+
+        <input
+          id="cta2Url"
+          placeholder="https://example.com/movie/{ID}"
+        />
+
+        <div class="hint">
+          You can use <strong>{ID}</strong> inside the URL.
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="notice">
+      CTA Text and CTA HTML are now completely separate.
+      So you can change the visible text without changing the link structure.
     </div>
 
   </div>
@@ -492,29 +597,14 @@
   <!-- TTS -->
   <div class="card">
 
-    <div class="section-title">
-      5. ElevenLabs TTS
-    </div>
+    <h2>5. TTS Settings</h2>
 
-    <div class="grid">
+    <div class="grid-3">
 
       <div>
-        <label>Voice ID</label>
-
-        <input
-          id="voiceId"
-          type="text"
-          placeholder="Paste your working ElevenLabs Voice ID"
-        />
-
-        <div class="hint">
-          Voice ID bukan API key.
-          API key tetap disimpan sebagai Cloudflare Secret.
-        </div>
-      </div>
-
-      <div>
-        <label>TTS Model</label>
+        <label for="modelId">
+          ElevenLabs Model
+        </label>
 
         <select id="modelId">
 
@@ -529,37 +619,75 @@
         </select>
       </div>
 
-      <div class="full">
 
-        <label>MP3 Format</label>
+      <div>
+        <label for="outputFormat">
+          MP3 Output Format
+        </label>
+
+        <select id="outputFormat">
+
+          <option value="mp3_22050_32" selected>
+            MP3 — 22.05 kHz / 32 kbps
+          </option>
+
+          <option value="mp3_44100_64">
+            MP3 — 44.1 kHz / 64 kbps
+          </option>
+
+          <option value="mp3_44100_96">
+            MP3 — 44.1 kHz / 96 kbps
+          </option>
+
+          <option value="mp3_44100_128">
+            MP3 — 44.1 kHz / 128 kbps
+          </option>
+
+        </select>
+
+        <div class="hint">
+          Smaller bitrate = smaller MP3 file.
+        </div>
+      </div>
+
+
+      <div>
+        <label>
+          Current Format
+        </label>
 
         <input
-          type="text"
+          id="formatPreview"
           value="mp3_22050_32"
           readonly
         />
 
         <div class="hint">
-          Fixed sementara ke MP3 22.05 kHz / 32 kbps
-          untuk ukuran file paling kecil.
+          This value will also be stored in the JSON package.
         </div>
-
       </div>
 
-      <div class="full">
+    </div>
 
-        <label>Narration Template</label>
 
-        <textarea id="narrationTemplate"></textarea>
+    <div class="divider"></div>
 
-        <div class="hint">
-          Variables:
-          {TITLE}, {YEAR}, {ID}, {GENRE},
-          {DIRECTOR}, {RATING}, {OVERVIEW}
-        </div>
 
-      </div>
+    <label for="ttsTemplate">
+      TTS Narration Template
+    </label>
 
+    <textarea
+      id="ttsTemplate"
+      class="small"
+    >Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
+
+    <div class="hint">
+      Available variables:
+      <strong>{TITLE}</strong>,
+      <strong>{YEAR}</strong>,
+      <strong>{ID}</strong>,
+      <strong>{ORIGINAL_TITLE}</strong>
     </div>
 
   </div>
@@ -568,215 +696,215 @@
   <!-- GENERATE -->
   <div class="card">
 
-    <div class="section-title">
-      6. Generate
-    </div>
+    <h2>6. Generate Package</h2>
 
     <div class="actions">
 
       <button
         id="generateBtn"
-        type="button"
+        class="success"
       >
-        Generate Podcast Package
+        🚀 Generate Podcast Package
       </button>
 
       <button
         id="clearBtn"
         type="button"
-        class="btn-secondary"
+        class="secondary"
       >
-        Clear Results
+        Clear
       </button>
 
     </div>
 
-    <div class="status-box" id="statusBox">
 
+    <div class="progress">
       <div
-        class="status-main"
-        id="statusMain"
-      >
-        Ready
-      </div>
-
-      <div class="progress-wrap">
-
-        <div
-          class="progress"
-          id="progressBar"
-        ></div>
-
-      </div>
-
-      <div class="stats">
-
-        <div class="stat">
-          <div class="stat-label">TOTAL</div>
-          <div
-            class="stat-value"
-            id="statTotal"
-          >0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">SUCCESS</div>
-          <div
-            class="stat-value"
-            id="statSuccess"
-          >0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">FAILED</div>
-          <div
-            class="stat-value"
-            id="statFailed"
-          >0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">MP3 SIZE</div>
-          <div
-            class="stat-value"
-            id="statSize"
-          >0 MB</div>
-        </div>
-
-      </div>
-
+        id="progressBar"
+        class="progress-bar"
+      ></div>
     </div>
 
     <div
-      id="downloadArea"
-      style="margin-top:15px;"
-    ></div>
+      id="progressText"
+      class="counter"
+    >
+      Ready.
+    </div>
+
+
+    <div
+      id="statusBox"
+      class="status-box"
+    >Ready to generate.</div>
 
   </div>
 
 
-  <!-- RESULTS -->
-  <div
-    class="results"
-    id="results"
-  ></div>
+  <!-- MOVIES -->
+  <div class="card">
+
+    <h2>7. Generated Movies</h2>
+
+    <div id="movieList" class="movie-list"></div>
+
+  </div>
 
 </div>
 
 
+<!-- JSZip -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+
 <script>
 
+  const $ = (id) => document.getElementById(id);
+
+
   /* =========================================================
-     DEFAULT SETTINGS
+     DEFAULT TITLE TEMPLATES
   ========================================================= */
 
   const DEFAULT_TITLE_TEMPLATES = [
-
-    "WATCH {TITLE} ({YEAR}) FULL MOVIE ONLINE",
-
-    "{TITLE} {YEAR} FULL MOVIE — WATCH ONLINE",
-
-    "WATCH {TITLE} FULL MOVIE {YEAR} ONLINE",
-
-    "{TITLE} ({YEAR}) — FULL MOVIE ONLINE",
-
-    "WATCH {TITLE} {YEAR} — FULL MOVIE STREAMING"
-
+    "Watch {TITLE} ({YEAR}) Online",
+    "{TITLE} ({YEAR}) - Movie Review",
+    "{TITLE} {YEAR} Full Movie Review",
+    "{TITLE} ({YEAR}) Movie Details and Review",
+    "Watch {TITLE} - {YEAR} Movie Review"
   ];
-
-
-  const DEFAULT_DESCRIPTION = `
-Watch {TITLE} ({YEAR}) and discover more information about this movie.
-
-Title: {TITLE}
-Release Year: {YEAR}
-Genre: {GENRE}
-Director: {DIRECTOR}
-Rating: {RATING}
-
-{OVERVIEW}
-
-{CTA1}
-
-{CTA2}
-  `.trim();
-
-
-  const DEFAULT_CTA1 =
-    '<a href="{CTA_URL}" target="_blank" rel="noopener">{CTA_TEXT}</a>';
-
-
-  const DEFAULT_CTA2 =
-    '<a href="{CTA_URL}" target="_blank" rel="noopener">{CTA_TEXT}</a>';
-
-
-  const DEFAULT_NARRATION =
-    "Welcome to Movie Review. Today we are talking about {TITLE}, released in {YEAR}. Don't forget to subscribe for more movie reviews.";
-
-
-  let titleTemplates = [
-    ...DEFAULT_TITLE_TEMPLATES
-  ];
-
-
-  let generatedEpisodes = [];
-
-
-  let isGenerating = false;
 
 
   /* =========================================================
-     DOM
+     STATE
   ========================================================= */
 
-  const $ = id =>
-    document.getElementById(id);
+  let generatedMovies = [];
 
 
   /* =========================================================
      INIT
   ========================================================= */
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
+  document.addEventListener("DOMContentLoaded", () => {
 
-      $("descriptionTemplate").value =
-        DEFAULT_DESCRIPTION;
+    initializeTitleTemplates();
 
-      $("cta1Template").value =
-        DEFAULT_CTA1;
+    loadLanguages();
 
-      $("cta2Template").value =
-        DEFAULT_CTA2;
+    updateIdCounter();
 
-      $("narrationTemplate").value =
-        DEFAULT_NARRATION;
+    $("tmdbIds").addEventListener(
+      "input",
+      updateIdCounter
+    );
 
-      renderTitleTemplates();
+    $("outputFormat").addEventListener(
+      "change",
+      () => {
+        $("formatPreview").value =
+          $("outputFormat").value;
+      }
+    );
 
-      $("addTemplateBtn")
-        .addEventListener(
-          "click",
-          addTitleTemplate
-        );
+    $("addTitleTemplate").addEventListener(
+      "click",
+      () => {
+        addTitleTemplate("");
+      }
+    );
 
-      $("generateBtn")
-        .addEventListener(
-          "click",
-          generateAll
-        );
+    $("generateBtn").addEventListener(
+      "click",
+      generateAll
+    );
 
-      $("clearBtn")
-        .addEventListener(
-          "click",
-          clearResults
-        );
+    $("clearBtn").addEventListener(
+      "click",
+      clearAll
+    );
 
-      await loadLanguages();
+  });
 
-    }
-  );
+
+  /* =========================================================
+     TITLE TEMPLATES
+  ========================================================= */
+
+  function initializeTitleTemplates() {
+
+    $("titleTemplates").innerHTML = "";
+
+    DEFAULT_TITLE_TEMPLATES.forEach(
+      template => addTitleTemplate(template)
+    );
+
+  }
+
+
+  function addTitleTemplate(value = "") {
+
+    const wrapper =
+      document.createElement("div");
+
+    wrapper.className =
+      "template-row";
+
+
+    const input =
+      document.createElement("input");
+
+    input.type = "text";
+
+    input.value = value;
+
+    input.placeholder =
+      "Example: Watch {TITLE} ({YEAR}) Online";
+
+
+    const remove =
+      document.createElement("button");
+
+    remove.type = "button";
+
+    remove.className =
+      "danger remove-btn";
+
+    remove.textContent =
+      "Remove";
+
+
+    remove.addEventListener(
+      "click",
+      () => {
+
+        wrapper.remove();
+
+      }
+    );
+
+
+    wrapper.appendChild(input);
+
+    wrapper.appendChild(remove);
+
+    $("titleTemplates").appendChild(
+      wrapper
+    );
+
+  }
+
+
+  function getTitleTemplates() {
+
+    return [
+      ...$("titleTemplates")
+        .querySelectorAll("input")
+    ]
+      .map(input => input.value.trim())
+      .filter(Boolean);
+
+  }
 
 
   /* =========================================================
@@ -785,52 +913,22 @@ Rating: {RATING}
 
   async function loadLanguages() {
 
-    const select =
-      $("language");
-
-    const status =
-      $("languageStatus");
-
     try {
-
-      status.textContent =
-        "Loading TMDB languages...";
 
       const response =
         await fetch(
-          "/api/movie?action=languages",
-          {
-            cache: "no-store"
-          }
+          "/api/movie?action=languages"
         );
 
-
-      const raw =
-        await response.text();
-
-
-      let data;
-
-      try {
-
-        data =
-          JSON.parse(raw);
-
-      } catch (error) {
-
-        throw new Error(
-          "TMDB language response bukan JSON: " +
-          raw.substring(0, 300)
-        );
-
-      }
+      const data =
+        await response.json();
 
 
       if (!response.ok) {
 
         throw new Error(
           data?.error ||
-          `HTTP ${response.status}`
+          "Failed to load languages."
         );
 
       }
@@ -842,48 +940,83 @@ Rating: {RATING}
           : [];
 
 
-      if (!languages.length) {
+      const select =
+        $("language");
 
-        throw new Error(
-          "TMDB tidak mengembalikan daftar bahasa."
-        );
 
-      }
+      const current =
+        select.value;
 
 
       select.innerHTML = "";
 
 
-      languages.forEach(code => {
+      const displayNames =
+        typeof Intl !== "undefined" &&
+        Intl.DisplayNames
+          ? new Intl.DisplayNames(
+              ["en"],
+              {
+                type: "language"
+              }
+            )
+          : null;
 
-        const option =
-          document.createElement("option");
 
-        option.value = code;
+      languages
+        .sort((a, b) =>
+          String(a).localeCompare(
+            String(b)
+          )
+        )
+        .forEach(code => {
 
-        option.textContent =
-          getLanguageLabel(code);
+          const option =
+            document.createElement("option");
 
-        select.appendChild(option);
+          option.value = code;
 
-      });
+
+          let label = code;
+
+          try {
+
+            if (displayNames) {
+
+              label =
+                displayNames.of(
+                  code.split("-")[0]
+                ) || code;
+
+            }
+
+          } catch (_) {}
+
+
+          option.textContent =
+            `${label} (${code})`;
+
+
+          select.appendChild(
+            option
+          );
+
+        });
 
 
       if (
+        languages.includes(current)
+      ) {
+
+        select.value = current;
+
+      } else if (
         languages.includes("en-US")
       ) {
 
         select.value = "en-US";
 
-      } else {
-
-        select.selectedIndex = 0;
-
       }
-
-
-      status.textContent =
-        `${languages.length} TMDB languages loaded.`;
 
     } catch (error) {
 
@@ -892,302 +1025,207 @@ Rating: {RATING}
         error
       );
 
-      select.innerHTML = `
+      $("language").innerHTML = `
         <option value="en-US">
-          English (US)
+          English (United States)
         </option>
       `;
 
-      status.textContent =
-        "Language list gagal dimuat: " +
-        error.message;
-
-    }
-
-  }
-
-
-  function getLanguageLabel(code) {
-
-    try {
-
-      const parts =
-        code.split("-");
-
-      const languageCode =
-        parts[0];
-
-      const regionCode =
-        parts[1];
-
-      const display =
-        new Intl.DisplayNames(
-          ["en"],
-          {
-            type: "language"
-          }
-        );
-
-      let label =
-        display.of(languageCode) ||
-        code;
-
-
-      if (regionCode) {
-
-        try {
-
-          const regionDisplay =
-            new Intl.DisplayNames(
-              ["en"],
-              {
-                type: "region"
-              }
-            );
-
-          const region =
-            regionDisplay.of(
-              regionCode
-            );
-
-          if (region) {
-
-            label +=
-              ` (${region})`;
-
-          }
-
-        } catch (_) {}
-
-      }
-
-
-      return `${label} — ${code}`;
-
-    } catch (_) {
-
-      return code;
-
     }
 
   }
 
 
   /* =========================================================
-     TITLE TEMPLATES
+     ID PARSER
   ========================================================= */
 
-  function renderTitleTemplates() {
-
-    const container =
-      $("titleTemplates");
-
-    container.innerHTML = "";
-
-
-    titleTemplates.forEach(
-      (template, index) => {
-
-        const row =
-          document.createElement("div");
-
-        row.className =
-          "template-row";
-
-
-        const input =
-          document.createElement("input");
-
-        input.type =
-          "text";
-
-        input.value =
-          template;
-
-        input.dataset.index =
-          index;
-
-
-        input.addEventListener(
-          "input",
-          event => {
-
-            titleTemplates[index] =
-              event.target.value;
-
-          }
-        );
-
-
-        const remove =
-          document.createElement("button");
-
-        remove.type =
-          "button";
-
-        remove.textContent =
-          "Remove";
-
-        remove.className =
-          "btn-danger";
-
-
-        remove.addEventListener(
-          "click",
-          () => {
-
-            titleTemplates.splice(
-              index,
-              1
-            );
-
-            renderTitleTemplates();
-
-          }
-        );
-
-
-        row.appendChild(input);
-
-        row.appendChild(remove);
-
-        container.appendChild(row);
-
-      }
-    );
-
-  }
-
-
-  function addTitleTemplate() {
-
-    titleTemplates.push(
-      "WATCH {TITLE} {YEAR} FULL MOVIE ONLINE"
-    );
-
-    renderTitleTemplates();
-
-  }
-
-
-  /* =========================================================
-     INPUT PARSER
-  ========================================================= */
-
-  function getTMDBIds() {
+  function parseIds() {
 
     const raw =
-      $("tmdbIds").value || "";
+      $("tmdbIds").value.trim();
 
+
+    if (!raw) {
+
+      return [];
+
+    }
+
+
+    return [
+      ...new Set(
+        raw
+          .split(/[\s,;]+/)
+          .map(x => x.trim())
+          .filter(Boolean)
+      )
+    ];
+
+  }
+
+
+  function updateIdCounter() {
 
     const ids =
-      raw
-        .split(/[\s,]+/)
-        .map(x => x.trim())
-        .filter(Boolean);
+      parseIds();
 
 
-    const unique = [];
-
-    const seen =
-      new Set();
+    $("idCounter").textContent =
+      ids.length;
 
 
-    for (const id of ids) {
+    if (ids.length > 100) {
 
-      if (
-        !/^\d+$/.test(id)
-      ) {
+      $("idCounter").style.color =
+        "#f87171";
 
-        continue;
+    } else {
 
-      }
-
-
-      if (
-        !seen.has(id)
-      ) {
-
-        seen.add(id);
-
-        unique.push(id);
-
-      }
+      $("idCounter").style.color =
+        "";
 
     }
-
-
-    return unique.slice(
-      0,
-      100
-    );
 
   }
 
 
   /* =========================================================
-     TMDB FETCH
+     TEMPLATE HELPERS
   ========================================================= */
 
-  async function getMovie(
-    id,
-    language
+  function replaceVariables(
+    template,
+    movie
   ) {
 
-    const url =
-      `/api/movie?id=${encodeURIComponent(id)}` +
-      `&language=${encodeURIComponent(language)}`;
-
-
-    const response =
-      await fetch(
-        url,
-        {
-          cache: "no-store"
-        }
+    return String(template || "")
+      .replaceAll(
+        "{TITLE}",
+        movie.title || ""
+      )
+      .replaceAll(
+        "{YEAR}",
+        movie.year || ""
+      )
+      .replaceAll(
+        "{ID}",
+        movie.id || ""
+      )
+      .replaceAll(
+        "{ORIGINAL_TITLE}",
+        movie.originalTitle || ""
+      )
+      .replaceAll(
+        "{OVERVIEW}",
+        movie.overview || ""
+      )
+      .replaceAll(
+        "{GENRES}",
+        movie.genres || ""
+      )
+      .replaceAll(
+        "{DIRECTOR}",
+        movie.director || ""
+      )
+      .replaceAll(
+        "{RATING}",
+        movie.rating ?? ""
+      )
+      .replaceAll(
+        "{RUNTIME}",
+        movie.runtime ?? ""
+      )
+      .replaceAll(
+        "{CAST}",
+        movie.cast || ""
       );
 
-
-    const raw =
-      await response.text();
+  }
 
 
-    let data;
+  function escapeHtml(value) {
 
-    try {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
 
-      data =
-        JSON.parse(raw);
+  }
 
-    } catch (_) {
 
-      throw new Error(
-        `TMDB response bukan JSON: ${raw.substring(0, 300)}`
-      );
+  function escapeAttribute(value) {
 
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+
+  }
+
+
+  /* =========================================================
+     RANDOM TITLE
+  ========================================================= */
+
+  function randomItem(array) {
+
+    if (!array.length) {
+      return "";
     }
 
+    return array[
+      Math.floor(
+        Math.random() * array.length
+      )
+    ];
 
-    if (!response.ok) {
+  }
 
-      throw new Error(
-        data?.error ||
-        `TMDB HTTP ${response.status}`
+
+  /* =========================================================
+     CTA
+  ========================================================= */
+
+  function buildCTA(
+    template,
+    text,
+    url,
+    movieId
+  ) {
+
+    const safeText =
+      escapeHtml(
+        text || ""
       );
 
-    }
 
-
-    if (!data?.id) {
-
-      throw new Error(
-        "TMDB metadata kosong."
+    const safeUrl =
+      escapeAttribute(
+        String(url || "")
+          .replaceAll(
+            "{ID}",
+            movieId
+          )
       );
 
-    }
 
-
-    return data;
+    return String(template || "")
+      .replaceAll(
+        "{CTA_URL}",
+        safeUrl
+      )
+      .replaceAll(
+        "{CTA_TEXT}",
+        safeText
+      )
+      .replaceAll(
+        "{ID}",
+        movieId
+      );
 
   }
 
@@ -1199,7 +1237,8 @@ Rating: {RATING}
   async function generateTTS(
     text,
     voiceId,
-    modelId
+    modelId,
+    outputFormat
   ) {
 
     const response =
@@ -1221,189 +1260,238 @@ Rating: {RATING}
 
             modelId,
 
-            // FIXED LOWEST MP3
-            outputFormat:
-              "mp3_22050_32"
+            outputFormat
 
           })
+
         }
       );
-
-
-    const contentType =
-      response.headers.get(
-        "content-type"
-      ) || "";
 
 
     if (!response.ok) {
 
       let message =
-        `TTS HTTP ${response.status}`;
+        `TTS failed (${response.status})`;
 
 
-      if (
-        contentType.includes(
-          "application/json"
-        )
-      ) {
+      try {
 
-        try {
+        const data =
+          await response.json();
 
-          const data =
-            await response.json();
+        message =
+          data?.error ||
+          message;
 
-          message =
-            data?.error ||
-            message;
-
-        } catch (_) {}
-
-      } else {
-
-        try {
-
-          const text =
-            await response.text();
-
-          if (text) {
-
-            message +=
-              ` — ${text.substring(0, 500)}`;
-
-          }
-
-        } catch (_) {}
-
-      }
+      } catch (_) {}
 
 
-      throw new Error(
-        message
-      );
+      throw new Error(message);
 
     }
 
 
-    const blob =
-      await response.blob();
-
-
-    if (
-      !blob ||
-      blob.size === 0
-    ) {
-
-      throw new Error(
-        "ElevenLabs mengembalikan MP3 kosong."
-      );
-
-    }
-
-
-    return blob;
+    return await response.arrayBuffer();
 
   }
 
 
   /* =========================================================
-     VARIABLES
+     TMDB
   ========================================================= */
 
-  function replaceVariables(
-    template,
-    movie,
-    extra = {}
+  async function fetchMovie(
+    id,
+    language
   ) {
 
-    const values = {
-
-      TITLE:
-        movie.title || "",
-
-      YEAR:
-        movie.year || "",
-
-      ID:
-        movie.id || "",
-
-      GENRE:
-        movie.genres || "",
-
-      DIRECTOR:
-        movie.director || "",
-
-      RATING:
-        movie.rating ??
-        "",
-
-      OVERVIEW:
-        movie.overview || "",
-
-      CTA_URL:
-        extra.ctaUrl || "",
-
-      CTA1:
-        extra.cta1 || "",
-
-      CTA2:
-        extra.cta2 || "",
-
-      CTA_TEXT:
-        extra.ctaText || ""
-
-    };
-
-
-    return String(template || "")
-      .replace(
-        /\{([A-Z0-9_]+)\}/g,
-        (match, key) => {
-
-          return Object.prototype
-            .hasOwnProperty
-            .call(values, key)
-
-            ? String(values[key])
-
-            : match;
-
-        }
+    const response =
+      await fetch(
+        `/api/movie?id=${encodeURIComponent(id)}&language=${encodeURIComponent(language)}`
       );
 
-  }
+
+    const data =
+      await response.json();
 
 
-  /* =========================================================
-     RANDOM TITLE
-  ========================================================= */
-
-  function getRandomTitleTemplate() {
-
-    if (
-      !titleTemplates.length
-    ) {
+    if (!response.ok) {
 
       throw new Error(
-        "Minimal harus ada 1 title template."
+        data?.error ||
+        `TMDB error (${response.status})`
       );
 
     }
 
 
-    const index =
-      Math.floor(
-        Math.random() *
-        titleTemplates.length
+    return data;
+
+  }
+
+
+  /* =========================================================
+     CREATE EPISODE
+  ========================================================= */
+
+  async function generateEpisode(
+    movie,
+    settings,
+    index,
+    total
+  ) {
+
+    const titleTemplate =
+      randomItem(
+        settings.titleTemplates
+      );
+
+
+    const finalTitle =
+      replaceVariables(
+        titleTemplate,
+        movie
+      );
+
+
+    const descriptionBase =
+      replaceVariables(
+        settings.descriptionTemplate,
+        movie
+      );
+
+
+    const cta1 =
+      buildCTA(
+        settings.cta1Template,
+        settings.cta1Text,
+        settings.cta1Url,
+        movie.id
+      );
+
+
+    const cta2 =
+      buildCTA(
+        settings.cta2Template,
+        settings.cta2Text,
+        settings.cta2Url,
+        movie.id
+      );
+
+
+    const description =
+      [
+        descriptionBase,
+        "",
+        cta1,
+        cta2
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+
+    const narration =
+      replaceVariables(
+        settings.ttsTemplate,
+        movie
+      );
+
+
+    updateStatus(
+      `[${index}/${total}] 🎙️ Generating TTS: ${movie.title}`
+    );
+
+
+    const audio =
+      await generateTTS(
+        narration,
+        settings.voiceId,
+        settings.modelId,
+        settings.outputFormat
+      );
+
+
+    const filename =
+      createAudioFilename(
+        movie,
+        index
       );
 
 
     return {
 
-      index,
+      id: movie.id,
 
-      template:
-        titleTemplates[index]
+      title: finalTitle,
+
+      original_title:
+        movie.originalTitle || "",
+
+      year:
+        movie.year || "",
+
+      description,
+
+      overview:
+        movie.overview || "",
+
+      rating:
+        movie.rating ?? null,
+
+      genres:
+        movie.genres || "",
+
+      director:
+        movie.director || "",
+
+      runtime:
+        movie.runtime || null,
+
+      cast:
+        movie.cast || "",
+
+      poster:
+        movie.poster || null,
+
+      backdrop:
+        movie.backdrop || null,
+
+      language:
+        movie.language || settings.language,
+
+      narration,
+
+      audio,
+
+      audio_filename:
+        filename,
+
+      output_format:
+        settings.outputFormat,
+
+      tts_model:
+        settings.modelId,
+
+      voice_id:
+        settings.voiceId,
+
+      cta1_text:
+        settings.cta1Text,
+
+      cta2_text:
+        settings.cta2Text,
+
+      cta1_template:
+        settings.cta1Template,
+
+      cta2_template:
+        settings.cta2Template,
+
+      cta1_url:
+        settings.cta1Url,
+
+      cta2_url:
+        settings.cta2Url
 
     };
 
@@ -1411,915 +1499,65 @@ Rating: {RATING}
 
 
   /* =========================================================
-     CTA
+     AUDIO FILENAME
   ========================================================= */
 
-  function buildCTAUrl(
-    baseUrl,
-    id
-  ) {
+  function slugify(text) {
 
-    const base =
-      String(baseUrl || "")
-        .trim()
-        .replace(
-          /\/+$/,
-          ""
-        );
-
-
-    if (!base) {
-
-      return "";
-
-    }
-
-
-    return `${base}/${id}`;
-
-  }
-
-
-  function buildCTA(
-    template,
-    text,
-    url,
-    id
-  ) {
-
-    return String(template || "")
-      .replace(
-        /\{CTA_URL\}/g,
-        escapeAttribute(url)
-      )
-      .replace(
-        /\{CTA_TEXT\}/g,
-        escapeHtml(text)
-      )
-      .replace(
-        /\{ID\}/g,
-        String(id)
-      );
-
-  }
-
-
-  /* =========================================================
-     FILE NAME
-  ========================================================= */
-
-  function slugify(
-    value,
-    fallback
-  ) {
-
-    let slug =
-      String(value || "")
+    let value =
+      String(text || "")
         .normalize("NFKD")
         .replace(
           /[\u0300-\u036f]/g,
           ""
         )
-        .replace(
-          /[^a-zA-Z0-9]+/g,
-          "-"
-        )
-        .replace(
-          /^-+|-+$/g,
-          ""
-        )
-        .toLowerCase();
-
-
-    if (!slug) {
-
-      slug =
-        fallback ||
-        "movie";
-
-    }
-
-
-    return slug;
-
-  }
-
-
-  function buildAudioFilename(
-    episodeNumber,
-    movie
-  ) {
-
-    const slug =
-      slugify(
-        movie.title,
-        `movie-${movie.id}`
-      );
-
-
-    return (
-      String(episodeNumber)
-        .padStart(3, "0") +
-      "-" +
-      slug +
-      "-" +
-      movie.id +
-      ".mp3"
-    );
-
-  }
-
-
-  /* =========================================================
-     GUID
-  ========================================================= */
-
-  function buildGuid(
-    movieId,
-    language
-  ) {
-
-    return (
-      `movie-${movieId}-` +
-      String(language)
         .toLowerCase()
         .replace(
           /[^a-z0-9]+/g,
           "-"
         )
-    );
+        .replace(
+          /^-+|-+$/g,
+          "");
+
+
+    if (!value) {
+
+      value = "movie";
+
+    }
+
+
+    return value;
 
   }
 
 
-  /* =========================================================
-     JSON
-  ========================================================= */
-
-  function prettyJSON(
-    data
+  function createAudioFilename(
+    movie,
+    index
   ) {
 
-    return JSON.stringify(
-      data,
-      null,
-      2
-    );
+    const slug =
+      slugify(
+        movie.title ||
+        movie.originalTitle ||
+        `movie-${movie.id}`
+      );
+
+
+    return `${String(index).padStart(3, "0")}-${slug}-${movie.id}.mp3`;
 
   }
 
 
   /* =========================================================
-     GENERATE ONE EPISODE
-  ========================================================= */
-
-  async function generateEpisode(
-    id,
-    episodeNumber,
-    settings
-  ) {
-
-    const resultCard =
-      createResultCard(
-        episodeNumber,
-        id
-      );
-
-
-    try {
-
-      updateResult(
-        resultCard,
-        "working",
-        "Loading TMDB metadata..."
-      );
-
-
-      /* -------------------------
-         STEP 1 — TMDB
-      ------------------------- */
-
-      const movie =
-        await getMovie(
-          id,
-          settings.language
-        );
-
-
-      updateResult(
-        resultCard,
-        "working",
-        `TMDB loaded: ${movie.title}`
-      );
-
-
-      /* -------------------------
-         STEP 2 — TITLE
-      ------------------------- */
-
-      const titleInfo =
-        getRandomTitleTemplate();
-
-
-      const generatedTitle =
-        replaceVariables(
-          titleInfo.template,
-          movie
-        );
-
-
-      /* -------------------------
-         STEP 3 — CTA
-      ------------------------- */
-
-      const ctaUrl =
-        buildCTAUrl(
-          settings.ctaBaseUrl,
-          movie.id
-        );
-
-
-      const cta1 =
-        buildCTA(
-          settings.cta1Template,
-          settings.cta1Text,
-          ctaUrl,
-          movie.id
-        );
-
-
-      const cta2 =
-        buildCTA(
-          settings.cta2Template,
-          settings.cta2Text,
-          ctaUrl,
-          movie.id
-        );
-
-
-      /* -------------------------
-         STEP 4 — DESCRIPTION
-      ------------------------- */
-
-      const description =
-        replaceVariables(
-          settings.descriptionTemplate,
-          movie,
-          {
-            ctaUrl,
-            cta1,
-            cta2
-          }
-        );
-
-
-      /* -------------------------
-         STEP 5 — NARRATION
-      ------------------------- */
-
-      const narration =
-        replaceVariables(
-          settings.narrationTemplate,
-          movie
-        );
-
-
-      if (!narration.trim()) {
-
-        throw new Error(
-          "Narration kosong."
-        );
-
-      }
-
-
-      updateResult(
-        resultCard,
-        "working",
-        "Generating MP3 with ElevenLabs..."
-      );
-
-
-      /* -------------------------
-         STEP 6 — TTS
-      ------------------------- */
-
-      const audioBlob =
-        await generateTTS(
-          narration,
-          settings.voiceId,
-          settings.modelId
-        );
-
-
-      updateResult(
-        resultCard,
-        "working",
-        `MP3 generated: ${formatBytes(audioBlob.size)}`
-      );
-
-
-      /* -------------------------
-         STEP 7 — FILE
-      ------------------------- */
-
-      const audioFilename =
-        buildAudioFilename(
-          episodeNumber,
-          movie
-        );
-
-
-      const guid =
-        buildGuid(
-          movie.id,
-          settings.language
-        );
-
-
-      /* -------------------------
-         METADATA
-      ------------------------- */
-
-      const metadata = {
-
-        episode_number:
-          episodeNumber,
-
-        tmdb_id:
-          movie.id,
-
-        tmdb_title:
-          movie.title || "",
-
-        original_title:
-          movie.originalTitle || "",
-
-        original_language:
-          movie.originalLanguage || "",
-
-        language:
-          settings.language,
-
-        year:
-          movie.year || "",
-
-        rating:
-          movie.rating ?? null,
-
-        genres:
-          movie.genres || "",
-
-        director:
-          movie.director || "",
-
-        runtime:
-          movie.runtime || null,
-
-        overview:
-          movie.overview || "",
-
-        cast:
-          movie.cast || "",
-
-        poster:
-          movie.poster || null,
-
-        backdrop:
-          movie.backdrop || null,
-
-        title:
-          generatedTitle,
-
-        description:
-          description,
-
-        narration:
-          narration,
-
-        cta_url:
-          ctaUrl,
-
-        cta1:
-          cta1,
-
-        cta2:
-          cta2,
-
-        template_number:
-          titleInfo.index + 1,
-
-        template:
-          titleInfo.template,
-
-        guid:
-          guid,
-
-        audio_filename:
-          audioFilename,
-
-        audio_mime:
-          "audio/mpeg",
-
-        audio_size:
-          audioBlob.size,
-
-        tts_model:
-          settings.modelId,
-
-        output_format:
-          "mp3_22050_32"
-
-      };
-
-
-      updateResult(
-        resultCard,
-        "success",
-        `${generatedTitle} — ${formatBytes(audioBlob.size)}`
-      );
-
-
-      return {
-
-        success: true,
-
-        id,
-
-        movie,
-
-        title:
-          generatedTitle,
-
-        description,
-
-        narration,
-
-        ctaUrl,
-
-        cta1,
-
-        cta2,
-
-        guid,
-
-        audioBlob,
-
-        audioFilename,
-
-        metadata,
-
-        card:
-          resultCard
-
-      };
-
-    } catch (error) {
-
-      console.error(
-        `Episode ${id} failed:`,
-        error
-      );
-
-
-      updateResult(
-        resultCard,
-        "error",
-        error?.message ||
-        "Unknown error"
-      );
-
-
-      return {
-
-        success: false,
-
-        id,
-
-        error:
-          error?.message ||
-          "Unknown error",
-
-        card:
-          resultCard
-
-      };
-
-    }
-
-  }
-
-
-  /* =========================================================
-     GENERATE ALL
-  ========================================================= */
-
-  async function generateAll() {
-
-    if (isGenerating) {
-
-      return;
-
-    }
-
-
-    const ids =
-      getTMDBIds();
-
-
-    if (!ids.length) {
-
-      alert(
-        "Masukkan minimal 1 TMDB ID."
-      );
-
-      return;
-
-    }
-
-
-    if (
-      typeof JSZip ===
-      "undefined"
-    ) {
-
-      alert(
-        "JSZip gagal dimuat. Refresh halaman lalu coba lagi."
-      );
-
-      return;
-
-    }
-
-
-    const voiceId =
-      $("voiceId")
-        .value
-        .trim();
-
-
-    if (!voiceId) {
-
-      alert(
-        "Masukkan ElevenLabs Voice ID."
-      );
-
-      $("voiceId").focus();
-
-      return;
-
-    }
-
-
-    if (
-      !titleTemplates.length
-    ) {
-
-      alert(
-        "Minimal harus ada 1 Title Template."
-      );
-
-      return;
-
-    }
-
-
-    const language =
-      $("language").value ||
-      "en-US";
-
-
-    const settings = {
-
-      language,
-
-      voiceId,
-
-      modelId:
-        $("modelId").value ||
-        "eleven_multilingual_v2",
-
-      ctaBaseUrl:
-        $("ctaBaseUrl")
-          .value
-          .trim(),
-
-      cta1Template:
-        $("cta1Template")
-          .value,
-
-      cta2Template:
-        $("cta2Template")
-          .value,
-
-      cta1Text:
-        "Watch Now",
-
-      cta2Text:
-        "More Details",
-
-      descriptionTemplate:
-        $("descriptionTemplate")
-          .value,
-
-      narrationTemplate:
-        $("narrationTemplate")
-          .value
-
-    };
-
-
-    isGenerating =
-      true;
-
-
-    $("generateBtn")
-      .disabled = true;
-
-
-    $("results")
-      .innerHTML = "";
-
-
-    $("downloadArea")
-      .innerHTML = "";
-
-
-    generatedEpisodes = [];
-
-
-    showStatus();
-
-
-    const total =
-      ids.length;
-
-
-    $("statTotal")
-      .textContent =
-      total;
-
-
-    $("statSuccess")
-      .textContent =
-      "0";
-
-
-    $("statFailed")
-      .textContent =
-      "0";
-
-
-    $("statSize")
-      .textContent =
-      "0 MB";
-
-
-    let successCount =
-      0;
-
-    let failedCount =
-      0;
-
-    let totalBytes =
-      0;
-
-
-    for (
-      let i = 0;
-      i < ids.length;
-      i++
-    ) {
-
-      const id =
-        ids[i];
-
-
-      setStatus(
-        `Processing ${i + 1}/${total}: TMDB ${id}`
-      );
-
-
-      const result =
-        await generateEpisode(
-          id,
-          i + 1,
-          settings
-        );
-
-
-      if (
-        result.success
-      ) {
-
-        generatedEpisodes.push(
-          result
-        );
-
-
-        successCount++;
-
-        totalBytes +=
-          result.audioBlob.size;
-
-      } else {
-
-        failedCount++;
-
-      }
-
-
-      $("statSuccess")
-        .textContent =
-        successCount;
-
-
-      $("statFailed")
-        .textContent =
-        failedCount;
-
-
-      $("statSize")
-        .textContent =
-        formatBytes(
-          totalBytes
-        );
-
-
-      const progress =
-        ((i + 1) / total) *
-        100;
-
-
-      $("progressBar")
-        .style.width =
-        `${progress}%`;
-
-    }
-
-
-    setStatus(
-      `Generation selesai — ${successCount} berhasil, ${failedCount} gagal.`
-    );
-
-
-    if (
-      generatedEpisodes.length
-    ) {
-
-      try {
-
-        setStatus(
-          "Creating ZIP package..."
-        );
-
-
-        const zip =
-          await createZipPackage(
-            generatedEpisodes,
-            settings,
-            ids.length
-          );
-
-
-        const blob =
-          await zip.generateAsync(
-            {
-              type: "blob",
-              compression:
-                "DEFLATE",
-              compressionOptions:
-                {
-                  level: 6
-                }
-            },
-            metadata => {
-
-              const percent =
-                Math.round(
-                  metadata.percent
-                );
-
-              setStatus(
-                `Creating ZIP package... ${percent}%`
-              );
-
-            }
-          );
-
-
-        const url =
-          URL.createObjectURL(
-            blob
-          );
-
-
-        const filename =
-          `podcast-package-${Date.now()}.zip`;
-
-
-        $("downloadArea")
-          .innerHTML = `
-            <button
-              type="button"
-              class="btn-success"
-              id="downloadZipBtn"
-            >
-              Download ZIP
-            </button>
-
-            <div class="hint">
-              ${filename}
-              — ${formatBytes(blob.size)}
-            </div>
-          `;
-
-
-        $("downloadZipBtn")
-          .addEventListener(
-            "click",
-            () => {
-
-              const a =
-                document.createElement(
-                  "a"
-                );
-
-              a.href =
-                url;
-
-              a.download =
-                filename;
-
-              document.body
-                .appendChild(a);
-
-              a.click();
-
-              a.remove();
-
-            }
-          );
-
-
-        setStatus(
-          `DONE — ${successCount} MP3 siap untuk package R2/RSS.`
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "ZIP error:",
-          error
-        );
-
-
-        $("downloadArea")
-          .innerHTML = `
-            <div class="error-text">
-              ZIP ERROR:
-              ${escapeHtml(
-                error?.message ||
-                "Unknown ZIP error"
-              )}
-            </div>
-          `;
-
-
-        setStatus(
-          "MP3 berhasil dibuat, tetapi ZIP gagal dibuat."
-        );
-
-      }
-
-    } else {
-
-      setStatus(
-        "Tidak ada MP3 yang berhasil dibuat."
-      );
-
-    }
-
-
-    isGenerating =
-      false;
-
-
-    $("generateBtn")
-      .disabled = false;
-
-  }
-
-
-  /* =========================================================
-     ZIP PACKAGE
+     ZIP
   ========================================================= */
 
   async function createZipPackage(
     episodes,
-    settings,
-    totalRequested
+    settings
   ) {
 
     const zip =
@@ -2327,127 +1565,204 @@ Rating: {RATING}
 
 
     const episodesFolder =
-      zip.folder(
-        "episodes"
-      );
+      zip.folder("episodes");
 
 
     const metadataFolder =
-      zip.folder(
-        "metadata"
-      );
+      zip.folder("metadata");
 
 
-    for (
-      const episode of episodes
-    ) {
+    /*
+      Individual MP3 + metadata
+    */
 
-      episodesFolder.file(
-        episode.audioFilename,
-        episode.audioBlob
-      );
+    episodes.forEach(
+      episode => {
+
+        episodesFolder.file(
+          episode.audio_filename,
+          episode.audio
+        );
 
 
-      metadataFolder.file(
-        `metadata-${String(
-          episode.metadata.episode_number
-        ).padStart(3, "0")}-${episode.metadata.tmdb_id}.json`,
-        prettyJSON(
-          episode.metadata
-        )
-      );
+        const metadata = {
 
-    }
+          id:
+            episode.id,
 
+          title:
+            episode.title,
+
+          original_title:
+            episode.original_title,
+
+          year:
+            episode.year,
+
+          description:
+            episode.description,
+
+          overview:
+            episode.overview,
+
+          rating:
+            episode.rating,
+
+          genres:
+            episode.genres,
+
+          director:
+            episode.director,
+
+          runtime:
+            episode.runtime,
+
+          cast:
+            episode.cast,
+
+          poster:
+            episode.poster,
+
+          backdrop:
+            episode.backdrop,
+
+          language:
+            episode.language,
+
+          narration:
+            episode.narration,
+
+          audio_filename:
+            episode.audio_filename,
+
+          output_format:
+            episode.output_format,
+
+          tts_model:
+            episode.tts_model,
+
+          voice_id:
+            episode.voice_id,
+
+          cta1_text:
+            episode.cta1_text,
+
+          cta2_text:
+            episode.cta2_text,
+
+          cta1_template:
+            episode.cta1_template,
+
+          cta2_template:
+            episode.cta2_template,
+
+          cta1_url:
+            episode.cta1_url,
+
+          cta2_url:
+            episode.cta2_url
+
+        };
+
+
+        metadataFolder.file(
+          `${episode.audio_filename.replace(/\.mp3$/i, "")}.json`,
+          JSON.stringify(
+            metadata,
+            null,
+            2
+          )
+        );
+
+      }
+    );
+
+
+    /*
+      Podcast data
+    */
 
     const podcastData = {
 
       generated_at:
-        new Date()
-          .toISOString(),
+        new Date().toISOString(),
+
+      total_episodes:
+        episodes.length,
 
       language:
         settings.language,
 
-      total_requested:
-        totalRequested,
-
-      total_success:
-        episodes.length,
-
-      total_failed:
-        totalRequested -
-        episodes.length,
-
       tts: {
 
-        model:
+        voice_id:
+          settings.voiceId,
+
+        model_id:
           settings.modelId,
 
         output_format:
-          "mp3_22050_32"
+          settings.outputFormat
+
+      },
+
+      title_templates:
+        settings.titleTemplates,
+
+      description_template:
+        settings.descriptionTemplate,
+
+      cta: {
+
+        cta1: {
+
+          text:
+            settings.cta1Text,
+
+          template:
+            settings.cta1Template,
+
+          url:
+            settings.cta1Url
+
+        },
+
+        cta2: {
+
+          text:
+            settings.cta2Text,
+
+          template:
+            settings.cta2Template,
+
+          url:
+            settings.cta2Url
+
+        }
 
       },
 
       episodes:
         episodes.map(
-          episode =>
-            episode.metadata
-        )
-
-    };
-
-
-    zip.file(
-      "podcast-data.json",
-      prettyJSON(
-        podcastData
-      )
-    );
-
-
-    const rssEpisodes = {
-
-      generated_at:
-        new Date()
-          .toISOString(),
-
-      language:
-        settings.language,
-
-      episodes:
-        episodes.map(
           episode => ({
 
-            guid:
-              episode.metadata.guid,
+            id:
+              episode.id,
 
             title:
-              episode.metadata.title,
-
-            description:
-              episode.metadata.description,
-
-            language:
-              episode.metadata.language,
-
-            tmdb_id:
-              episode.metadata.tmdb_id,
-
-            audio_filename:
-              episode.metadata.audio_filename,
-
-            audio_mime:
-              episode.metadata.audio_mime,
-
-            audio_size:
-              episode.metadata.audio_size,
+              episode.title,
 
             year:
-              episode.metadata.year,
+              episode.year,
 
-            poster:
-              episode.metadata.poster
+            audio:
+              episode.audio_filename,
+
+            output_format:
+              episode.output_format,
+
+            description:
+              episode.description
 
           })
         )
@@ -2456,253 +1771,663 @@ Rating: {RATING}
 
 
     zip.file(
-      "rss-episodes.json",
-      prettyJSON(
-        rssEpisodes
+      "podcast-data.json",
+      JSON.stringify(
+        podcastData,
+        null,
+        2
       )
     );
 
 
+    /*
+      RSS episode data
+    */
+
+    const rssEpisodes =
+      episodes.map(
+        episode => ({
+
+          id:
+            episode.id,
+
+          title:
+            episode.title,
+
+          year:
+            episode.year,
+
+          description:
+            episode.description,
+
+          audio_filename:
+            episode.audio_filename,
+
+          output_format:
+            episode.output_format,
+
+          narration:
+            episode.narration,
+
+          cta1: {
+
+            text:
+              episode.cta1_text,
+
+            template:
+              episode.cta1_template,
+
+            url:
+              episode.cta1_url
+
+          },
+
+          cta2: {
+
+            text:
+              episode.cta2_text,
+
+            template:
+              episode.cta2_template,
+
+            url:
+              episode.cta2_url
+
+          }
+
+        })
+      );
+
+
+    zip.file(
+      "rss-episodes.json",
+      JSON.stringify(
+        rssEpisodes,
+        null,
+        2
+      )
+    );
+
+
+    /*
+      README
+    */
+
     const readme = `
-MOVIE TTS PODCAST PACKAGE V2.5.1
-================================
+MOVIE PODCAST PACKAGE
+=====================
 
 Generated:
 ${new Date().toISOString()}
 
-Language:
-${settings.language}
-
-Total requested:
-${totalRequested}
-
-Successful:
+Total episodes:
 ${episodes.length}
 
-Failed:
-${totalRequested - episodes.length}
+TMDB language:
+${settings.language}
 
-TTS Model:
+ElevenLabs model:
 ${settings.modelId}
 
-Audio:
-MP3 22.05 kHz / 32 kbps
+ElevenLabs voice:
+${settings.voiceId}
 
-FILES
------
+MP3 output format:
+${settings.outputFormat}
+
+
+FOLDER STRUCTURE
+================
 
 episodes/
-    Contains generated MP3 files.
+  Contains generated MP3 files.
 
 metadata/
-    Individual JSON metadata for each episode.
+  Contains individual JSON metadata files.
 
 podcast-data.json
-    Complete podcast generation data.
+  Contains complete podcast configuration and episode data.
 
 rss-episodes.json
-    Simplified episode data prepared for RSS generation.
+  Contains episode information prepared for RSS processing.
 
-NEXT STEP
----------
 
-Upload the files inside "episodes/"
-to Cloudflare R2.
+TITLE TEMPLATES
+===============
 
-Then use rss-episodes.json
-to generate the podcast RSS feed.
+${settings.titleTemplates
+  .map(
+    (x, i) =>
+      `${i + 1}. ${x}`
+  )
+  .join("\n")}
 
-Each episode contains:
 
-- title
-- description
-- guid
-- audio filename
-- audio MIME type
-- audio size
-- TMDB ID
-- language
-- poster
-- year
+DESCRIPTION TEMPLATE
+====================
 
-IMPORTANT
----------
+${settings.descriptionTemplate}
 
-The final RSS feed should replace
-the relative audio_filename with
-your public R2 audio URL.
 
-Example:
+CTA 1
+=====
 
-episodes/001-movie-550.mp3
+Text:
+${settings.cta1Text}
 
-becomes:
+Template:
+${settings.cta1Template}
 
-https://your-r2-public-domain.com/episodes/001-movie-550.mp3
-    `.trim();
+URL:
+${settings.cta1Url}
+
+
+CTA 2
+=====
+
+Text:
+${settings.cta2Text}
+
+Template:
+${settings.cta2Template}
+
+URL:
+${settings.cta2Url}
+
+
+TTS TEMPLATE
+============
+
+${settings.ttsTemplate}
+
+
+NOTES
+=====
+
+Each movie receives one randomly selected title template.
+
+Each episode has its own generated MP3 file.
+
+The selected MP3 output format is:
+${settings.outputFormat}
+
+CTA text and CTA HTML templates are stored in the JSON files so they can be edited or reused later.
+`;
 
 
     zip.file(
       "README.txt",
-      readme
+      readme.trim()
     );
 
 
-    return zip;
+    return await zip.generateAsync(
+      {
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: {
+          level: 6
+        }
+      },
+      metadata => {
+
+        const percent =
+          Math.round(
+            metadata.percent
+          );
+
+
+        $("progressBar").style.width =
+          `${percent}%`;
+
+
+        $("progressText").textContent =
+          `Creating ZIP: ${percent}%`;
+
+      }
+    );
 
   }
 
 
   /* =========================================================
-     RESULT CARD
+     MAIN GENERATOR
   ========================================================= */
 
-  function createResultCard(
-    episodeNumber,
-    id
-  ) {
+  async function generateAll() {
 
-    const card =
-      document.createElement(
-        "div"
+    const button =
+      $("generateBtn");
+
+
+    button.disabled = true;
+
+
+    generatedMovies = [];
+
+
+    $("movieList").innerHTML = "";
+
+    $("statusBox").textContent =
+      "Starting...";
+
+
+    $("progressBar").style.width =
+      "0%";
+
+
+    try {
+
+      const ids =
+        parseIds();
+
+
+      if (!ids.length) {
+
+        throw new Error(
+          "Please enter at least one TMDB ID."
+        );
+
+      }
+
+
+      if (ids.length > 100) {
+
+        throw new Error(
+          "Maximum 100 TMDB IDs."
+        );
+
+      }
+
+
+      const voiceId =
+        $("voiceId")
+          .value
+          .trim();
+
+
+      if (!voiceId) {
+
+        throw new Error(
+          "ElevenLabs Voice ID is required."
+        );
+
+      }
+
+
+      const titleTemplates =
+        getTitleTemplates();
+
+
+      if (!titleTemplates.length) {
+
+        throw new Error(
+          "Please add at least one title template."
+        );
+
+      }
+
+
+      const settings = {
+
+        language:
+          $("language").value,
+
+        voiceId,
+
+        modelId:
+          $("modelId").value,
+
+        outputFormat:
+          $("outputFormat").value ||
+          "mp3_22050_32",
+
+        titleTemplates,
+
+        descriptionTemplate:
+          $("descriptionTemplate").value.trim(),
+
+        ttsTemplate:
+          $("ttsTemplate").value.trim(),
+
+        cta1Text:
+          $("cta1Text").value.trim(),
+
+        cta2Text:
+          $("cta2Text").value.trim(),
+
+        cta1Template:
+          $("cta1Template").value.trim(),
+
+        cta2Template:
+          $("cta2Template").value.trim(),
+
+        cta1Url:
+          $("cta1Url").value.trim(),
+
+        cta2Url:
+          $("cta2Url").value.trim()
+
+      };
+
+
+      $("formatPreview").value =
+        settings.outputFormat;
+
+
+      updateStatus(
+        `Found ${ids.length} TMDB ID(s).\n` +
+        `Language: ${settings.language}\n` +
+        `Model: ${settings.modelId}\n` +
+        `MP3: ${settings.outputFormat}\n`
       );
 
 
-    card.className =
-      "episode";
+      /*
+        Process each movie
+      */
+
+      for (
+        let i = 0;
+        i < ids.length;
+        i++
+      ) {
+
+        const id =
+          ids[i];
 
 
-    card.innerHTML = `
+        updateProgress(
+          i,
+          ids.length,
+          `Fetching TMDB: ${id}`
+        );
 
-      <div class="episode-head">
 
-        <div>
+        const item =
+          createMovieStatusItem(
+            id,
+            i + 1
+          );
 
-          <div class="episode-title">
-            Episode ${episodeNumber}
-            — TMDB ${escapeHtml(id)}
-          </div>
 
-          <div
-            class="episode-meta"
-            data-role="message"
-          >
-            Waiting...
-          </div>
+        try {
 
+          const movie =
+            await fetchMovie(
+              id,
+              settings.language
+            );
+
+
+          updateMovieStatus(
+            item,
+            "TMDB loaded",
+            "pending"
+          );
+
+
+          const episode =
+            await generateEpisode(
+              movie,
+              settings,
+              i + 1,
+              ids.length
+            );
+
+
+          generatedMovies.push(
+            episode
+          );
+
+
+          updateMovieStatus(
+            item,
+            "Generated",
+            "success"
+          );
+
+
+          updateStatus(
+            `[${i + 1}/${ids.length}] ✅ ${movie.title}`
+          );
+
+        } catch (error) {
+
+          updateMovieStatus(
+            item,
+            error?.message ||
+              "Generation failed.",
+            "error"
+          );
+
+
+          updateStatus(
+            `[${i + 1}/${ids.length}] ❌ ${id}: ${error?.message || "Unknown error"}`
+          );
+
+        }
+
+      }
+
+
+      /*
+        No successful episodes
+      */
+
+      if (!generatedMovies.length) {
+
+        throw new Error(
+          "No episodes were generated successfully."
+        );
+
+      }
+
+
+      updateProgress(
+        ids.length,
+        ids.length,
+        "Creating ZIP package..."
+      );
+
+
+      const zipBlob =
+        await createZipPackage(
+          generatedMovies,
+          settings
+        );
+
+
+      const filename =
+        `movie-podcast-package-${Date.now()}.zip`;
+
+
+      downloadBlob(
+        zipBlob,
+        filename
+      );
+
+
+      $("progressBar").style.width =
+        "100%";
+
+
+      $("progressText").textContent =
+        `Complete — ${generatedMovies.length}/${ids.length} episodes generated.`;
+
+
+      updateStatus(
+        `\n🎉 DONE\n\n` +
+        `Successful: ${generatedMovies.length}\n` +
+        `Failed: ${ids.length - generatedMovies.length}\n` +
+        `MP3 format: ${settings.outputFormat}\n` +
+        `ZIP: ${filename}`
+      );
+
+
+    } catch (error) {
+
+      updateStatus(
+        `\n❌ ERROR\n\n${error?.message || error}`
+      );
+
+
+      $("progressText").textContent =
+        "Generation failed.";
+
+    } finally {
+
+      button.disabled = false;
+
+    }
+
+  }
+
+
+  /* =========================================================
+     PROGRESS
+  ========================================================= */
+
+  function updateProgress(
+    current,
+    total,
+    message
+  ) {
+
+    const percent =
+      total
+        ? Math.round(
+            (current / total) * 100
+          )
+        : 0;
+
+
+    $("progressBar").style.width =
+      `${percent}%`;
+
+
+    $("progressText").textContent =
+      `${percent}% — ${message}`;
+
+  }
+
+
+  function updateStatus(
+    message
+  ) {
+
+    const box =
+      $("statusBox");
+
+
+    box.textContent +=
+      `${message}\n`;
+
+
+    box.scrollTop =
+      box.scrollHeight;
+
+  }
+
+
+  /* =========================================================
+     MOVIE STATUS UI
+  ========================================================= */
+
+  function createMovieStatusItem(
+    id,
+    number
+  ) {
+
+    const item =
+      document.createElement("div");
+
+
+    item.className =
+      "movie-item";
+
+
+    item.innerHTML = `
+
+      <div>
+
+        <div class="badge pending">
+          ${number}
         </div>
 
-        <span
-          class="badge badge-working"
-          data-role="badge"
-        >
-          WAITING
+      </div>
+
+      <div>
+
+        <div class="movie-title">
+          TMDB ID: ${escapeHtml(id)}
+        </div>
+
+        <div class="movie-meta">
+          Waiting...
+        </div>
+
+      </div>
+
+      <div>
+
+        <span class="badge pending">
+          Pending
         </span>
 
       </div>
 
-      <div
-        data-role="details"
-        class="small"
-        style="margin-top:8px;"
-      ></div>
-
     `;
 
 
-    $("results")
-      .appendChild(card);
+    $("movieList").appendChild(
+      item
+    );
 
 
-    return card;
+    return item;
 
   }
 
 
-  function updateResult(
-    card,
-    status,
-    message
+  function updateMovieStatus(
+    item,
+    message,
+    type
   ) {
 
+    const meta =
+      item.querySelector(
+        ".movie-meta"
+      );
+
+
     const badge =
-      card.querySelector(
-        '[data-role="badge"]'
+      item.querySelector(
+        ".badge:last-child"
       );
 
 
-    const messageEl =
-      card.querySelector(
-        '[data-role="message"]'
-      );
+    if (meta) {
 
-
-    const details =
-      card.querySelector(
-        '[data-role="details"]'
-      );
-
-
-    messageEl.textContent =
-      message;
-
-
-    badge.className =
-      "badge";
-
-
-    if (
-      status === "success"
-    ) {
-
-      badge.classList.add(
-        "badge-success"
-      );
-
-      badge.textContent =
-        "SUCCESS";
-
-      details.className =
-        "success-text";
-
-      details.textContent =
+      meta.textContent =
         message;
 
     }
 
-    else if (
-      status === "error"
-    ) {
 
-      badge.classList.add(
-        "badge-error"
-      );
+    if (badge) {
 
       badge.textContent =
-        "FAILED";
+        type === "success"
+          ? "Generated"
+          : type === "error"
+            ? "Error"
+            : "Processing";
 
-      details.className =
-        "error-text";
 
-      details.textContent =
-        message;
-
-    }
-
-    else {
-
-      badge.classList.add(
-        "badge-working"
-      );
-
-      badge.textContent =
-        "WORKING";
-
-      details.className =
-        "small";
-
-      details.textContent =
-        message;
+      badge.className =
+        `badge ${type}`;
 
     }
 
@@ -2710,28 +2435,42 @@ https://your-r2-public-domain.com/episodes/001-movie-550.mp3
 
 
   /* =========================================================
-     STATUS
+     DOWNLOAD
   ========================================================= */
 
-  function showStatus() {
-
-    $("statusBox")
-      .classList.add(
-        "show"
-      );
-
-  }
-
-
-  function setStatus(
-    message
+  function downloadBlob(
+    blob,
+    filename
   ) {
 
-    $("statusMain")
-      .innerHTML =
-      escapeHtml(
-        message
+    const url =
+      URL.createObjectURL(
+        blob
       );
+
+
+    const a =
+      document.createElement("a");
+
+
+    a.href =
+      url;
+
+    a.download =
+      filename;
+
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+
+    setTimeout(
+      () => URL.revokeObjectURL(url),
+      5000
+    );
 
   }
 
@@ -2740,10 +2479,12 @@ https://your-r2-public-domain.com/episodes/001-movie-550.mp3
      CLEAR
   ========================================================= */
 
-  function clearResults() {
+  function clearAll() {
 
     if (
-      isGenerating
+      !confirm(
+        "Clear all generated data and form values?"
+      )
     ) {
 
       return;
@@ -2751,139 +2492,30 @@ https://your-r2-public-domain.com/episodes/001-movie-550.mp3
     }
 
 
-    $("results")
-      .innerHTML = "";
+    $("tmdbIds").value = "";
 
+    $("voiceId").value = "";
 
-    $("downloadArea")
-      .innerHTML = "";
+    $("cta1Url").value = "";
 
+    $("cta2Url").value = "";
 
-    $("progressBar")
-      .style.width =
+    $("movieList").innerHTML = "";
+
+    $("statusBox").textContent =
+      "Ready to generate.";
+
+    $("progressBar").style.width =
       "0%";
 
+    $("progressText").textContent =
+      "Ready.";
 
-    $("statTotal")
-      .textContent =
-      "0";
+    generatedMovies = [];
 
+    initializeTitleTemplates();
 
-    $("statSuccess")
-      .textContent =
-      "0";
-
-
-    $("statFailed")
-      .textContent =
-      "0";
-
-
-    $("statSize")
-      .textContent =
-      "0 MB";
-
-
-    setStatus(
-      "Ready"
-    );
-
-
-    generatedEpisodes =
-      [];
-
-  }
-
-
-  /* =========================================================
-     HELPERS
-  ========================================================= */
-
-  function formatBytes(
-    bytes
-  ) {
-
-    if (
-      !bytes ||
-      bytes <= 0
-    ) {
-
-      return "0 B";
-
-    }
-
-
-    const units = [
-      "B",
-      "KB",
-      "MB",
-      "GB"
-    ];
-
-
-    const index =
-      Math.floor(
-        Math.log(bytes) /
-        Math.log(1024)
-      );
-
-
-    return (
-      (bytes /
-        Math.pow(
-          1024,
-          index
-        )
-      ).toFixed(
-        index === 0
-          ? 0
-          : 2
-      ) +
-      " " +
-      units[index]
-    );
-
-  }
-
-
-  function escapeHtml(
-    value
-  ) {
-
-    return String(
-      value ?? ""
-    )
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /'/g,
-        "&#039;"
-      );
-
-  }
-
-
-  function escapeAttribute(
-    value
-  ) {
-
-    return escapeHtml(
-      value
-    );
+    updateIdCounter();
 
   }
 
