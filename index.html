@@ -1,10 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Movie Podcast Generator V2.5.2</title>
+  <title>Movie Podcast Generator V2.5.3</title>
 
   <style>
     * {
@@ -289,18 +290,6 @@
       margin-top: 12px;
     }
 
-    .warning {
-      background: #422006;
-      border-color: #92400e;
-      color: #fde68a;
-    }
-
-    .success-box {
-      background: #052e16;
-      border-color: #166534;
-      color: #bbf7d0;
-    }
-
     .divider {
       height: 1px;
       background: #1e293b;
@@ -333,13 +322,17 @@
 
 <div class="container">
 
-  <h1>🎬 Movie Podcast Generator V2.5.2</h1>
+  <h1>🎬 Movie Podcast Generator V2.5.3</h1>
 
   <div class="subtitle">
     TMDB Metadata → Random SEO Title → Custom Description → TTS MP3 → JSON → ZIP
   </div>
 
-  <!-- TMDB -->
+
+  <!-- =====================================================
+       TMDB
+  ====================================================== -->
+
   <div class="card">
 
     <h2>1. TMDB Movies</h2>
@@ -347,6 +340,7 @@
     <div class="grid">
 
       <div class="full">
+
         <label for="tmdbIds">
           TMDB IDs
         </label>
@@ -368,25 +362,33 @@
         <div class="counter">
           IDs: <span id="idCounter">0</span> / 100
         </div>
+
       </div>
 
+
       <div>
+
         <label for="language">
           TMDB Language
         </label>
 
         <select id="language">
+
           <option value="en-US">
             English (United States)
           </option>
+
         </select>
 
         <div class="hint">
-          Movie title, overview, genres and other metadata will use this language when available.
+          Movie metadata will use this language when available.
         </div>
+
       </div>
 
+
       <div>
+
         <label for="voiceId">
           ElevenLabs Voice ID
         </label>
@@ -400,6 +402,7 @@
         <div class="hint">
           Use the Voice ID that already works in your ElevenLabs account.
         </div>
+
       </div>
 
     </div>
@@ -407,7 +410,10 @@
   </div>
 
 
-  <!-- TITLE -->
+  <!-- =====================================================
+       TITLE TEMPLATES
+  ====================================================== -->
+
   <div class="card">
 
     <h2>2. Random Title Templates</h2>
@@ -431,25 +437,36 @@
     </div>
 
     <div class="notice">
-      Each movie will randomly receive only ONE title template.
-      The generator will not use all templates for the same movie.
+      Each movie randomly receives ONE title template.
     </div>
 
   </div>
 
 
-  <!-- DESCRIPTION -->
+  <!-- =====================================================
+       DESCRIPTION
+  ====================================================== -->
+
   <div class="card">
 
     <h2>3. Description Template</h2>
 
     <textarea
       id="descriptionTemplate"
-      class="small"
-    >Watch {TITLE} ({YEAR}) and discover more information about this movie. Get the latest movie details, cast, genres, rating and more.</textarea>
+    >Watch {TITLE} ({YEAR}) and discover more about this movie, including its story, cast, genres, rating, and director.
+
+If you are looking for information about {TITLE}, this page provides useful movie details and a quick overview.
+
+{OVERVIEW}
+
+{CTA1}
+
+{CTA2}</textarea>
 
     <div class="hint">
-      Variables:
+
+      Available variables:
+
       <strong>{TITLE}</strong>,
       <strong>{YEAR}</strong>,
       <strong>{ID}</strong>,
@@ -459,21 +476,36 @@
       <strong>{DIRECTOR}</strong>,
       <strong>{RATING}</strong>,
       <strong>{RUNTIME}</strong>,
-      <strong>{CAST}</strong>
+      <strong>{CAST}</strong>,
+      <strong>{CTA1}</strong>,
+      <strong>{CTA2}</strong>
+
+    </div>
+
+    <div class="notice">
+      <strong>{CTA1}</strong> and <strong>{CTA2}</strong> are now real
+      description variables. Put them wherever you want inside this template.
+      They will NOT be automatically added to the end.
     </div>
 
   </div>
 
 
-  <!-- CTA -->
+  <!-- =====================================================
+       CTA
+  ====================================================== -->
+
   <div class="card">
 
     <h2>4. CTA Settings</h2>
 
     <div class="grid">
 
-      <!-- CTA 1 -->
+
+      <!-- CTA 1 TEXT -->
+
       <div>
+
         <label for="cta1Text">
           CTA 1 Text
         </label>
@@ -485,11 +517,16 @@
         />
 
         <div class="hint">
-          This is the visible text shown inside the CTA link/button.
+          Visible text of CTA 1.
         </div>
+
       </div>
 
+
+      <!-- CTA 1 TEMPLATE -->
+
       <div>
+
         <label for="cta1Template">
           CTA 1 HTML Template
         </label>
@@ -497,7 +534,7 @@
         <input
           id="cta1Template"
           value='<a href="{CTA_URL}" target="_blank" rel="noopener">{CTA_TEXT}</a>'
-          placeholder="CTA HTML template"
+          placeholder="CTA 1 HTML"
         />
 
         <div class="hint">
@@ -506,11 +543,14 @@
           <strong>{CTA_TEXT}</strong>,
           <strong>{ID}</strong>
         </div>
+
       </div>
 
 
-      <!-- CTA 2 -->
+      <!-- CTA 2 TEXT -->
+
       <div>
+
         <label for="cta2Text">
           CTA 2 Text
         </label>
@@ -522,11 +562,16 @@
         />
 
         <div class="hint">
-          Visible text for CTA 2.
+          Visible text of CTA 2.
         </div>
+
       </div>
 
+
+      <!-- CTA 2 TEMPLATE -->
+
       <div>
+
         <label for="cta2Template">
           CTA 2 HTML Template
         </label>
@@ -534,7 +579,7 @@
         <input
           id="cta2Template"
           value='<a href="{CTA_URL}" target="_blank" rel="noopener">{CTA_TEXT}</a>'
-          placeholder="CTA HTML template"
+          placeholder="CTA 2 HTML"
         />
 
         <div class="hint">
@@ -543,6 +588,7 @@
           <strong>{CTA_TEXT}</strong>,
           <strong>{ID}</strong>
         </div>
+
       </div>
 
     </div>
@@ -553,55 +599,87 @@
 
     <div class="grid">
 
+
+      <!-- CTA 1 URL -->
+
       <div>
+
         <label for="cta1Url">
           CTA 1 URL
         </label>
 
         <input
           id="cta1Url"
+          value="https://movietts.pages.dev/{ID}"
           placeholder="https://example.com/watch/{ID}"
         />
 
         <div class="hint">
-          You can use <strong>{ID}</strong> inside the URL.
+          Use <strong>{ID}</strong> to automatically insert the TMDB ID.
         </div>
+
       </div>
 
+
+      <!-- CTA 2 URL -->
+
       <div>
+
         <label for="cta2Url">
           CTA 2 URL
         </label>
 
         <input
           id="cta2Url"
+          value="https://movietts.pages.dev/{ID}"
           placeholder="https://example.com/movie/{ID}"
         />
 
         <div class="hint">
-          You can use <strong>{ID}</strong> inside the URL.
+          Use <strong>{ID}</strong> to automatically insert the TMDB ID.
         </div>
+
       </div>
 
     </div>
 
 
     <div class="notice">
-      CTA Text and CTA HTML are now completely separate.
-      So you can change the visible text without changing the link structure.
+      Example:
+      <br><br>
+
+      URL:
+      <strong>https://movietts.pages.dev/{ID}</strong>
+
+      <br>
+
+      TMDB ID:
+      <strong>1101383</strong>
+
+      <br>
+
+      Result:
+      <strong>https://movietts.pages.dev/1101383</strong>
     </div>
 
   </div>
 
 
-  <!-- TTS -->
+  <!-- =====================================================
+       TTS
+  ====================================================== -->
+
   <div class="card">
 
     <h2>5. TTS Settings</h2>
 
     <div class="grid-3">
 
+
+      <!-- MODEL -->
+
       <div>
+
         <label for="modelId">
           ElevenLabs Model
         </label>
@@ -617,10 +695,14 @@
           </option>
 
         </select>
+
       </div>
 
 
+      <!-- FORMAT -->
+
       <div>
+
         <label for="outputFormat">
           MP3 Output Format
         </label>
@@ -646,14 +728,18 @@
         </select>
 
         <div class="hint">
-          Smaller bitrate = smaller MP3 file.
+          Smaller bitrate generally produces a smaller audio file.
         </div>
+
       </div>
 
 
+      <!-- FORMAT PREVIEW -->
+
       <div>
-        <label>
-          Current Format
+
+        <label for="formatPreview">
+          Selected Format
         </label>
 
         <input
@@ -662,9 +748,6 @@
           readonly
         />
 
-        <div class="hint">
-          This value will also be stored in the JSON package.
-        </div>
       </div>
 
     </div>
@@ -683,7 +766,7 @@
     >Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
 
     <div class="hint">
-      Available variables:
+      Variables:
       <strong>{TITLE}</strong>,
       <strong>{YEAR}</strong>,
       <strong>{ID}</strong>,
@@ -693,7 +776,10 @@
   </div>
 
 
-  <!-- GENERATE -->
+  <!-- =====================================================
+       GENERATE
+  ====================================================== -->
+
   <div class="card">
 
     <h2>6. Generate Package</h2>
@@ -719,11 +805,14 @@
 
 
     <div class="progress">
+
       <div
         id="progressBar"
         class="progress-bar"
       ></div>
+
     </div>
+
 
     <div
       id="progressText"
@@ -741,25 +830,35 @@
   </div>
 
 
-  <!-- MOVIES -->
+  <!-- =====================================================
+       MOVIES
+  ====================================================== -->
+
   <div class="card">
 
     <h2>7. Generated Movies</h2>
 
-    <div id="movieList" class="movie-list"></div>
+    <div
+      id="movieList"
+      class="movie-list"
+    ></div>
 
   </div>
 
 </div>
 
 
-<!-- JSZip -->
+<!-- =======================================================
+     JSZIP
+======================================================= -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 
 <script>
 
-  const $ = (id) => document.getElementById(id);
+  const $ = (id) =>
+    document.getElementById(id);
 
 
   /* =========================================================
@@ -767,17 +866,19 @@
   ========================================================= */
 
   const DEFAULT_TITLE_TEMPLATES = [
+
     "Watch {TITLE} ({YEAR}) Online",
+
     "{TITLE} ({YEAR}) - Movie Review",
+
     "{TITLE} {YEAR} Full Movie Review",
+
     "{TITLE} ({YEAR}) Movie Details and Review",
+
     "Watch {TITLE} - {YEAR} Movie Review"
+
   ];
 
-
-  /* =========================================================
-     STATE
-  ========================================================= */
 
   let generatedMovies = [];
 
@@ -786,45 +887,62 @@
      INIT
   ========================================================= */
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    initializeTitleTemplates();
+      initializeTitleTemplates();
 
-    loadLanguages();
+      loadLanguages();
 
-    updateIdCounter();
+      updateIdCounter();
 
-    $("tmdbIds").addEventListener(
-      "input",
-      updateIdCounter
-    );
 
-    $("outputFormat").addEventListener(
-      "change",
-      () => {
-        $("formatPreview").value =
-          $("outputFormat").value;
-      }
-    );
+      $("tmdbIds")
+        .addEventListener(
+          "input",
+          updateIdCounter
+        );
 
-    $("addTitleTemplate").addEventListener(
-      "click",
-      () => {
-        addTitleTemplate("");
-      }
-    );
 
-    $("generateBtn").addEventListener(
-      "click",
-      generateAll
-    );
+      $("outputFormat")
+        .addEventListener(
+          "change",
+          () => {
 
-    $("clearBtn").addEventListener(
-      "click",
-      clearAll
-    );
+            $("formatPreview").value =
+              $("outputFormat").value;
 
-  });
+          }
+        );
+
+
+      $("addTitleTemplate")
+        .addEventListener(
+          "click",
+          () => {
+
+            addTitleTemplate("");
+
+          }
+        );
+
+
+      $("generateBtn")
+        .addEventListener(
+          "click",
+          generateAll
+        );
+
+
+      $("clearBtn")
+        .addEventListener(
+          "click",
+          clearAll
+        );
+
+    }
+  );
 
 
   /* =========================================================
@@ -835,17 +953,22 @@
 
     $("titleTemplates").innerHTML = "";
 
-    DEFAULT_TITLE_TEMPLATES.forEach(
-      template => addTitleTemplate(template)
-    );
+    DEFAULT_TITLE_TEMPLATES
+      .forEach(
+        template =>
+          addTitleTemplate(template)
+      );
 
   }
 
 
-  function addTitleTemplate(value = "") {
+  function addTitleTemplate(
+    value = ""
+  ) {
 
     const wrapper =
       document.createElement("div");
+
 
     wrapper.className =
       "template-row";
@@ -854,9 +977,14 @@
     const input =
       document.createElement("input");
 
-    input.type = "text";
 
-    input.value = value;
+    input.type =
+      "text";
+
+
+    input.value =
+      value;
+
 
     input.placeholder =
       "Example: Watch {TITLE} ({YEAR}) Online";
@@ -865,10 +993,14 @@
     const remove =
       document.createElement("button");
 
-    remove.type = "button";
+
+    remove.type =
+      "button";
+
 
     remove.className =
       "danger remove-btn";
+
 
     remove.textContent =
       "Remove";
@@ -888,9 +1020,9 @@
 
     wrapper.appendChild(remove);
 
-    $("titleTemplates").appendChild(
-      wrapper
-    );
+
+    $("titleTemplates")
+      .appendChild(wrapper);
 
   }
 
@@ -901,14 +1033,17 @@
       ...$("titleTemplates")
         .querySelectorAll("input")
     ]
-      .map(input => input.value.trim())
+      .map(
+        input =>
+          input.value.trim()
+      )
       .filter(Boolean);
 
   }
 
 
   /* =========================================================
-     TMDB LANGUAGES
+     LANGUAGES
   ========================================================= */
 
   async function loadLanguages() {
@@ -919,6 +1054,7 @@
         await fetch(
           "/api/movie?action=languages"
         );
+
 
       const data =
         await response.json();
@@ -935,7 +1071,9 @@
 
 
       const languages =
-        Array.isArray(data.languages)
+        Array.isArray(
+          data.languages
+        )
           ? data.languages
           : [];
 
@@ -948,7 +1086,8 @@
         select.value;
 
 
-      select.innerHTML = "";
+      select.innerHTML =
+        "";
 
 
       const displayNames =
@@ -964,57 +1103,69 @@
 
 
       languages
-        .sort((a, b) =>
-          String(a).localeCompare(
-            String(b)
-          )
+        .sort(
+          (a, b) =>
+            String(a)
+              .localeCompare(
+                String(b)
+              )
         )
-        .forEach(code => {
+        .forEach(
+          code => {
 
-          const option =
-            document.createElement("option");
-
-          option.value = code;
-
-
-          let label = code;
-
-          try {
-
-            if (displayNames) {
-
-              label =
-                displayNames.of(
-                  code.split("-")[0]
-                ) || code;
-
-            }
-
-          } catch (_) {}
+            const option =
+              document.createElement(
+                "option"
+              );
 
 
-          option.textContent =
-            `${label} (${code})`;
+            option.value =
+              code;
 
 
-          select.appendChild(
-            option
-          );
+            let label =
+              code;
 
-        });
+
+            try {
+
+              if (displayNames) {
+
+                label =
+                  displayNames.of(
+                    code.split("-")[0]
+                  ) || code;
+
+              }
+
+            } catch (_) {}
+
+
+            option.textContent =
+              `${label} (${code})`;
+
+
+            select.appendChild(
+              option
+            );
+
+          }
+        );
 
 
       if (
         languages.includes(current)
       ) {
 
-        select.value = current;
+        select.value =
+          current;
 
       } else if (
         languages.includes("en-US")
       ) {
 
-        select.value = "en-US";
+        select.value =
+          "en-US";
 
       }
 
@@ -1025,10 +1176,13 @@
         error
       );
 
+
       $("language").innerHTML = `
+
         <option value="en-US">
           English (United States)
         </option>
+
       `;
 
     }
@@ -1043,7 +1197,9 @@
   function parseIds() {
 
     const raw =
-      $("tmdbIds").value.trim();
+      $("tmdbIds")
+        .value
+        .trim();
 
 
     if (!raw) {
@@ -1056,8 +1212,12 @@
     return [
       ...new Set(
         raw
-          .split(/[\s,;]+/)
-          .map(x => x.trim())
+          .split(
+            /[\s,;]+/
+          )
+          .map(
+            x => x.trim()
+          )
           .filter(Boolean)
       )
     ];
@@ -1071,18 +1231,23 @@
       parseIds();
 
 
-    $("idCounter").textContent =
+    $("idCounter")
+      .textContent =
       ids.length;
 
 
     if (ids.length > 100) {
 
-      $("idCounter").style.color =
+      $("idCounter")
+        .style
+        .color =
         "#f87171";
 
     } else {
 
-      $("idCounter").style.color =
+      $("idCounter")
+        .style
+        .color =
         "";
 
     }
@@ -1091,95 +1256,164 @@
 
 
   /* =========================================================
-     TEMPLATE HELPERS
+     VARIABLE REPLACEMENT
   ========================================================= */
 
   function replaceVariables(
     template,
-    movie
+    movie,
+    extra = {}
   ) {
 
-    return String(template || "")
-      .replaceAll(
-        "{TITLE}",
-        movie.title || ""
-      )
-      .replaceAll(
-        "{YEAR}",
-        movie.year || ""
-      )
-      .replaceAll(
-        "{ID}",
-        movie.id || ""
-      )
-      .replaceAll(
-        "{ORIGINAL_TITLE}",
-        movie.originalTitle || ""
-      )
-      .replaceAll(
-        "{OVERVIEW}",
-        movie.overview || ""
-      )
-      .replaceAll(
-        "{GENRES}",
-        movie.genres || ""
-      )
-      .replaceAll(
-        "{DIRECTOR}",
-        movie.director || ""
-      )
-      .replaceAll(
-        "{RATING}",
-        movie.rating ?? ""
-      )
-      .replaceAll(
-        "{RUNTIME}",
-        movie.runtime ?? ""
-      )
-      .replaceAll(
-        "{CAST}",
-        movie.cast || ""
+    let result =
+      String(
+        template || ""
       );
 
-  }
+
+    const variables = {
+
+      "{TITLE}":
+        movie.title || "",
+
+      "{YEAR}":
+        movie.year || "",
+
+      "{ID}":
+        movie.id || "",
+
+      "{ORIGINAL_TITLE}":
+        movie.originalTitle || "",
+
+      "{OVERVIEW}":
+        movie.overview || "",
+
+      "{GENRES}":
+        movie.genres || "",
+
+      "{DIRECTOR}":
+        movie.director || "",
+
+      "{RATING}":
+        movie.rating ?? "",
+
+      "{RUNTIME}":
+        movie.runtime ?? "",
+
+      "{CAST}":
+        movie.cast || "",
+
+      "{CTA1}":
+        extra.cta1 || "",
+
+      "{CTA2}":
+        extra.cta2 || ""
+
+    };
 
 
-  function escapeHtml(value) {
+    Object.entries(
+      variables
+    )
+      .forEach(
+        ([key, value]) => {
 
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+          result =
+            result.replaceAll(
+              key,
+              String(value)
+            );
 
-  }
+        }
+      );
 
 
-  function escapeAttribute(value) {
-
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;");
+    return result;
 
   }
 
 
   /* =========================================================
-     RANDOM TITLE
+     HTML ESCAPE
   ========================================================= */
 
-  function randomItem(array) {
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
+
+  }
+
+
+  function escapeAttribute(
+    value
+  ) {
+
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      );
+
+  }
+
+
+  /* =========================================================
+     RANDOM
+  ========================================================= */
+
+  function randomItem(
+    array
+  ) {
 
     if (!array.length) {
+
       return "";
+
     }
+
 
     return array[
       Math.floor(
-        Math.random() * array.length
+        Math.random() *
+        array.length
       )
     ];
 
@@ -1187,7 +1421,7 @@
 
 
   /* =========================================================
-     CTA
+     CTA BUILDER
   ========================================================= */
 
   function buildCTA(
@@ -1197,6 +1431,16 @@
     movieId
   ) {
 
+    const finalUrl =
+      String(
+        url || ""
+      )
+        .replaceAll(
+          "{ID}",
+          movieId
+        );
+
+
     const safeText =
       escapeHtml(
         text || ""
@@ -1205,15 +1449,13 @@
 
     const safeUrl =
       escapeAttribute(
-        String(url || "")
-          .replaceAll(
-            "{ID}",
-            movieId
-          )
+        finalUrl
       );
 
 
-    return String(template || "")
+    return String(
+      template || ""
+    )
       .replaceAll(
         "{CTA_URL}",
         safeUrl
@@ -1245,24 +1487,29 @@
       await fetch(
         "/api/tts",
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
-          body: JSON.stringify({
+          body:
+            JSON.stringify({
 
-            text,
+              text,
 
-            voiceId,
+              voiceId,
 
-            modelId,
+              modelId,
 
-            outputFormat
+              outputFormat
 
-          })
+            })
 
         }
       );
@@ -1279,6 +1526,7 @@
         const data =
           await response.json();
 
+
         message =
           data?.error ||
           message;
@@ -1286,12 +1534,15 @@
       } catch (_) {}
 
 
-      throw new Error(message);
+      throw new Error(
+        message
+      );
 
     }
 
 
-    return await response.arrayBuffer();
+    return await response
+      .arrayBuffer();
 
   }
 
@@ -1331,7 +1582,7 @@
 
 
   /* =========================================================
-     CREATE EPISODE
+     EPISODE
   ========================================================= */
 
   async function generateEpisode(
@@ -1354,12 +1605,12 @@
       );
 
 
-    const descriptionBase =
-      replaceVariables(
-        settings.descriptionTemplate,
-        movie
-      );
-
+    /*
+      Build CTA first.
+      CTA is NOT automatically appended.
+      It only appears where {CTA1} or {CTA2}
+      exists inside Description Template.
+    */
 
     const cta1 =
       buildCTA(
@@ -1379,16 +1630,24 @@
       );
 
 
-    const description =
-      [
-        descriptionBase,
-        "",
-        cta1,
-        cta2
-      ]
-        .filter(Boolean)
-        .join("\n");
+    /*
+      Description
+    */
 
+    const description =
+      replaceVariables(
+        settings.descriptionTemplate,
+        movie,
+        {
+          cta1,
+          cta2
+        }
+      );
+
+
+    /*
+      TTS
+    */
 
     const narration =
       replaceVariables(
@@ -1420,9 +1679,11 @@
 
     return {
 
-      id: movie.id,
+      id:
+        movie.id,
 
-      title: finalTitle,
+      title:
+        finalTitle,
 
       original_title:
         movie.originalTitle || "",
@@ -1457,7 +1718,8 @@
         movie.backdrop || null,
 
       language:
-        movie.language || settings.language,
+        movie.language ||
+        settings.language,
 
       narration,
 
@@ -1475,6 +1737,12 @@
       voice_id:
         settings.voiceId,
 
+      cta1:
+        cta1,
+
+      cta2:
+        cta2,
+
       cta1_text:
         settings.cta1Text,
 
@@ -1488,10 +1756,18 @@
         settings.cta2Template,
 
       cta1_url:
-        settings.cta1Url,
+        settings.cta1Url
+          .replaceAll(
+            "{ID}",
+            movie.id
+          ),
 
       cta2_url:
         settings.cta2Url
+          .replaceAll(
+            "{ID}",
+            movie.id
+          )
 
     };
 
@@ -1499,13 +1775,17 @@
 
 
   /* =========================================================
-     AUDIO FILENAME
+     FILENAME
   ========================================================= */
 
-  function slugify(text) {
+  function slugify(
+    text
+  ) {
 
     let value =
-      String(text || "")
+      String(
+        text || ""
+      )
         .normalize("NFKD")
         .replace(
           /[\u0300-\u036f]/g,
@@ -1523,7 +1803,8 @@
 
     if (!value) {
 
-      value = "movie";
+      value =
+        "movie";
 
     }
 
@@ -1546,7 +1827,11 @@
       );
 
 
-    return `${String(index).padStart(3, "0")}-${slug}-${movie.id}.mp3`;
+    return (
+      `${String(index).padStart(3, "0")}-` +
+      `${slug}-` +
+      `${movie.id}.mp3`
+    );
 
   }
 
@@ -1565,15 +1850,19 @@
 
 
     const episodesFolder =
-      zip.folder("episodes");
+      zip.folder(
+        "episodes"
+      );
 
 
     const metadataFolder =
-      zip.folder("metadata");
+      zip.folder(
+        "metadata"
+      );
 
 
     /*
-      Individual MP3 + metadata
+      MP3 + individual JSON
     */
 
     episodes.forEach(
@@ -1644,6 +1933,12 @@
           voice_id:
             episode.voice_id,
 
+          cta1:
+            episode.cta1,
+
+          cta2:
+            episode.cta2,
+
           cta1_text:
             episode.cta1_text,
 
@@ -1666,26 +1961,36 @@
 
 
         metadataFolder.file(
-          `${episode.audio_filename.replace(/\.mp3$/i, "")}.json`,
+
+          `${episode.audio_filename
+            .replace(
+              /\.mp3$/i,
+              ""
+            )}.json`,
+
           JSON.stringify(
             metadata,
             null,
             2
           )
+
         );
 
       }
     );
 
 
-    /*
-      Podcast data
-    */
+    /* =======================================================
+       PODCAST DATA
+    ======================================================= */
 
     const podcastData = {
 
       generated_at:
         new Date().toISOString(),
+
+      version:
+        "2.5.3",
 
       total_episodes:
         episodes.length,
@@ -1780,9 +2085,9 @@
     );
 
 
-    /*
-      RSS episode data
-    */
+    /* =======================================================
+       RSS EPISODES
+    ======================================================= */
 
     const rssEpisodes =
       episodes.map(
@@ -1814,6 +2119,9 @@
             text:
               episode.cta1_text,
 
+            html:
+              episode.cta1,
+
             template:
               episode.cta1_template,
 
@@ -1826,6 +2134,9 @@
 
             text:
               episode.cta2_text,
+
+            html:
+              episode.cta2,
 
             template:
               episode.cta2_template,
@@ -1849,13 +2160,17 @@
     );
 
 
-    /*
-      README
-    */
+    /* =======================================================
+       README
+    ======================================================= */
 
     const readme = `
+
 MOVIE PODCAST PACKAGE
 =====================
+
+Version:
+2.5.3
 
 Generated:
 ${new Date().toISOString()}
@@ -1880,16 +2195,16 @@ FOLDER STRUCTURE
 ================
 
 episodes/
-  Contains generated MP3 files.
+Contains generated MP3 files.
 
 metadata/
-  Contains individual JSON metadata files.
+Contains individual JSON metadata files.
 
 podcast-data.json
-  Contains complete podcast configuration and episode data.
+Contains complete podcast configuration.
 
 rss-episodes.json
-  Contains episode information prepared for RSS processing.
+Contains episode information prepared for RSS processing.
 
 
 TITLE TEMPLATES
@@ -1941,17 +2256,21 @@ TTS TEMPLATE
 ${settings.ttsTemplate}
 
 
-NOTES
-=====
+IMPORTANT
+=========
 
-Each movie receives one randomly selected title template.
+CTA 1 is inserted only where {CTA1} appears
+inside the Description Template.
 
-Each episode has its own generated MP3 file.
+CTA 2 is inserted only where {CTA2} appears
+inside the Description Template.
 
-The selected MP3 output format is:
+{ID} inside CTA URLs is automatically replaced
+with the TMDB movie ID.
+
+Selected MP3 output:
 ${settings.outputFormat}
 
-CTA text and CTA HTML templates are stored in the JSON files so they can be edited or reused later.
 `;
 
 
@@ -1961,14 +2280,26 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
     );
 
 
+    /*
+      ZIP
+    */
+
     return await zip.generateAsync(
+
       {
-        type: "blob",
-        compression: "DEFLATE",
-        compressionOptions: {
-          level: 6
-        }
+        type:
+          "blob",
+
+        compression:
+          "DEFLATE",
+
+        compressionOptions:
+          {
+            level: 6
+          }
+
       },
+
       metadata => {
 
         const percent =
@@ -1977,14 +2308,18 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
           );
 
 
-        $("progressBar").style.width =
+        $("progressBar")
+          .style
+          .width =
           `${percent}%`;
 
 
-        $("progressText").textContent =
+        $("progressText")
+          .textContent =
           `Creating ZIP: ${percent}%`;
 
       }
+
     );
 
   }
@@ -2000,19 +2335,27 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
       $("generateBtn");
 
 
-    button.disabled = true;
+    button.disabled =
+      true;
 
 
-    generatedMovies = [];
+    generatedMovies =
+      [];
 
 
-    $("movieList").innerHTML = "";
+    $("movieList")
+      .innerHTML =
+      "";
 
-    $("statusBox").textContent =
+
+    $("statusBox")
+      .textContent =
       "Starting...";
 
 
-    $("progressBar").style.width =
+    $("progressBar")
+      .style
+      .width =
       "0%";
 
 
@@ -2085,47 +2428,69 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
         titleTemplates,
 
         descriptionTemplate:
-          $("descriptionTemplate").value.trim(),
+          $("descriptionTemplate")
+            .value
+            .trim(),
 
         ttsTemplate:
-          $("ttsTemplate").value.trim(),
+          $("ttsTemplate")
+            .value
+            .trim(),
 
         cta1Text:
-          $("cta1Text").value.trim(),
+          $("cta1Text")
+            .value
+            .trim(),
 
         cta2Text:
-          $("cta2Text").value.trim(),
+          $("cta2Text")
+            .value
+            .trim(),
 
         cta1Template:
-          $("cta1Template").value.trim(),
+          $("cta1Template")
+            .value
+            .trim(),
 
         cta2Template:
-          $("cta2Template").value.trim(),
+          $("cta2Template")
+            .value
+            .trim(),
 
         cta1Url:
-          $("cta1Url").value.trim(),
+          $("cta1Url")
+            .value
+            .trim(),
 
         cta2Url:
-          $("cta2Url").value.trim()
+          $("cta2Url")
+            .value
+            .trim()
 
       };
 
 
-      $("formatPreview").value =
+      $("formatPreview")
+        .value =
         settings.outputFormat;
 
 
       updateStatus(
+
         `Found ${ids.length} TMDB ID(s).\n` +
+
         `Language: ${settings.language}\n` +
+
         `Model: ${settings.modelId}\n` +
+
         `MP3: ${settings.outputFormat}\n`
+
       );
 
 
-      /*
-        Process each movie
-      */
+      /* =====================================================
+         PROCESS MOVIES
+      ====================================================== */
 
       for (
         let i = 0;
@@ -2192,6 +2557,7 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
             `[${i + 1}/${ids.length}] ✅ ${movie.title}`
           );
 
+
         } catch (error) {
 
           updateMovieStatus(
@@ -2210,10 +2576,6 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
 
       }
 
-
-      /*
-        No successful episodes
-      */
 
       if (!generatedMovies.length) {
 
@@ -2248,36 +2610,54 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
       );
 
 
-      $("progressBar").style.width =
+      $("progressBar")
+        .style
+        .width =
         "100%";
 
 
-      $("progressText").textContent =
+      $("progressText")
+        .textContent =
         `Complete — ${generatedMovies.length}/${ids.length} episodes generated.`;
 
 
       updateStatus(
+
         `\n🎉 DONE\n\n` +
+
         `Successful: ${generatedMovies.length}\n` +
-        `Failed: ${ids.length - generatedMovies.length}\n` +
+
+        `Failed: ${
+          ids.length -
+          generatedMovies.length
+        }\n` +
+
         `MP3 format: ${settings.outputFormat}\n` +
+
         `ZIP: ${filename}`
+
       );
 
 
     } catch (error) {
 
       updateStatus(
-        `\n❌ ERROR\n\n${error?.message || error}`
+        `\n❌ ERROR\n\n${
+          error?.message ||
+          error
+        }`
       );
 
 
-      $("progressText").textContent =
+      $("progressText")
+        .textContent =
         "Generation failed.";
+
 
     } finally {
 
-      button.disabled = false;
+      button.disabled =
+        false;
 
     }
 
@@ -2302,11 +2682,14 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
         : 0;
 
 
-    $("progressBar").style.width =
+    $("progressBar")
+      .style
+      .width =
       `${percent}%`;
 
 
-    $("progressText").textContent =
+    $("progressText")
+      .textContent =
       `${percent}% — ${message}`;
 
   }
@@ -2331,7 +2714,7 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
 
 
   /* =========================================================
-     MOVIE STATUS UI
+     MOVIE STATUS
   ========================================================= */
 
   function createMovieStatusItem(
@@ -2340,7 +2723,9 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
   ) {
 
     const item =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
 
     item.className =
@@ -2357,6 +2742,7 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
 
       </div>
 
+
       <div>
 
         <div class="movie-title">
@@ -2369,6 +2755,7 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
 
       </div>
 
+
       <div>
 
         <span class="badge pending">
@@ -2380,9 +2767,8 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
     `;
 
 
-    $("movieList").appendChild(
-      item
-    );
+    $("movieList")
+      .appendChild(item);
 
 
     return item;
@@ -2450,25 +2836,34 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
 
 
     const a =
-      document.createElement("a");
+      document.createElement(
+        "a"
+      );
 
 
     a.href =
       url;
 
+
     a.download =
       filename;
 
 
-    document.body.appendChild(a);
+    document.body
+      .appendChild(a);
+
 
     a.click();
+
 
     a.remove();
 
 
     setTimeout(
-      () => URL.revokeObjectURL(url),
+      () =>
+        URL.revokeObjectURL(
+          url
+        ),
       5000
     );
 
@@ -2492,26 +2887,44 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
     }
 
 
-    $("tmdbIds").value = "";
+    $("tmdbIds").value =
+      "";
 
-    $("voiceId").value = "";
 
-    $("cta1Url").value = "";
+    $("voiceId").value =
+      "";
 
-    $("cta2Url").value = "";
 
-    $("movieList").innerHTML = "";
+    $("cta1Url").value =
+      "https://movietts.pages.dev/{ID}";
+
+
+    $("cta2Url").value =
+      "https://movietts.pages.dev/{ID}";
+
+
+    $("movieList").innerHTML =
+      "";
+
 
     $("statusBox").textContent =
       "Ready to generate.";
 
-    $("progressBar").style.width =
+
+    $("progressBar")
+      .style
+      .width =
       "0%";
 
-    $("progressText").textContent =
+
+    $("progressText")
+      .textContent =
       "Ready.";
 
-    generatedMovies = [];
+
+    generatedMovies =
+      [];
+
 
     initializeTitleTemplates();
 
@@ -2523,3 +2936,4 @@ CTA text and CTA HTML templates are stored in the JSON files so they can be edit
 
 </body>
 </html>
+```
