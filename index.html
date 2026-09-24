@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Movie TTS Generator V2</title>
+  <title>Movie TTS Generator V2.2</title>
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
@@ -22,12 +22,18 @@
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: auto;
     }
 
     h1 {
-      margin-bottom: 8px;
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
     }
 
     .subtitle {
@@ -43,28 +49,43 @@
       margin-bottom: 20px;
     }
 
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: bold;
     }
 
-    textarea,
     input,
+    textarea,
     select {
       width: 100%;
       background: #0f1117;
-      color: white;
+      color: #fff;
       border: 1px solid #343b48;
       border-radius: 8px;
       padding: 12px;
       font-size: 14px;
       outline: none;
+      font-family: inherit;
     }
 
     textarea {
-      min-height: 150px;
+      min-height: 130px;
       resize: vertical;
+      line-height: 1.5;
+    }
+
+    textarea.code {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 13px;
     }
 
     input:focus,
@@ -73,8 +94,61 @@
       border-color: #667eea;
     }
 
-    .field {
+    .small {
+      font-size: 12px;
+      color: #8b93a1;
+      margin-top: 7px;
+      line-height: 1.5;
+    }
+
+    .variables {
+      background: #10131a;
+      border: 1px solid #292f3a;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #b8c0ce;
+      line-height: 1.8;
+    }
+
+    .variables code {
+      color: #93c5fd;
+      background: #181c25;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+
+    .section-title {
       margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #292f3a;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .cta-box {
+      border: 1px solid #343b48;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 15px;
+      background: #141821;
+    }
+
+    .cta-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .cta-number {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      border-radius: 5px;
+      padding: 3px 7px;
+      margin-right: 6px;
+      font-size: 12px;
     }
 
     button {
@@ -123,7 +197,7 @@
     .movie {
       display: flex;
       gap: 15px;
-      padding: 15px 0;
+      padding: 18px 0;
       border-bottom: 1px solid #292f3a;
     }
 
@@ -137,10 +211,12 @@
       object-fit: cover;
       border-radius: 6px;
       background: #252a34;
+      flex-shrink: 0;
     }
 
     .movie-info {
       flex: 1;
+      min-width: 0;
     }
 
     .movie-title {
@@ -152,27 +228,95 @@
     .movie-meta {
       color: #9ca3af;
       font-size: 13px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .narration {
+    .output-block {
+      margin-top: 12px;
+    }
+
+    .output-label {
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .output-content {
+      background: #10131a;
+      border: 1px solid #292f3a;
+      border-radius: 7px;
+      padding: 10px;
       color: #d1d5db;
       font-size: 13px;
       line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .code-output {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+
+    .narration {
+      background: #10131a;
+      border: 1px solid #292f3a;
+      border-radius: 7px;
+      padding: 10px;
+      color: #d1d5db;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 8px;
     }
 
     .success {
       color: #4ade80;
+      margin-top: 10px;
+      font-size: 13px;
     }
 
     .error {
       color: #f87171;
+      margin-top: 10px;
+      font-size: 13px;
     }
 
-    .small {
-      font-size: 12px;
-      color: #8b93a1;
-      margin-top: 7px;
+    .tip {
+      background: #10131a;
+      border-left: 3px solid #667eea;
+      padding: 12px;
+      border-radius: 6px;
+      color: #b8c0ce;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 600px) {
+
+      body {
+        padding: 15px 10px;
+      }
+
+      .box {
+        padding: 15px;
+      }
+
+      .movie {
+        gap: 10px;
+      }
+
+      .poster {
+        width: 55px;
+        height: 80px;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
     }
   </style>
 </head>
@@ -181,21 +325,30 @@
 
 <div class="container">
 
-  <h1>🎬 Movie TTS Generator V2</h1>
+  <h1>🎬 Movie TTS Generator V2.2</h1>
 
   <div class="subtitle">
-    TMDB → Metadata → Indonesian TTS → MP3 ZIP
+    TMDB → Metadata → Title → Description → 2 CTA → TTS → MP3 → ZIP
   </div>
+
+
+  <!-- ========================================= -->
+  <!-- TMDB -->
+  <!-- ========================================= -->
 
   <div class="box">
 
+    <div class="section-title">
+      🎬 TMDB Input
+    </div>
+
     <div class="field">
+
       <label>TMDB Movie IDs</label>
 
       <textarea
         id="tmdbIds"
-        placeholder="Contoh:
-550
+        placeholder="550
 238
 680
 278
@@ -209,7 +362,342 @@
 
       <div class="small">
         Maksimal 100 TMDB ID per proses.
+        Bisa dipisahkan dengan Enter, koma, titik koma, atau spasi.
       </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>CTA Base URL</label>
+
+      <input
+        id="ctaBaseUrl"
+        type="text"
+        value="https://movietts.pages.dev/"
+        placeholder="https://example.com/"
+      >
+
+      <div class="small">
+        TMDB ID otomatis ditambahkan di belakang URL.
+      </div>
+
+      <div class="variables">
+
+        Contoh:
+
+        <br>
+
+        <code>https://movietts.pages.dev/</code>
+
+        +
+
+        <code>550</code>
+
+        <br>
+
+        menjadi:
+
+        <br>
+
+        <code>https://movietts.pages.dev/550</code>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- TITLE -->
+  <!-- ========================================= -->
+
+  <div class="box">
+
+    <div class="section-title">
+      📝 Title Template
+    </div>
+
+    <div class="field">
+
+      <label>Title Template</label>
+
+      <input
+        id="titleTemplate"
+        type="text"
+        value="{TITLE} ({YEAR}) - Movie Review"
+      >
+
+      <div class="variables">
+
+        Available Variables:
+
+        <br>
+
+        <code>{TITLE}</code> = Movie title
+
+        <br>
+
+        <code>{YEAR}</code> = Release year
+
+        <br>
+
+        <code>{ID}</code> = TMDB ID
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- CTA BUTTONS -->
+  <!-- ========================================= -->
+
+  <div class="box">
+
+    <div class="section-title">
+      🔗 CTA Buttons
+    </div>
+
+
+    <!-- CTA 1 -->
+
+    <div class="cta-box">
+
+      <div class="cta-title">
+
+        <span class="cta-number">CTA 1</span>
+
+        First CTA Button
+
+      </div>
+
+
+      <div class="field">
+
+        <label>Button 1 Text</label>
+
+        <input
+          id="cta1Text"
+          type="text"
+          value="Watch Now"
+          placeholder="Watch Now"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>Button 1 HTML Template</label>
+
+        <textarea
+          id="cta1Template"
+          class="code"
+        ><a href="{CTA_URL}" class="watch-btn">{CTA_TEXT}</a></textarea>
+
+        <div class="variables">
+
+          Available Variables:
+
+          <br>
+
+          <code>{CTA_URL}</code>
+          = Automatic movie URL
+
+          <br>
+
+          <code>{CTA_TEXT}</code>
+          = Button text
+
+          <br>
+
+          <code>{ID}</code>
+          = TMDB ID
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- CTA 2 -->
+
+    <div class="cta-box">
+
+      <div class="cta-title">
+
+        <span class="cta-number">CTA 2</span>
+
+        Second CTA Button
+
+      </div>
+
+
+      <div class="field">
+
+        <label>Button 2 Text</label>
+
+        <input
+          id="cta2Text"
+          type="text"
+          value="Download Now"
+          placeholder="Download Now"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>Button 2 HTML Template</label>
+
+        <textarea
+          id="cta2Template"
+          class="code"
+        ><a href="{CTA_URL}" class="download-btn">{CTA_TEXT}</a></textarea>
+
+        <div class="variables">
+
+          Available Variables:
+
+          <br>
+
+          <code>{CTA_URL}</code>
+          = Automatic movie URL
+
+          <br>
+
+          <code>{CTA_TEXT}</code>
+          = Button text
+
+          <br>
+
+          <code>{ID}</code>
+          = TMDB ID
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="tip">
+
+      💡 Kamu bebas mengubah HTML tombol.
+      Contoh teks tombol:
+      <strong>Watch Now</strong>,
+      <strong>Download Now</strong>,
+      <strong>Tonton Sekarang</strong>,
+      <strong>Play Movie</strong>, dll.
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- DESCRIPTION -->
+  <!-- ========================================= -->
+
+  <div class="box">
+
+    <div class="section-title">
+      📄 Description Template
+    </div>
+
+    <div class="field">
+
+      <label>Description Template</label>
+
+      <textarea id="descriptionTemplate">Watch {TITLE} ({YEAR}).
+
+Genre: {GENRE}
+Director: {DIRECTOR}
+Rating: {RATING}
+
+{OVERVIEW}
+
+{CTA1}
+
+{CTA2}</textarea>
+
+
+      <div class="variables">
+
+        Available Variables:
+
+        <br><br>
+
+        <code>{TITLE}</code>
+        = Movie title
+
+        <br>
+
+        <code>{YEAR}</code>
+        = Release year
+
+        <br>
+
+        <code>{ID}</code>
+        = TMDB ID
+
+        <br>
+
+        <code>{GENRE}</code>
+        = Genres
+
+        <br>
+
+        <code>{DIRECTOR}</code>
+        = Director
+
+        <br>
+
+        <code>{RATING}</code>
+        = TMDB rating
+
+        <br>
+
+        <code>{OVERVIEW}</code>
+        = TMDB overview
+
+        <br>
+
+        <code>{CTA1}</code>
+        = Complete HTML CTA 1
+
+        <br>
+
+        <code>{CTA2}</code>
+        = Complete HTML CTA 2
+
+        <br>
+
+        <code>{CTA_URL}</code>
+        = Automatic CTA URL
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- TTS -->
+  <!-- ========================================= -->
+
+  <div class="box">
+
+    <div class="section-title">
+      🎙️ ElevenLabs TTS
     </div>
 
 
@@ -220,12 +708,12 @@
       <input
         id="voiceId"
         type="text"
-        placeholder="Masukkan Voice ID ElevenLabs"
-        value="hpp4J3VqNfWAUOO0d1Us"
+        value="YOUR_VOICE_ID_HERE"
+        placeholder="Enter ElevenLabs Voice ID"
       >
 
       <div class="small">
-        Voice ID diambil dari voice yang tersedia di akun ElevenLabs kamu.
+        Voice ID harus berasal dari voice yang bisa digunakan oleh API akunmu.
       </div>
 
     </div>
@@ -273,43 +761,85 @@
     </div>
 
 
+    <!-- AUDIO NARRATION -->
+
     <div class="field">
 
-      <label>Narration Template</label>
+      <label>Audio Narration Template</label>
 
-      <textarea id="template">Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
+      <textarea id="narrationTemplate">Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
 
-      <div class="small">
-        Variable tersedia: {TITLE}, {YEAR}, {GENRE}, {DIRECTOR}, {RATING}
+
+      <div class="variables">
+
+        Available Variables:
+
+        <br>
+
+        <code>{TITLE}</code>
+
+        <br>
+
+        <code>{YEAR}</code>
+
+        <br>
+
+        <code>{GENRE}</code>
+
+        <br>
+
+        <code>{DIRECTOR}</code>
+
+        <br>
+
+        <code>{RATING}</code>
+
       </div>
 
     </div>
 
 
-    <button id="generateBtn" onclick="generateAll()">
+    <button
+      id="generateBtn"
+      onclick="generateAll()"
+    >
+
       🚀 Generate MP3
+
     </button>
 
+
     <div class="progress">
+
       <div
         id="progressBar"
         class="progress-bar"
       ></div>
+
     </div>
+
 
     <div
       id="status"
       class="status"
     >
+
       Ready.
+
     </div>
 
   </div>
 
 
+  <!-- ========================================= -->
+  <!-- RESULTS -->
+  <!-- ========================================= -->
+
   <div class="box">
 
-    <h2>Results</h2>
+    <div class="section-title">
+      📦 Results
+    </div>
 
     <div id="results"></div>
 
@@ -320,23 +850,41 @@
 
 <script>
 
+
+// =========================================
+// GET TMDB IDS
+// =========================================
+
 function getIds() {
 
   const raw =
-    document.getElementById("tmdbIds").value;
+    document.getElementById(
+      "tmdbIds"
+    ).value;
 
-  const ids = raw
-    .split(/[\s,;]+/)
-    .map(x => x.trim())
-    .filter(Boolean);
 
-  return [...new Set(ids)];
+  const ids =
+    raw
+      .split(/[\s,;]+/)
+      .map(x => x.trim())
+      .filter(Boolean)
+      .filter(x => /^\d+$/.test(x));
+
+
+  return [
+    ...new Set(ids)
+  ];
+
 }
 
 
+// =========================================
+// SLUGIFY
+// =========================================
+
 function slugify(text) {
 
-  return text
+  return String(text || "")
     .toLowerCase()
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -347,36 +895,224 @@ function slugify(text) {
 }
 
 
-function buildNarration(movie) {
+// =========================================
+// BUILD CTA URL
+// =========================================
 
-  const template =
-    document.getElementById("template").value;
+function buildCTAUrl(
+  baseUrl,
+  id
+) {
 
-  return template
-    .replaceAll("{TITLE}", movie.title || "")
-    .replaceAll("{YEAR}", movie.year || "")
-    .replaceAll("{GENRE}", movie.genres || "")
-    .replaceAll("{DIRECTOR}", movie.director || "")
+  let base =
+    String(baseUrl || "")
+      .trim();
+
+
+  if (!base) {
+    return "";
+  }
+
+
+  base =
+    base.replace(
+      /\/+$/,
+      ""
+    );
+
+
+  return `${base}/${id}`;
+
+}
+
+
+// =========================================
+// BUILD CTA BUTTON
+// =========================================
+
+function buildCTAButton(
+  template,
+  text,
+  url,
+  id
+) {
+
+  return String(template || "")
     .replaceAll(
-      "{RATING}",
-      movie.rating != null
-        ? Number(movie.rating).toFixed(1)
-        : ""
+      "{CTA_URL}",
+      url
+    )
+    .replaceAll(
+      "{CTA_TEXT}",
+      text
+    )
+    .replaceAll(
+      "{ID}",
+      id
     );
 
 }
 
 
-function setProgress(current, total) {
+// =========================================
+// REPLACE VARIABLES
+// =========================================
+
+function replaceVariables(
+  template,
+  movie,
+  extra = {}
+) {
+
+  return String(template || "")
+
+    .replaceAll(
+      "{TITLE}",
+      movie.title || ""
+    )
+
+    .replaceAll(
+      "{YEAR}",
+      movie.year || ""
+    )
+
+    .replaceAll(
+      "{ID}",
+      movie.id || ""
+    )
+
+    .replaceAll(
+      "{GENRE}",
+      movie.genres || ""
+    )
+
+    .replaceAll(
+      "{DIRECTOR}",
+      movie.director || ""
+    )
+
+    .replaceAll(
+      "{RATING}",
+      movie.rating != null
+        ? Number(movie.rating).toFixed(1)
+        : ""
+    )
+
+    .replaceAll(
+      "{OVERVIEW}",
+      movie.overview || ""
+    )
+
+    .replaceAll(
+      "{CTA_URL}",
+      extra.ctaUrl || ""
+    )
+
+    .replaceAll(
+      "{CTA1}",
+      extra.cta1 || ""
+    )
+
+    .replaceAll(
+      "{CTA2}",
+      extra.cta2 || ""
+    );
+
+}
+
+
+// =========================================
+// BUILD TITLE
+// =========================================
+
+function buildTitle(movie) {
+
+  const template =
+    document.getElementById(
+      "titleTemplate"
+    ).value;
+
+
+  return replaceVariables(
+    template,
+    movie
+  );
+
+}
+
+
+// =========================================
+// BUILD DESCRIPTION
+// =========================================
+
+function buildDescription(
+  movie,
+  ctaUrl,
+  cta1,
+  cta2
+) {
+
+  const template =
+    document.getElementById(
+      "descriptionTemplate"
+    ).value;
+
+
+  return replaceVariables(
+    template,
+    movie,
+    {
+      ctaUrl,
+      cta1,
+      cta2
+    }
+  );
+
+}
+
+
+// =========================================
+// BUILD NARRATION
+// =========================================
+
+function buildNarration(movie) {
+
+  const template =
+    document.getElementById(
+      "narrationTemplate"
+    ).value;
+
+
+  return replaceVariables(
+    template,
+    movie
+  );
+
+}
+
+
+// =========================================
+// PROGRESS
+// =========================================
+
+function setProgress(
+  current,
+  total
+) {
 
   const percentage =
     total > 0
-      ? Math.round((current / total) * 100)
+      ? Math.round(
+          (current / total) * 100
+        )
       : 0;
+
 
   document.getElementById(
     "progressBar"
-  ).style.width = percentage + "%";
+  ).style.width =
+    percentage + "%";
+
 
   document.getElementById(
     "status"
@@ -386,6 +1122,10 @@ function setProgress(current, total) {
 }
 
 
+// =========================================
+// GET MOVIE
+// =========================================
+
 async function getMovie(id) {
 
   const response =
@@ -393,8 +1133,10 @@ async function getMovie(id) {
       `/api/movie?id=${encodeURIComponent(id)}`
     );
 
+
   const data =
     await response.json();
+
 
   if (!response.ok) {
 
@@ -405,10 +1147,15 @@ async function getMovie(id) {
 
   }
 
+
   return data;
 
 }
 
+
+// =========================================
+// GENERATE SPEECH
+// =========================================
 
 async function generateSpeech(
   text,
@@ -418,24 +1165,30 @@ async function generateSpeech(
 ) {
 
   const response =
-    await fetch("/api/tts", {
+    await fetch(
+      "/api/tts",
+      {
+        method: "POST",
 
-      method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-      headers: {
-        "Content-Type": "application/json"
-      },
+        body: JSON.stringify({
 
-      body: JSON.stringify({
+          text,
 
-        text,
-        voiceId,
-        modelId,
-        outputFormat
+          voiceId,
 
-      })
+          modelId,
 
-    });
+          outputFormat
+
+        })
+
+      }
+    );
 
 
   if (!response.ok) {
@@ -443,17 +1196,23 @@ async function generateSpeech(
     let message =
       `TTS error ${response.status}`;
 
+
     try {
 
       const data =
         await response.json();
 
+
       message =
-        data.error || message;
+        data.error ||
+        message;
 
     } catch (_) {}
 
-    throw new Error(message);
+
+    throw new Error(
+      message
+    );
 
   }
 
@@ -463,98 +1222,309 @@ async function generateSpeech(
 }
 
 
+// =========================================
+// ADD RESULT
+// =========================================
+
 function addResult(
   movie,
+  title,
+  description,
   narration,
+  ctaUrl,
   status,
   error = ""
 ) {
 
   const results =
-    document.getElementById("results");
+    document.getElementById(
+      "results"
+    );
+
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
-  div.className = "movie";
 
-  div.innerHTML = `
+  div.className =
+    "movie";
 
-    ${
-      movie.poster
-        ? `<img class="poster" src="${movie.poster}" alt="">`
-        : `<div class="poster"></div>`
-    }
 
-    <div class="movie-info">
+  const poster =
+    movie.poster
+      ? `
+        <img
+          class="poster"
+          src="${escapeHtml(movie.poster)}"
+          alt=""
+        >
+      `
+      : `
+        <div class="poster"></div>
+      `;
 
-      <div class="movie-title">
-        ${escapeHtml(movie.title)}
+
+  if (status === "success") {
+
+    div.innerHTML = `
+
+      ${poster}
+
+      <div class="movie-info">
+
+        <div class="movie-title">
+          ${escapeHtml(movie.title)}
+        </div>
+
+
+        <div class="movie-meta">
+
+          ${escapeHtml(movie.year || "-")}
+
+          ${
+            movie.genres
+              ? " • " +
+                escapeHtml(movie.genres)
+              : ""
+          }
+
+          ${
+            movie.rating != null
+              ? " • ⭐ " +
+                escapeHtml(movie.rating)
+              : ""
+          }
+
+        </div>
+
+
+        <div class="output-block">
+
+          <div class="output-label">
+            Generated Title
+          </div>
+
+          <div class="output-content">
+
+            ${escapeHtml(title)}
+
+          </div>
+
+        </div>
+
+
+        <div class="output-block">
+
+          <div class="output-label">
+            CTA URL
+          </div>
+
+          <div class="output-content">
+
+            ${escapeHtml(ctaUrl)}
+
+          </div>
+
+        </div>
+
+
+        <div class="output-block">
+
+          <div class="output-label">
+            Generated Description
+          </div>
+
+          <div class="output-content code-output">
+
+            ${escapeHtml(description)}
+
+          </div>
+
+        </div>
+
+
+        <div class="output-block">
+
+          <div class="output-label">
+            Audio Narration
+          </div>
+
+          <div class="narration">
+
+            ${escapeHtml(narration)}
+
+          </div>
+
+        </div>
+
+
+        <div class="success">
+
+          ✓ MP3 berhasil dibuat
+
+        </div>
+
       </div>
 
-      <div class="movie-meta">
-        ${movie.year || "-"}
-        ${movie.genres ? " • " + escapeHtml(movie.genres) : ""}
-        ${movie.rating != null ? " • ⭐ " + movie.rating : ""}
+    `;
+
+  } else {
+
+    div.innerHTML = `
+
+      ${poster}
+
+      <div class="movie-info">
+
+        <div class="movie-title">
+
+          ${escapeHtml(movie.title)}
+
+        </div>
+
+        <div class="error">
+
+          ✕ ${escapeHtml(error)}
+
+        </div>
+
       </div>
 
-      <div class="narration">
-        ${escapeHtml(narration)}
-      </div>
+    `;
 
-      <div class="${status === "success" ? "success" : "error"}">
-        ${
-          status === "success"
-            ? "✓ MP3 berhasil dibuat"
-            : "✕ " + escapeHtml(error)
-        }
-      </div>
+  }
 
-    </div>
-  `;
 
-  results.appendChild(div);
+  results.appendChild(
+    div
+  );
 
 }
 
+
+// =========================================
+// ESCAPE HTML
+// =========================================
 
 function escapeHtml(text) {
 
   return String(text || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
 }
 
 
+// =========================================
+// GENERATE ALL
+// =========================================
+
 async function generateAll() {
 
   const button =
-    document.getElementById("generateBtn");
+    document.getElementById(
+      "generateBtn"
+    );
+
+
+  // ---------------------------------------
+  // INPUTS
+  // ---------------------------------------
 
   const ids =
     getIds();
 
+
   const voiceId =
-    document.getElementById("voiceId")
-      .value
-      .trim();
+    document.getElementById(
+      "voiceId"
+    )
+    .value
+    .trim();
+
+
+  const ctaBaseUrl =
+    document.getElementById(
+      "ctaBaseUrl"
+    )
+    .value
+    .trim();
+
+
+  const cta1Text =
+    document.getElementById(
+      "cta1Text"
+    )
+    .value
+    .trim();
+
+
+  const cta1Template =
+    document.getElementById(
+      "cta1Template"
+    ).value;
+
+
+  const cta2Text =
+    document.getElementById(
+      "cta2Text"
+    )
+    .value
+    .trim();
+
+
+  const cta2Template =
+    document.getElementById(
+      "cta2Template"
+    ).value;
+
 
   const modelId =
-    document.getElementById("model")
-      .value;
+    document.getElementById(
+      "model"
+    ).value;
+
 
   const outputFormat =
-    document.getElementById("format")
-      .value;
+    document.getElementById(
+      "format"
+    ).value;
 
+
+  // ---------------------------------------
+  // VALIDATION
+  // ---------------------------------------
 
   if (!ids.length) {
 
-    alert("Masukkan minimal 1 TMDB ID.");
+    alert(
+      "Masukkan minimal 1 TMDB ID."
+    );
 
     return;
 
@@ -574,11 +1544,12 @@ async function generateAll() {
 
   if (
     !voiceId ||
-    voiceId === "YOUR_VOICE_ID_HERE"
+    voiceId ===
+      "YOUR_VOICE_ID_HERE"
   ) {
 
     alert(
-      "Masukkan Voice ID ElevenLabs terlebih dahulu."
+      "Masukkan Voice ID ElevenLabs."
     );
 
     return;
@@ -586,7 +1557,68 @@ async function generateAll() {
   }
 
 
-  button.disabled = true;
+  if (!ctaBaseUrl) {
+
+    alert(
+      "Masukkan CTA Base URL."
+    );
+
+    return;
+
+  }
+
+
+  if (!cta1Text) {
+
+    alert(
+      "Isi teks CTA Button 1."
+    );
+
+    return;
+
+  }
+
+
+  if (!cta2Text) {
+
+    alert(
+      "Isi teks CTA Button 2."
+    );
+
+    return;
+
+  }
+
+
+  if (!cta1Template.trim()) {
+
+    alert(
+      "Isi HTML Template CTA 1."
+    );
+
+    return;
+
+  }
+
+
+  if (!cta2Template.trim()) {
+
+    alert(
+      "Isi HTML Template CTA 2."
+    );
+
+    return;
+
+  }
+
+
+  // ---------------------------------------
+  // DISABLE
+  // ---------------------------------------
+
+  button.disabled =
+    true;
+
 
   button.textContent =
     "⏳ Generating...";
@@ -594,21 +1626,31 @@ async function generateAll() {
 
   document.getElementById(
     "results"
-  ).innerHTML = "";
+  ).innerHTML =
+    "";
 
 
   document.getElementById(
     "progressBar"
-  ).style.width = "0%";
+  ).style.width =
+    "0%";
 
 
   const zip =
     new JSZip();
 
 
-  let successCount = 0;
-  let errorCount = 0;
+  let successCount =
+    0;
 
+
+  let errorCount =
+    0;
+
+
+  // =======================================
+  // LOOP
+  // =======================================
 
   for (
     let i = 0;
@@ -616,21 +1658,101 @@ async function generateAll() {
     i++
   ) {
 
-    const id = ids[i];
+    const id =
+      ids[i];
 
-    setProgress(i, ids.length);
+
+    setProgress(
+      i,
+      ids.length
+    );
+
 
     try {
+
+      // -----------------------------------
+      // TMDB METADATA
+      // -----------------------------------
 
       const movie =
         await getMovie(id);
 
 
+      // -----------------------------------
+      // CTA URL
+      // -----------------------------------
+
+      const ctaUrl =
+        buildCTAUrl(
+          ctaBaseUrl,
+          movie.id
+        );
+
+
+      // -----------------------------------
+      // CTA 1
+      // -----------------------------------
+
+      const cta1 =
+        buildCTAButton(
+          cta1Template,
+          cta1Text,
+          ctaUrl,
+          movie.id
+        );
+
+
+      // -----------------------------------
+      // CTA 2
+      // -----------------------------------
+
+      const cta2 =
+        buildCTAButton(
+          cta2Template,
+          cta2Text,
+          ctaUrl,
+          movie.id
+        );
+
+
+      // -----------------------------------
+      // TITLE
+      // -----------------------------------
+
+      const finalTitle =
+        buildTitle(
+          movie
+        );
+
+
+      // -----------------------------------
+      // DESCRIPTION
+      // -----------------------------------
+
+      const finalDescription =
+        buildDescription(
+          movie,
+          ctaUrl,
+          cta1,
+          cta2
+        );
+
+
+      // -----------------------------------
+      // AUDIO NARRATION
+      // -----------------------------------
+
       const narration =
-        buildNarration(movie);
+        buildNarration(
+          movie
+        );
 
 
-      const blob =
+      // -----------------------------------
+      // ELEVENLABS
+      // -----------------------------------
+
+      const audioBlob =
         await generateSpeech(
           narration,
           voiceId,
@@ -639,19 +1761,34 @@ async function generateAll() {
         );
 
 
+      // -----------------------------------
+      // MP3 FILENAME
+      // -----------------------------------
+
       const filename =
         `${slugify(movie.title)}-${movie.year || "unknown"}-${movie.id}.mp3`;
 
 
+      // -----------------------------------
+      // ADD MP3 TO ZIP
+      // -----------------------------------
+
       zip.file(
         filename,
-        blob
+        audioBlob
       );
 
 
+      // -----------------------------------
+      // RESULT
+      // -----------------------------------
+
       addResult(
         movie,
+        finalTitle,
+        finalDescription,
         narration,
+        ctaUrl,
         "success"
       );
 
@@ -666,14 +1803,19 @@ async function generateAll() {
 
       addResult(
         {
-          title: `TMDB ID ${id}`,
+          title:
+            `TMDB ID ${id}`,
           year: "",
           genres: "",
           rating: null
         },
         "",
+        "",
+        "",
+        "",
         "error",
-        error?.message || "Unknown error"
+        error?.message ||
+          "Unknown error"
       );
 
     }
@@ -687,6 +1829,10 @@ async function generateAll() {
   }
 
 
+  // =======================================
+  // CREATE ZIP
+  // =======================================
+
   if (successCount > 0) {
 
     document.getElementById(
@@ -697,32 +1843,56 @@ async function generateAll() {
 
     const zipBlob =
       await zip.generateAsync({
-        type: "blob"
+
+        type: "blob",
+
+        compression:
+          "STORE"
+
       });
 
 
     const url =
-      URL.createObjectURL(zipBlob);
+      URL.createObjectURL(
+        zipBlob
+      );
 
 
     const a =
-      document.createElement("a");
+      document.createElement(
+        "a"
+      );
 
-    a.href = url;
+
+    a.href =
+      url;
+
 
     a.download =
       `movie-tts-${Date.now()}.zip`;
 
-    document.body.appendChild(a);
+
+    document.body.appendChild(
+      a
+    );
+
 
     a.click();
 
+
     a.remove();
 
-    URL.revokeObjectURL(url);
+
+    URL.revokeObjectURL(
+      url
+    );
 
   }
 
+
+  // =======================================
+  // FINISHED
+  // =======================================
 
   document.getElementById(
     "status"
@@ -730,7 +1900,9 @@ async function generateAll() {
     `Selesai — ${successCount} berhasil, ${errorCount} gagal.`;
 
 
-  button.disabled = false;
+  button.disabled =
+    false;
+
 
   button.textContent =
     "🚀 Generate MP3";
