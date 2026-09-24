@@ -148,8 +148,8 @@ export async function onRequestPost(context) {
     const r2Key = `episodes/${safeFileName}`;
 
     const uploadUrl =
-      env.R2_UPLOAD_URL.replace(/\/$/, "") +
-      `/upload/${encodeURIComponent(r2Key)}`;
+  env.R2_UPLOAD_URL.replace(/\/$/, "") +
+  `/upload/${r2Key}`;
 
     const uploadResponse = await fetch(uploadUrl, {
       method: "PUT",
