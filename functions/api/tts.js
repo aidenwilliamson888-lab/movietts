@@ -1,219 +1,326 @@
 export async function onRequestPost(context) {
-  try {
-    const env = context.env;
+  const { request, env } = context;
 
+  try {
     if (!env.ELEVENLABS_API_KEY) {
-      return new Response(
-        JSON.stringify({
-          error: "ELEVENLABS_API_KEY is not configured"
-        }),
+      return jsonResponse(
         {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+          success: false,
+          error: "ELEVENLABS_API_KEY is not configured."
+        },
+        500
       );
     }
 
     if (!env.R2_UPLOAD_URL) {
-      return new Response(
-        JSON.stringify({
-          error: "R2_UPLOAD_URL is not configured"
-        }),
+      return jsonResponse(
         {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+          success: false,
+          error: "R2_UPLOAD_URL is not configured."
+        },
+        500
       );
     }
 
     if (!env.R2_UPLOAD_SECRET) {
-      return new Response(
-        JSON.stringify({
-          error: "R2_UPLOAD_SECRET is not configured"
-        }),
+      return jsonResponse(
         {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+          success: false,
+          error: "R2_UPLOAD_SECRET is not configured."
+        },
+        500
       );
     }
 
-    const body = await context.request.json();
+    const body = await request.json();
 
-    const {
-      text,
-      voiceId,
-      modelId = "eleven_multilingual_v2",
-      outputFormat = "mp3_22050_32",
-      fileName = "episode.mp3"
-    } = body;
+    const text = String(body?.text || "").trim();
+    const voiceId = String(body?.voiceId || "").trim();
+    const modelId =
+      String(body?.modelId || "eleven_multilingual_v2").trim();
+
+    const outputFormat =
+      String(body?.outputFormat || "mp3_22050_32").trim();
+
+    const fileName =
+      String(body?.fileName || "episode.mp3").trim();
+
 
     if (!text) {
-      return new Response(
-        JSON.stringify({
-          error: "Missing text"
-        }),
+      return jsonResponse(
         {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+          success: false,
+          error: "TTS text is required."
+        },
+        400
       );
     }
 
     if (!voiceId) {
-      return new Response(
-        JSON.stringify({
-          error: "Missing voiceId"
-        }),
+      return jsonResponse(
         {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+          success: false,
+          error: "ElevenLabs voiceId is required."
+        },
+        400
       );
     }
 
     if (text.length > 1500) {
-      return new Response(
-        JSON.stringify({
-          error: "Text is too long. Maximum 1500 characters."
-        }),
+      return jsonResponse(
         {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+          success: false,
+          error: "TTS text must be 1500 characters or less."
+        },
+        400
       );
     }
 
+
     /*
-     * STEP 1
-     * Generate audio with ElevenLabs
+     * Sanitize filename
      */
 
-    const elevenResponse = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
-        voiceId
-      )}?output_format=${encodeURIComponent(outputFormat)}`,
-      {
+    const safeFileName =
+      fileName
+        .replace(/[^a-zA-Z0-9._-]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+
+
+    const finalFileName =
+      safeFileName.toLowerCase().endsWith(".mp3")
+        ? safeFileName
+        : `${safeFileName}.mp3`;
+
+
+    /*
+     * R2 object key
+     *
+     * IMPORTANT:
+     * Keep "/" literal.
+     */
+
+    const r2Key =
+      `episodes/${finalFileName}`;
+
+
+    /*
+     * ElevenLabs
+     */
+
+    const elevenLabsUrl =
+      `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}`;
+
+
+    const elevenLabsResponse =
+      await fetch(elevenLabsUrl, {
         method: "POST",
+
         headers: {
           "xi-api-key": env.ELEVENLABS_API_KEY,
           "Content-Type": "application/json",
           "Accept": "audio/mpeg"
         },
+
         body: JSON.stringify({
           text,
-          model_id: modelId
+          model_id: modelId,
+          output_format: outputFormat
         })
-      }
-    );
+      });
 
-    if (!elevenResponse.ok) {
-      const errorText = await elevenResponse.text();
 
-      return new Response(
-        JSON.stringify({
-          error: "ElevenLabs request failed",
-          details: errorText
-        }),
+    if (!elevenLabsResponse.ok) {
+
+      const errorText =
+        await elevenLabsResponse.text();
+
+      return jsonResponse(
         {
-          status: elevenResponse.status,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+          success: false,
+          error:
+            `ElevenLabs error (${elevenLabsResponse.status}): ${errorText}`
+        },
+        elevenLabsResponse.status
       );
     }
 
+
     /*
-     * STEP 2
-     * Send MP3 directly to Worker Account A
+     * We need the same audio stream twice:
+     *
+     * Stream #1 → Worker → R2
+     * Stream #2 → Browser → ZIP
+     *
+     * tee() duplicates the ReadableStream.
      */
 
-    const safeFileName = String(fileName)
-      .replace(/[^a-zA-Z0-9._-]/g, "-")
-      .replace(/-+/g, "-");
+    if (!elevenLabsResponse.body) {
+      return jsonResponse(
+        {
+          success: false,
+          error: "ElevenLabs returned an empty audio body."
+        },
+        502
+      );
+    }
 
-    const r2Key = `episodes/${safeFileName}`;
+
+    const [uploadStream, browserStream] =
+      elevenLabsResponse.body.tee();
+
+
+    /*
+     * Upload to Account A Worker
+     */
 
     const uploadUrl =
-  env.R2_UPLOAD_URL.replace(/\/$/, "") +
-  `/upload/${r2Key}`;
+      env.R2_UPLOAD_URL.replace(/\/$/, "") +
+      `/upload/${r2Key}`;
 
-    const uploadResponse = await fetch(uploadUrl, {
-      method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${env.R2_UPLOAD_SECRET}`,
-        "Content-Type": "audio/mpeg"
-      },
-      body: elevenResponse.body
-    });
+
+    const uploadResponse =
+      await fetch(uploadUrl, {
+
+        method: "PUT",
+
+        headers: {
+          "Authorization":
+            `Bearer ${env.R2_UPLOAD_SECRET}`,
+
+          "Content-Type":
+            "audio/mpeg"
+        },
+
+        body: uploadStream
+
+      });
+
 
     if (!uploadResponse.ok) {
-      const uploadError = await uploadResponse.text();
 
-      return new Response(
-        JSON.stringify({
-          error: "R2 upload failed",
-          status: uploadResponse.status,
-          details: uploadError
-        }),
+      const uploadError =
+        await uploadResponse.text();
+
+      return jsonResponse(
         {
-          status: 502,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
+          success: false,
+
+          error:
+            `R2 upload failed (${uploadResponse.status}): ${uploadError}`
+        },
+        502
       );
+
     }
 
-    const uploadResult = await uploadResponse.json();
 
     /*
-     * STEP 3
-     * Return R2 information to Movie TTS
+     * Public R2 URL
+     *
+     * IMPORTANT:
+     * Replace this with your actual R2 custom domain.
      */
 
+    const audioBaseUrl =
+      "https://audio.domainlu.com";
+
+
+    const audioUrl =
+      `${audioBaseUrl}/${r2Key}`;
+
+
+    /*
+     * Return MP3 directly to browser.
+     *
+     * Metadata is passed through response headers.
+     *
+     * Browser is same-origin with /api/tts,
+     * so it does not need R2 CORS just to receive this MP3.
+     */
+
+    const headers =
+      new Headers();
+
+    headers.set(
+      "Content-Type",
+      "audio/mpeg"
+    );
+
+    headers.set(
+      "Content-Disposition",
+      `inline; filename="${finalFileName}"`
+    );
+
+    headers.set(
+      "X-Audio-URL",
+      audioUrl
+    );
+
+    headers.set(
+      "X-Audio-Key",
+      r2Key
+    );
+
+    headers.set(
+      "X-File-Name",
+      finalFileName
+    );
+
+    headers.set(
+      "X-Output-Format",
+      outputFormat
+    );
+
+    headers.set(
+      "X-Model-ID",
+      modelId
+    );
+
+
     return new Response(
-      JSON.stringify({
-        success: true,
-        fileName: safeFileName,
-        key: r2Key,
-        audioUrl: uploadResult.url,
-        outputFormat,
-        modelId
-      }),
+      browserStream,
       {
         status: 200,
-        headers: {
-          "Content-Type": "application/json"
-        }
+        headers
       }
     );
 
+
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: "Internal server error",
-        details: error?.message || String(error)
-      }),
+
+    return jsonResponse(
       {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
+        success: false,
+
+        error:
+          error?.message ||
+          "Unknown TTS error."
+      },
+      500
     );
+
   }
+}
+
+
+/*
+ * JSON helper
+ */
+
+function jsonResponse(data, status = 200) {
+
+  return new Response(
+    JSON.stringify(data, null, 2),
+    {
+      status,
+
+      headers: {
+        "Content-Type":
+          "application/json; charset=utf-8"
+      }
+    }
+  );
+
 }
