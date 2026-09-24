@@ -1,350 +1,689 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Movie TTS Generator V2.2</title>
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Movie TTS Generator V2.3
+  </title>
 
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
+
   <style>
+
     * {
       box-sizing: border-box;
     }
 
+
     body {
+
       margin: 0;
+
       padding: 30px 15px;
+
       background: #0f1117;
+
       color: #f5f5f5;
-      font-family: Arial, sans-serif;
+
+      font-family:
+        Arial,
+        sans-serif;
+
     }
+
 
     .container {
+
       max-width: 1100px;
+
       margin: auto;
+
     }
+
 
     h1 {
+
       margin: 0 0 8px;
+
       font-size: 28px;
+
     }
 
-    h2 {
-      margin-top: 0;
-      font-size: 20px;
-    }
 
     .subtitle {
+
       color: #9ca3af;
+
       margin-bottom: 25px;
+
     }
+
 
     .box {
+
       background: #181c25;
-      border: 1px solid #292f3a;
+
+      border:
+        1px solid
+        #292f3a;
+
       border-radius: 12px;
+
       padding: 20px;
+
       margin-bottom: 20px;
+
     }
+
+
+    .section-title {
+
+      margin-bottom: 18px;
+
+      padding-bottom: 10px;
+
+      border-bottom:
+        1px solid
+        #292f3a;
+
+      font-size: 18px;
+
+      font-weight: bold;
+
+    }
+
 
     .field {
+
       margin-bottom: 20px;
+
     }
+
 
     .field:last-child {
+
       margin-bottom: 0;
+
     }
 
+
     label {
+
       display: block;
+
       margin-bottom: 8px;
+
       font-weight: bold;
+
     }
+
 
     input,
     textarea,
     select {
+
       width: 100%;
+
       background: #0f1117;
+
       color: #fff;
-      border: 1px solid #343b48;
+
+      border:
+        1px solid
+        #343b48;
+
       border-radius: 8px;
+
       padding: 12px;
+
       font-size: 14px;
+
       outline: none;
+
       font-family: inherit;
+
     }
+
 
     textarea {
+
       min-height: 130px;
+
       resize: vertical;
+
       line-height: 1.5;
+
     }
 
+
     textarea.code {
-      font-family: Consolas, Monaco, monospace;
+
+      font-family:
+        Consolas,
+        Monaco,
+        monospace;
+
       font-size: 13px;
+
     }
+
 
     input:focus,
     textarea:focus,
     select:focus {
-      border-color: #667eea;
+
+      border-color:
+        #667eea;
+
     }
+
 
     .small {
+
       font-size: 12px;
+
       color: #8b93a1;
+
       margin-top: 7px;
+
       line-height: 1.5;
+
     }
+
 
     .variables {
+
       background: #10131a;
-      border: 1px solid #292f3a;
+
+      border:
+        1px solid
+        #292f3a;
+
       border-radius: 8px;
+
       padding: 12px;
+
       margin-top: 10px;
+
       font-size: 12px;
+
       color: #b8c0ce;
+
       line-height: 1.8;
+
     }
+
 
     .variables code {
+
       color: #93c5fd;
+
       background: #181c25;
+
       padding: 2px 5px;
+
       border-radius: 4px;
+
     }
 
-    .section-title {
-      margin-bottom: 18px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #292f3a;
-      font-size: 18px;
-      font-weight: bold;
-    }
 
     .cta-box {
-      border: 1px solid #343b48;
+
+      border:
+        1px solid
+        #343b48;
+
       border-radius: 10px;
+
       padding: 16px;
+
       margin-top: 15px;
+
       background: #141821;
+
     }
+
 
     .cta-title {
+
       font-size: 16px;
+
       font-weight: bold;
+
       margin-bottom: 15px;
+
     }
+
 
     .cta-number {
+
       display: inline-block;
+
       background: #667eea;
+
       color: white;
+
       border-radius: 5px;
+
       padding: 3px 7px;
+
       margin-right: 6px;
+
       font-size: 12px;
+
     }
+
 
     button {
+
       width: 100%;
+
       border: 0;
+
       border-radius: 8px;
+
       padding: 14px;
+
       font-size: 16px;
+
       font-weight: bold;
+
       cursor: pointer;
+
       background: #667eea;
+
       color: white;
+
     }
+
 
     button:hover {
+
       background: #5568d8;
+
     }
+
 
     button:disabled {
+
       opacity: 0.5;
+
       cursor: not-allowed;
+
     }
+
 
     .progress {
+
       width: 100%;
+
       height: 12px;
+
       background: #0b0d12;
+
       border-radius: 20px;
+
       overflow: hidden;
+
       margin-top: 15px;
+
     }
+
 
     .progress-bar {
+
       height: 100%;
+
       width: 0%;
+
       background: #667eea;
-      transition: width 0.3s;
+
+      transition:
+        width 0.3s;
+
     }
+
 
     .status {
+
       margin-top: 10px;
+
       color: #aeb6c5;
+
       font-size: 14px;
+
     }
+
 
     .movie {
+
       display: flex;
+
       gap: 15px;
+
       padding: 18px 0;
-      border-bottom: 1px solid #292f3a;
+
+      border-bottom:
+        1px solid
+        #292f3a;
+
     }
+
 
     .movie:last-child {
+
       border-bottom: none;
+
     }
+
 
     .poster {
+
       width: 70px;
+
       height: 100px;
+
       object-fit: cover;
+
       border-radius: 6px;
+
       background: #252a34;
+
       flex-shrink: 0;
+
     }
+
 
     .movie-info {
+
       flex: 1;
+
       min-width: 0;
+
     }
+
 
     .movie-title {
+
       font-size: 17px;
+
       font-weight: bold;
+
       margin-bottom: 6px;
+
     }
+
 
     .movie-meta {
+
       color: #9ca3af;
+
       font-size: 13px;
+
       margin-bottom: 12px;
+
     }
+
 
     .output-block {
+
       margin-top: 12px;
+
     }
+
 
     .output-label {
+
       color: #93c5fd;
+
       font-size: 12px;
+
       font-weight: bold;
+
       margin-bottom: 5px;
+
       text-transform: uppercase;
+
     }
+
 
     .output-content {
+
       background: #10131a;
-      border: 1px solid #292f3a;
+
+      border:
+        1px solid
+        #292f3a;
+
       border-radius: 7px;
+
       padding: 10px;
+
       color: #d1d5db;
+
       font-size: 13px;
+
       line-height: 1.5;
+
       white-space: pre-wrap;
+
       word-break: break-word;
+
     }
+
 
     .code-output {
-      font-family: Consolas, Monaco, monospace;
+
+      font-family:
+        Consolas,
+        Monaco,
+        monospace;
+
       font-size: 12px;
-      white-space: pre-wrap;
+
     }
+
 
     .narration {
+
       background: #10131a;
-      border: 1px solid #292f3a;
+
+      border:
+        1px solid
+        #292f3a;
+
       border-radius: 7px;
+
       padding: 10px;
+
       color: #d1d5db;
+
       font-size: 13px;
+
       line-height: 1.5;
+
       margin-top: 8px;
+
     }
+
 
     .success {
+
       color: #4ade80;
+
       margin-top: 10px;
+
       font-size: 13px;
+
     }
+
 
     .error {
+
       color: #f87171;
+
       margin-top: 10px;
+
       font-size: 13px;
+
     }
 
+
     .tip {
+
       background: #10131a;
-      border-left: 3px solid #667eea;
+
+      border-left:
+        3px solid
+        #667eea;
+
       padding: 12px;
+
       border-radius: 6px;
+
       color: #b8c0ce;
+
       font-size: 13px;
+
       line-height: 1.6;
+
       margin-top: 12px;
+
     }
+
+
+    .language-row {
+
+      display: flex;
+
+      gap: 10px;
+
+      align-items: center;
+
+    }
+
+
+    .language-status {
+
+      font-size: 12px;
+
+      color: #8b93a1;
+
+      white-space: nowrap;
+
+    }
+
 
     @media (max-width: 600px) {
 
       body {
-        padding: 15px 10px;
+
+        padding:
+          15px 10px;
+
       }
+
 
       .box {
+
         padding: 15px;
+
       }
+
 
       .movie {
+
         gap: 10px;
+
       }
+
 
       .poster {
+
         width: 55px;
+
         height: 80px;
+
       }
 
+
       h1 {
+
         font-size: 23px;
+
       }
+
+
+      .language-row {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+      }
+
+
+      .language-status {
+
+        white-space: normal;
+
+      }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
-  <h1>🎬 Movie TTS Generator V2.2</h1>
+
+  <h1>
+    🎬 Movie TTS Generator V2.3
+  </h1>
+
 
   <div class="subtitle">
-    TMDB → Metadata → Title → Description → 2 CTA → TTS → MP3 → ZIP
+
+    TMDB → Language → Metadata → Title → Description →
+    2 CTA → TTS → MP3 → ZIP
+
   </div>
 
 
-  <!-- ========================================= -->
-  <!-- TMDB -->
-  <!-- ========================================= -->
+  <!-- ================================================= -->
+  <!-- TMDB INPUT -->
+  <!-- ================================================= -->
 
   <div class="box">
 
+
     <div class="section-title">
+
       🎬 TMDB Input
+
     </div>
+
 
     <div class="field">
 
-      <label>TMDB Movie IDs</label>
+      <label>
+        TMDB Movie IDs
+      </label>
+
 
       <textarea
         id="tmdbIds"
@@ -356,21 +695,114 @@
 155
 497
 603
-27205
-157336"
+27205"
       ></textarea>
 
+
       <div class="small">
+
         Maksimal 100 TMDB ID per proses.
-        Bisa dipisahkan dengan Enter, koma, titik koma, atau spasi.
+
+        Bisa dipisahkan dengan Enter,
+        koma, titik koma, atau spasi.
+
       </div>
 
     </div>
 
 
+    <!-- LANGUAGE -->
+
     <div class="field">
 
-      <label>CTA Base URL</label>
+      <label>
+        🌎 TMDB Language
+      </label>
+
+
+      <div class="language-row">
+
+
+        <select
+          id="tmdbLanguage"
+        >
+
+          <option value="">
+            Loading TMDB languages...
+          </option>
+
+        </select>
+
+
+        <div
+          id="languageStatus"
+          class="language-status"
+        >
+          Loading...
+        </div>
+
+
+      </div>
+
+
+      <div class="small">
+
+        Pilihan bahasa diambil langsung dari
+        Primary Translations TMDB.
+
+        Title, overview, dan genre akan mengikuti
+        bahasa yang dipilih jika TMDB memiliki
+        terjemahannya.
+
+      </div>
+
+
+      <div class="variables">
+
+        Contoh:
+
+        <br>
+
+        🇺🇸 <code>en-US</code> → English (US)
+
+        <br>
+
+        🇮🇩 <code>id-ID</code> → Indonesian
+
+        <br>
+
+        🇪🇸 <code>es-ES</code> → Spanish (Spain)
+
+        <br>
+
+        🇲🇽 <code>es-MX</code> → Spanish (Mexico)
+
+        <br>
+
+        🇧🇷 <code>pt-BR</code> → Portuguese (Brazil)
+
+        <br>
+
+        🇯🇵 <code>ja-JP</code> → Japanese
+
+        <br>
+
+        🇰🇷 <code>ko-KR</code> → Korean
+
+      </div>
+
+    </div>
+
+
+    <!-- CTA BASE -->
+
+    <div class="field">
+
+
+      <label>
+        CTA Base URL
+      </label>
+
 
       <input
         id="ctaBaseUrl"
@@ -379,9 +811,14 @@
         placeholder="https://example.com/"
       >
 
+
       <div class="small">
-        TMDB ID otomatis ditambahkan di belakang URL.
+
+        TMDB ID otomatis ditambahkan
+        di belakang URL.
+
       </div>
+
 
       <div class="variables">
 
@@ -389,7 +826,9 @@
 
         <br>
 
-        <code>https://movietts.pages.dev/</code>
+        <code>
+          https://movietts.pages.dev/
+        </code>
 
         +
 
@@ -397,32 +836,42 @@
 
         <br>
 
-        menjadi:
+        =
 
-        <br>
-
-        <code>https://movietts.pages.dev/550</code>
+        <code>
+          https://movietts.pages.dev/550
+        </code>
 
       </div>
 
+
     </div>
+
 
   </div>
 
 
-  <!-- ========================================= -->
+  <!-- ================================================= -->
   <!-- TITLE -->
-  <!-- ========================================= -->
+  <!-- ================================================= -->
 
   <div class="box">
 
+
     <div class="section-title">
+
       📝 Title Template
+
     </div>
+
 
     <div class="field">
 
-      <label>Title Template</label>
+
+      <label>
+        Title Template
+      </label>
+
 
       <input
         id="titleTemplate"
@@ -430,37 +879,42 @@
         value="{TITLE} ({YEAR}) - Movie Review"
       >
 
+
       <div class="variables">
 
-        Available Variables:
+        <code>{TITLE}</code>
+        = Movie title
 
         <br>
 
-        <code>{TITLE}</code> = Movie title
+        <code>{YEAR}</code>
+        = Release year
 
         <br>
 
-        <code>{YEAR}</code> = Release year
-
-        <br>
-
-        <code>{ID}</code> = TMDB ID
+        <code>{ID}</code>
+        = TMDB ID
 
       </div>
 
+
     </div>
+
 
   </div>
 
 
-  <!-- ========================================= -->
-  <!-- CTA BUTTONS -->
-  <!-- ========================================= -->
+  <!-- ================================================= -->
+  <!-- CTA -->
+  <!-- ================================================= -->
 
   <div class="box">
 
+
     <div class="section-title">
+
       🔗 CTA Buttons
+
     </div>
 
 
@@ -468,9 +922,12 @@
 
     <div class="cta-box">
 
+
       <div class="cta-title">
 
-        <span class="cta-number">CTA 1</span>
+        <span class="cta-number">
+          CTA 1
+        </span>
 
         First CTA Button
 
@@ -479,7 +936,11 @@
 
       <div class="field">
 
-        <label>Button 1 Text</label>
+
+        <label>
+          Button 1 Text
+        </label>
+
 
         <input
           id="cta1Text"
@@ -488,23 +949,25 @@
           placeholder="Watch Now"
         >
 
+
       </div>
 
 
       <div class="field">
 
-        <label>Button 1 HTML Template</label>
+
+        <label>
+          Button 1 HTML Template
+        </label>
+
 
         <textarea
           id="cta1Template"
           class="code"
         ><a href="{CTA_URL}" class="watch-btn">{CTA_TEXT}</a></textarea>
 
+
         <div class="variables">
-
-          Available Variables:
-
-          <br>
 
           <code>{CTA_URL}</code>
           = Automatic movie URL
@@ -521,7 +984,9 @@
 
         </div>
 
+
       </div>
+
 
     </div>
 
@@ -530,9 +995,12 @@
 
     <div class="cta-box">
 
+
       <div class="cta-title">
 
-        <span class="cta-number">CTA 2</span>
+        <span class="cta-number">
+          CTA 2
+        </span>
 
         Second CTA Button
 
@@ -541,7 +1009,11 @@
 
       <div class="field">
 
-        <label>Button 2 Text</label>
+
+        <label>
+          Button 2 Text
+        </label>
+
 
         <input
           id="cta2Text"
@@ -550,23 +1022,25 @@
           placeholder="Download Now"
         >
 
+
       </div>
 
 
       <div class="field">
 
-        <label>Button 2 HTML Template</label>
+
+        <label>
+          Button 2 HTML Template
+        </label>
+
 
         <textarea
           id="cta2Template"
           class="code"
         ><a href="{CTA_URL}" class="download-btn">{CTA_TEXT}</a></textarea>
 
+
         <div class="variables">
-
-          Available Variables:
-
-          <br>
 
           <code>{CTA_URL}</code>
           = Automatic movie URL
@@ -583,40 +1057,61 @@
 
         </div>
 
+
       </div>
+
 
     </div>
 
 
     <div class="tip">
 
-      💡 Kamu bebas mengubah HTML tombol.
-      Contoh teks tombol:
+      💡 Kamu bebas mengganti teks maupun
+      HTML tombol.
+
+      <br><br>
+
+      Contoh teks:
+
       <strong>Watch Now</strong>,
+
       <strong>Download Now</strong>,
+
       <strong>Tonton Sekarang</strong>,
-      <strong>Play Movie</strong>, dll.
+
+      <strong>Play Movie</strong>.
 
     </div>
+
 
   </div>
 
 
-  <!-- ========================================= -->
+  <!-- ================================================= -->
   <!-- DESCRIPTION -->
-  <!-- ========================================= -->
+  <!-- ================================================= -->
 
   <div class="box">
 
+
     <div class="section-title">
+
       📄 Description Template
+
     </div>
+
 
     <div class="field">
 
-      <label>Description Template</label>
 
-      <textarea id="descriptionTemplate">Watch {TITLE} ({YEAR}).
+      <label>
+        Description Template
+      </label>
+
+
+      <textarea
+        id="descriptionTemplate"
+      >Watch {TITLE} ({YEAR}).
 
 Genre: {GENRE}
 Director: {DIRECTOR}
@@ -631,9 +1126,6 @@ Rating: {RATING}
 
       <div class="variables">
 
-        Available Variables:
-
-        <br><br>
 
         <code>{TITLE}</code>
         = Movie title
@@ -651,7 +1143,7 @@ Rating: {RATING}
         <br>
 
         <code>{GENRE}</code>
-        = Genres
+        = Genre sesuai bahasa TMDB
 
         <br>
 
@@ -666,17 +1158,17 @@ Rating: {RATING}
         <br>
 
         <code>{OVERVIEW}</code>
-        = TMDB overview
+        = TMDB overview sesuai bahasa
 
         <br>
 
         <code>{CTA1}</code>
-        = Complete HTML CTA 1
+        = Full HTML CTA 1
 
         <br>
 
         <code>{CTA2}</code>
-        = Complete HTML CTA 2
+        = Full HTML CTA 2
 
         <br>
 
@@ -685,96 +1177,149 @@ Rating: {RATING}
 
       </div>
 
+
     </div>
+
 
   </div>
 
 
-  <!-- ========================================= -->
+  <!-- ================================================= -->
   <!-- TTS -->
-  <!-- ========================================= -->
+  <!-- ================================================= -->
 
   <div class="box">
 
+
     <div class="section-title">
+
       🎙️ ElevenLabs TTS
+
     </div>
 
 
+    <!-- VOICE -->
+
     <div class="field">
 
-      <label>ElevenLabs Voice ID</label>
+
+      <label>
+        ElevenLabs Voice ID
+      </label>
+
 
       <input
         id="voiceId"
         type="text"
-        value="YOUR_VOICE_ID_HERE"
-        placeholder="Enter ElevenLabs Voice ID"
+        value=""
+        placeholder="Paste ElevenLabs Voice ID here"
       >
 
+
       <div class="small">
-        Voice ID harus berasal dari voice yang bisa digunakan oleh API akunmu.
+
+        Voice ID dimasukkan langsung di web,
+        jadi kamu bisa mengganti voice kapan saja
+        tanpa deploy ulang.
+
       </div>
+
 
     </div>
 
 
+    <!-- MODEL -->
+
     <div class="field">
 
-      <label>TTS Model</label>
+
+      <label>
+        TTS Model
+      </label>
+
 
       <select id="model">
 
-        <option value="eleven_multilingual_v2">
+
+        <option
+          value="eleven_multilingual_v2"
+        >
+
           Eleven Multilingual v2
+
         </option>
 
+
       </select>
+
 
     </div>
 
 
+    <!-- FORMAT -->
+
     <div class="field">
 
-      <label>MP3 Quality</label>
+
+      <label>
+        MP3 Quality
+      </label>
+
 
       <select id="format">
 
+
         <option value="mp3_22050_32">
+
           MP3 22.05 kHz / 32 kbps — Small
+
         </option>
+
 
         <option value="mp3_44100_64">
+
           MP3 44.1 kHz / 64 kbps
+
         </option>
+
 
         <option value="mp3_44100_96">
+
           MP3 44.1 kHz / 96 kbps
+
         </option>
+
 
         <option value="mp3_44100_128">
+
           MP3 44.1 kHz / 128 kbps
+
         </option>
 
+
       </select>
+
 
     </div>
 
 
-    <!-- AUDIO NARRATION -->
+    <!-- NARRATION -->
 
     <div class="field">
 
-      <label>Audio Narration Template</label>
 
-      <textarea id="narrationTemplate">Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
+      <label>
+        Audio Narration Template
+      </label>
+
+
+      <textarea
+        id="narrationTemplate"
+      >Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
 
 
       <div class="variables">
 
-        Available Variables:
-
-        <br>
 
         <code>{TITLE}</code>
 
@@ -794,10 +1339,14 @@ Rating: {RATING}
 
         <code>{RATING}</code>
 
+
       </div>
+
 
     </div>
 
+
+    <!-- GENERATE -->
 
     <button
       id="generateBtn"
@@ -811,10 +1360,12 @@ Rating: {RATING}
 
     <div class="progress">
 
+
       <div
         id="progressBar"
         class="progress-bar"
       ></div>
+
 
     </div>
 
@@ -828,22 +1379,31 @@ Rating: {RATING}
 
     </div>
 
+
   </div>
 
 
-  <!-- ========================================= -->
+  <!-- ================================================= -->
   <!-- RESULTS -->
-  <!-- ========================================= -->
+  <!-- ================================================= -->
 
   <div class="box">
 
+
     <div class="section-title">
+
       📦 Results
+
     </div>
 
-    <div id="results"></div>
+
+    <div
+      id="results"
+    ></div>
+
 
   </div>
+
 
 </div>
 
@@ -851,9 +1411,302 @@ Rating: {RATING}
 <script>
 
 
-// =========================================
-// GET TMDB IDS
-// =========================================
+// =====================================================
+// LANGUAGE NAME MAP
+//
+// Browser locale digunakan untuk menampilkan nama
+// bahasa secara lebih manusiawi.
+//
+// Kalau browser tidak mengenali kode tertentu,
+// kita tetap menampilkan code TMDB.
+// =====================================================
+
+function getLanguageName(
+  code
+) {
+
+  try {
+
+    const display =
+      new Intl.DisplayNames(
+        ["en"],
+        {
+          type: "language"
+        }
+      );
+
+
+    const languageCode =
+      code.split("-")[0];
+
+
+    const name =
+      display.of(
+        languageCode
+      );
+
+
+    if (name) {
+
+      return name;
+
+    }
+
+  } catch (_) {}
+
+
+  return code;
+
+}
+
+
+// =====================================================
+// COUNTRY NAME
+// =====================================================
+
+function getCountryName(
+  code
+) {
+
+  if (!code) {
+    return "";
+  }
+
+
+  try {
+
+    const display =
+      new Intl.DisplayNames(
+        ["en"],
+        {
+          type: "region"
+        }
+      );
+
+
+    return (
+      display.of(code) ||
+      code
+    );
+
+  } catch (_) {
+
+    return code;
+
+  }
+
+}
+
+
+// =====================================================
+// FORMAT LANGUAGE LABEL
+// =====================================================
+
+function formatLanguageLabel(
+  code
+) {
+
+  const parts =
+    code.split("-");
+
+
+  const language =
+    getLanguageName(
+      code
+    );
+
+
+  if (
+    parts.length > 1
+  ) {
+
+    const country =
+      getCountryName(
+        parts[1]
+      );
+
+
+    return `${language} (${country}) — ${code}`;
+
+  }
+
+
+  return `${language} — ${code}`;
+
+}
+
+
+// =====================================================
+// LOAD TMDB LANGUAGES
+// =====================================================
+
+async function loadLanguages() {
+
+  const select =
+    document.getElementById(
+      "tmdbLanguage"
+    );
+
+
+  const status =
+    document.getElementById(
+      "languageStatus"
+    );
+
+
+  try {
+
+    status.textContent =
+      "Loading TMDB languages...";
+
+
+    const response =
+      await fetch(
+        "/api/movie?action=languages"
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Failed to load languages."
+      );
+
+    }
+
+
+    const languages =
+      Array.isArray(
+        data.languages
+      )
+        ? data.languages
+        : [];
+
+
+    if (!languages.length) {
+
+      throw new Error(
+        "TMDB returned no languages."
+      );
+
+    }
+
+
+    // Clear select
+
+    select.innerHTML =
+      "";
+
+
+    // Sort languages
+
+    languages.sort(
+      (a, b) =>
+        a.localeCompare(
+          b
+        )
+    );
+
+
+    // Add options
+
+    for (
+      const code of languages
+    ) {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        code;
+
+
+      option.textContent =
+        formatLanguageLabel(
+          code
+        );
+
+
+      select.appendChild(
+        option
+      );
+
+    }
+
+
+    // Prefer English US
+
+    if (
+      languages.includes(
+        "en-US"
+      )
+    ) {
+
+      select.value =
+        "en-US";
+
+    }
+
+    // Otherwise Indonesian
+
+    else if (
+      languages.includes(
+        "id-ID"
+      )
+    ) {
+
+      select.value =
+        "id-ID";
+
+    }
+
+
+    status.textContent =
+      `${languages.length} TMDB translations loaded`;
+
+  } catch (error) {
+
+    select.innerHTML = `
+
+      <option value="en-US">
+        English (United States) — en-US
+      </option>
+
+      <option value="id-ID">
+        Indonesian (Indonesia) — id-ID
+      </option>
+
+    `;
+
+
+    select.value =
+      "en-US";
+
+
+    status.textContent =
+      "Using fallback languages";
+
+
+    console.error(
+      error
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// GET IDS
+// =====================================================
 
 function getIds() {
 
@@ -865,10 +1718,18 @@ function getIds() {
 
   const ids =
     raw
-      .split(/[\s,;]+/)
-      .map(x => x.trim())
+      .split(
+        /[\s,;]+/
+      )
+      .map(
+        x =>
+          x.trim()
+      )
       .filter(Boolean)
-      .filter(x => /^\d+$/.test(x));
+      .filter(
+        x =>
+          /^\d+$/.test(x)
+      );
 
 
   return [
@@ -878,26 +1739,50 @@ function getIds() {
 }
 
 
-// =========================================
+// =====================================================
 // SLUGIFY
-// =========================================
+// =====================================================
 
-function slugify(text) {
+function slugify(
+  text
+) {
 
-  return String(text || "")
+  return String(
+    text || ""
+  )
+
     .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .substring(0, 100);
+
+    .normalize(
+      "NFKD"
+    )
+
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+
+    .replace(
+      /[^a-z0-9]+/g,
+      "-"
+    )
+
+    .replace(
+      /^-+|-+$/g,
+      ""
+    )
+
+    .substring(
+      0,
+      100
+    );
 
 }
 
 
-// =========================================
+// =====================================================
 // BUILD CTA URL
-// =========================================
+// =====================================================
 
 function buildCTAUrl(
   baseUrl,
@@ -905,12 +1790,15 @@ function buildCTAUrl(
 ) {
 
   let base =
-    String(baseUrl || "")
-      .trim();
+    String(
+      baseUrl || ""
+    ).trim();
 
 
   if (!base) {
+
     return "";
+
   }
 
 
@@ -926,9 +1814,9 @@ function buildCTAUrl(
 }
 
 
-// =========================================
+// =====================================================
 // BUILD CTA BUTTON
-// =========================================
+// =====================================================
 
 function buildCTAButton(
   template,
@@ -937,15 +1825,20 @@ function buildCTAButton(
   id
 ) {
 
-  return String(template || "")
+  return String(
+    template || ""
+  )
+
     .replaceAll(
       "{CTA_URL}",
       url
     )
+
     .replaceAll(
       "{CTA_TEXT}",
       text
     )
+
     .replaceAll(
       "{ID}",
       id
@@ -954,9 +1847,9 @@ function buildCTAButton(
 }
 
 
-// =========================================
+// =====================================================
 // REPLACE VARIABLES
-// =========================================
+// =====================================================
 
 function replaceVariables(
   template,
@@ -964,7 +1857,9 @@ function replaceVariables(
   extra = {}
 ) {
 
-  return String(template || "")
+  return String(
+    template || ""
+  )
 
     .replaceAll(
       "{TITLE}",
@@ -994,7 +1889,9 @@ function replaceVariables(
     .replaceAll(
       "{RATING}",
       movie.rating != null
-        ? Number(movie.rating).toFixed(1)
+        ? Number(
+            movie.rating
+          ).toFixed(1)
         : ""
     )
 
@@ -1021,11 +1918,13 @@ function replaceVariables(
 }
 
 
-// =========================================
+// =====================================================
 // BUILD TITLE
-// =========================================
+// =====================================================
 
-function buildTitle(movie) {
+function buildTitle(
+  movie
+) {
 
   const template =
     document.getElementById(
@@ -1041,9 +1940,9 @@ function buildTitle(movie) {
 }
 
 
-// =========================================
+// =====================================================
 // BUILD DESCRIPTION
-// =========================================
+// =====================================================
 
 function buildDescription(
   movie,
@@ -1071,11 +1970,13 @@ function buildDescription(
 }
 
 
-// =========================================
+// =====================================================
 // BUILD NARRATION
-// =========================================
+// =====================================================
 
-function buildNarration(movie) {
+function buildNarration(
+  movie
+) {
 
   const template =
     document.getElementById(
@@ -1091,9 +1992,9 @@ function buildNarration(movie) {
 }
 
 
-// =========================================
+// =====================================================
 // PROGRESS
-// =========================================
+// =====================================================
 
 function setProgress(
   current,
@@ -1103,7 +2004,10 @@ function setProgress(
   const percentage =
     total > 0
       ? Math.round(
-          (current / total) * 100
+          (
+            current /
+            total
+          ) * 100
         )
       : 0;
 
@@ -1122,15 +2026,18 @@ function setProgress(
 }
 
 
-// =========================================
+// =====================================================
 // GET MOVIE
-// =========================================
+// =====================================================
 
-async function getMovie(id) {
+async function getMovie(
+  id,
+  language
+) {
 
   const response =
     await fetch(
-      `/api/movie?id=${encodeURIComponent(id)}`
+      `/api/movie?id=${encodeURIComponent(id)}&language=${encodeURIComponent(language)}`
     );
 
 
@@ -1153,9 +2060,9 @@ async function getMovie(id) {
 }
 
 
-// =========================================
+// =====================================================
 // GENERATE SPEECH
-// =========================================
+// =====================================================
 
 async function generateSpeech(
   text,
@@ -1175,17 +2082,18 @@ async function generateSpeech(
             "application/json"
         },
 
-        body: JSON.stringify({
+        body:
+          JSON.stringify({
 
-          text,
+            text,
 
-          voiceId,
+            voiceId,
 
-          modelId,
+            modelId,
 
-          outputFormat
+            outputFormat
 
-        })
+          })
 
       }
     );
@@ -1222,9 +2130,9 @@ async function generateSpeech(
 }
 
 
-// =========================================
+// =====================================================
 // ADD RESULT
-// =========================================
+// =====================================================
 
 function addResult(
   movie,
@@ -1232,6 +2140,7 @@ function addResult(
   description,
   narration,
   ctaUrl,
+  language,
   status,
   error = ""
 ) {
@@ -1254,6 +2163,7 @@ function addResult(
 
   const poster =
     movie.poster
+
       ? `
         <img
           class="poster"
@@ -1261,12 +2171,15 @@ function addResult(
           alt=""
         >
       `
+
       : `
         <div class="poster"></div>
       `;
 
 
-  if (status === "success") {
+  if (
+    status === "success"
+  ) {
 
     div.innerHTML = `
 
@@ -1275,25 +2188,47 @@ function addResult(
       <div class="movie-info">
 
         <div class="movie-title">
-          ${escapeHtml(movie.title)}
+
+          ${escapeHtml(
+            movie.title
+          )}
+
         </div>
 
 
         <div class="movie-meta">
 
-          ${escapeHtml(movie.year || "-")}
+          Language:
+          ${escapeHtml(
+            language
+          )}
+
+          <br>
+
+          Year:
+          ${escapeHtml(
+            movie.year || "-"
+          )}
 
           ${
             movie.genres
+
               ? " • " +
-                escapeHtml(movie.genres)
+                escapeHtml(
+                  movie.genres
+                )
+
               : ""
           }
 
           ${
             movie.rating != null
+
               ? " • ⭐ " +
-                escapeHtml(movie.rating)
+                escapeHtml(
+                  movie.rating
+                )
+
               : ""
           }
 
@@ -1308,7 +2243,9 @@ function addResult(
 
           <div class="output-content">
 
-            ${escapeHtml(title)}
+            ${escapeHtml(
+              title
+            )}
 
           </div>
 
@@ -1323,7 +2260,9 @@ function addResult(
 
           <div class="output-content">
 
-            ${escapeHtml(ctaUrl)}
+            ${escapeHtml(
+              ctaUrl
+            )}
 
           </div>
 
@@ -1338,7 +2277,9 @@ function addResult(
 
           <div class="output-content code-output">
 
-            ${escapeHtml(description)}
+            ${escapeHtml(
+              description
+            )}
 
           </div>
 
@@ -1353,7 +2294,9 @@ function addResult(
 
           <div class="narration">
 
-            ${escapeHtml(narration)}
+            ${escapeHtml(
+              narration
+            )}
 
           </div>
 
@@ -1370,7 +2313,10 @@ function addResult(
 
     `;
 
-  } else {
+  }
+
+
+  else {
 
     div.innerHTML = `
 
@@ -1380,13 +2326,20 @@ function addResult(
 
         <div class="movie-title">
 
-          ${escapeHtml(movie.title)}
+          ${escapeHtml(
+            movie.title ||
+            "TMDB Movie"
+          )}
 
         </div>
 
+
         <div class="error">
 
-          ✕ ${escapeHtml(error)}
+          ✕
+          ${escapeHtml(
+            error
+          )}
 
         </div>
 
@@ -1404,13 +2357,17 @@ function addResult(
 }
 
 
-// =========================================
+// =====================================================
 // ESCAPE HTML
-// =========================================
+// =====================================================
 
-function escapeHtml(text) {
+function escapeHtml(
+  text
+) {
 
-  return String(text || "")
+  return String(
+    text || ""
+  )
 
     .replaceAll(
       "&",
@@ -1440,9 +2397,9 @@ function escapeHtml(text) {
 }
 
 
-// =========================================
+// =====================================================
 // GENERATE ALL
-// =========================================
+// =====================================================
 
 async function generateAll() {
 
@@ -1452,12 +2409,18 @@ async function generateAll() {
     );
 
 
-  // ---------------------------------------
-  // INPUTS
-  // ---------------------------------------
+  // ---------------------------------------------------
+  // INPUT
+  // ---------------------------------------------------
 
   const ids =
     getIds();
+
+
+  const language =
+    document.getElementById(
+      "tmdbLanguage"
+    ).value;
 
 
   const voiceId =
@@ -1516,9 +2479,9 @@ async function generateAll() {
     ).value;
 
 
-  // ---------------------------------------
+  // ---------------------------------------------------
   // VALIDATION
-  // ---------------------------------------
+  // ---------------------------------------------------
 
   if (!ids.length) {
 
@@ -1531,7 +2494,9 @@ async function generateAll() {
   }
 
 
-  if (ids.length > 100) {
+  if (
+    ids.length > 100
+  ) {
 
     alert(
       "Maksimal 100 TMDB ID per proses."
@@ -1542,11 +2507,18 @@ async function generateAll() {
   }
 
 
-  if (
-    !voiceId ||
-    voiceId ===
-      "YOUR_VOICE_ID_HERE"
-  ) {
+  if (!language) {
+
+    alert(
+      "Pilih bahasa TMDB terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+
+  if (!voiceId) {
 
     alert(
       "Masukkan Voice ID ElevenLabs."
@@ -1590,7 +2562,9 @@ async function generateAll() {
   }
 
 
-  if (!cta1Template.trim()) {
+  if (
+    !cta1Template.trim()
+  ) {
 
     alert(
       "Isi HTML Template CTA 1."
@@ -1601,7 +2575,9 @@ async function generateAll() {
   }
 
 
-  if (!cta2Template.trim()) {
+  if (
+    !cta2Template.trim()
+  ) {
 
     alert(
       "Isi HTML Template CTA 2."
@@ -1612,9 +2588,9 @@ async function generateAll() {
   }
 
 
-  // ---------------------------------------
+  // ---------------------------------------------------
   // DISABLE
-  // ---------------------------------------
+  // ---------------------------------------------------
 
   button.disabled =
     true;
@@ -1648,9 +2624,9 @@ async function generateAll() {
     0;
 
 
-  // =======================================
+  // ---------------------------------------------------
   // LOOP
-  // =======================================
+  // ---------------------------------------------------
 
   for (
     let i = 0;
@@ -1670,17 +2646,20 @@ async function generateAll() {
 
     try {
 
-      // -----------------------------------
-      // TMDB METADATA
-      // -----------------------------------
+      // -----------------------------------------------
+      // GET TMDB
+      // -----------------------------------------------
 
       const movie =
-        await getMovie(id);
+        await getMovie(
+          id,
+          language
+        );
 
 
-      // -----------------------------------
+      // -----------------------------------------------
       // CTA URL
-      // -----------------------------------
+      // -----------------------------------------------
 
       const ctaUrl =
         buildCTAUrl(
@@ -1689,9 +2668,9 @@ async function generateAll() {
         );
 
 
-      // -----------------------------------
+      // -----------------------------------------------
       // CTA 1
-      // -----------------------------------
+      // -----------------------------------------------
 
       const cta1 =
         buildCTAButton(
@@ -1702,9 +2681,9 @@ async function generateAll() {
         );
 
 
-      // -----------------------------------
+      // -----------------------------------------------
       // CTA 2
-      // -----------------------------------
+      // -----------------------------------------------
 
       const cta2 =
         buildCTAButton(
@@ -1715,9 +2694,9 @@ async function generateAll() {
         );
 
 
-      // -----------------------------------
+      // -----------------------------------------------
       // TITLE
-      // -----------------------------------
+      // -----------------------------------------------
 
       const finalTitle =
         buildTitle(
@@ -1725,9 +2704,9 @@ async function generateAll() {
         );
 
 
-      // -----------------------------------
+      // -----------------------------------------------
       // DESCRIPTION
-      // -----------------------------------
+      // -----------------------------------------------
 
       const finalDescription =
         buildDescription(
@@ -1738,9 +2717,9 @@ async function generateAll() {
         );
 
 
-      // -----------------------------------
-      // AUDIO NARRATION
-      // -----------------------------------
+      // -----------------------------------------------
+      // NARRATION
+      // -----------------------------------------------
 
       const narration =
         buildNarration(
@@ -1748,9 +2727,9 @@ async function generateAll() {
         );
 
 
-      // -----------------------------------
-      // ELEVENLABS
-      // -----------------------------------
+      // -----------------------------------------------
+      // TTS
+      // -----------------------------------------------
 
       const audioBlob =
         await generateSpeech(
@@ -1761,17 +2740,17 @@ async function generateAll() {
         );
 
 
-      // -----------------------------------
-      // MP3 FILENAME
-      // -----------------------------------
+      // -----------------------------------------------
+      // FILENAME
+      // -----------------------------------------------
 
       const filename =
         `${slugify(movie.title)}-${movie.year || "unknown"}-${movie.id}.mp3`;
 
 
-      // -----------------------------------
-      // ADD MP3 TO ZIP
-      // -----------------------------------
+      // -----------------------------------------------
+      // ADD ZIP
+      // -----------------------------------------------
 
       zip.file(
         filename,
@@ -1779,9 +2758,9 @@ async function generateAll() {
       );
 
 
-      // -----------------------------------
+      // -----------------------------------------------
       // RESULT
-      // -----------------------------------
+      // -----------------------------------------------
 
       addResult(
         movie,
@@ -1789,6 +2768,7 @@ async function generateAll() {
         finalDescription,
         narration,
         ctaUrl,
+        language,
         "success"
       );
 
@@ -1796,7 +2776,12 @@ async function generateAll() {
       successCount++;
 
 
-    } catch (error) {
+    }
+
+
+    catch (
+      error
+    ) {
 
       errorCount++;
 
@@ -1805,15 +2790,26 @@ async function generateAll() {
         {
           title:
             `TMDB ID ${id}`,
+
           year: "",
+
           genres: "",
+
           rating: null
         },
+
         "",
+
         "",
+
         "",
+
         "",
+
+        language,
+
         "error",
+
         error?.message ||
           "Unknown error"
       );
@@ -1829,11 +2825,13 @@ async function generateAll() {
   }
 
 
-  // =======================================
+  // ---------------------------------------------------
   // CREATE ZIP
-  // =======================================
+  // ---------------------------------------------------
 
-  if (successCount > 0) {
+  if (
+    successCount > 0
+  ) {
 
     document.getElementById(
       "status"
@@ -1844,7 +2842,8 @@ async function generateAll() {
     const zipBlob =
       await zip.generateAsync({
 
-        type: "blob",
+        type:
+          "blob",
 
         compression:
           "STORE"
@@ -1869,7 +2868,7 @@ async function generateAll() {
 
 
     a.download =
-      `movie-tts-${Date.now()}.zip`;
+      `movie-tts-${language}-${Date.now()}.zip`;
 
 
     document.body.appendChild(
@@ -1890,14 +2889,14 @@ async function generateAll() {
   }
 
 
-  // =======================================
+  // ---------------------------------------------------
   // FINISHED
-  // =======================================
+  // ---------------------------------------------------
 
   document.getElementById(
     "status"
   ).textContent =
-    `Selesai — ${successCount} berhasil, ${errorCount} gagal.`;
+    `Selesai — ${successCount} berhasil, ${errorCount} gagal. Language: ${language}`;
 
 
   button.disabled =
@@ -1909,7 +2908,23 @@ async function generateAll() {
 
 }
 
+
+// =====================================================
+// INITIALIZE
+// =====================================================
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    loadLanguages();
+
+  }
+);
+
 </script>
 
+
 </body>
+
 </html>
