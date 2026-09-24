@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>Movie TTS Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie TTS V2 - TMDB to MP3</title>
 
   <style>
     * {
@@ -14,28 +13,28 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #0f1117;
+      background: #0b1020;
       color: #fff;
     }
 
     .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 30px 20px;
+      width: min(1100px, 94%);
+      margin: 30px auto;
     }
 
     h1 {
-      margin: 0 0 8px;
+      margin-bottom: 5px;
     }
 
     .subtitle {
       color: #9ca3af;
+      margin-top: 0;
       margin-bottom: 25px;
     }
 
     .card {
-      background: #181c25;
-      border: 1px solid #292f3a;
+      background: #151b2e;
+      border: 1px solid #27304a;
       border-radius: 14px;
       padding: 20px;
       margin-bottom: 20px;
@@ -47,37 +46,62 @@
       margin-bottom: 8px;
     }
 
-    textarea {
+    textarea,
+    input,
+    select {
       width: 100%;
-      min-height: 180px;
-      resize: vertical;
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid #303744;
-      background: #0f1117;
+      background: #0d1324;
       color: #fff;
+      border: 1px solid #303a58;
+      border-radius: 9px;
+      padding: 12px;
       font-size: 14px;
       outline: none;
     }
 
-    textarea:focus {
-      border-color: #6366f1;
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: #667eea;
     }
 
-    .template {
-      min-height: 100px;
-      margin-top: 15px;
+    #tmdbIds {
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    #template {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .help {
+      color: #8f9ab5;
+      font-size: 13px;
+      margin-top: 7px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
     }
 
     button {
-      margin-top: 15px;
-      padding: 13px 22px;
       border: 0;
-      border-radius: 10px;
-      background: #6366f1;
-      color: #fff;
+      border-radius: 9px;
+      padding: 12px 18px;
       font-weight: bold;
       cursor: pointer;
+      color: white;
+      background: #5865f2;
     }
 
     button:hover {
@@ -85,89 +109,129 @@
     }
 
     button:disabled {
-      opacity: .5;
+      opacity: .45;
       cursor: not-allowed;
     }
 
-    .status {
+    .secondary {
+      background: #374151;
+    }
+
+    .success {
+      background: #16a34a;
+    }
+
+    .danger {
+      background: #dc2626;
+    }
+
+    .progress-wrap {
       margin-top: 15px;
-      color: #9ca3af;
     }
 
-    .movie {
-      display: grid;
-      grid-template-columns: 90px 1fr;
-      gap: 18px;
-      padding: 18px 0;
-      border-bottom: 1px solid #292f3a;
+    .progress-bg {
+      width: 100%;
+      height: 18px;
+      background: #0a0f1d;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #29334d;
     }
 
-    .movie:last-child {
-      border-bottom: 0;
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #5865f2;
+      transition: width .25s ease;
     }
 
-    .poster {
-      width: 90px;
-      height: 135px;
-      object-fit: cover;
-      border-radius: 8px;
-      background: #252a34;
+    .progress-text {
+      margin-top: 8px;
+      color: #cbd5e1;
+      font-size: 14px;
     }
 
-    .movie h3 {
-      margin: 0 0 8px;
+    .status {
+      max-height: 350px;
+      overflow-y: auto;
+      margin-top: 15px;
     }
 
-    .meta {
-      color: #aeb6c2;
-      font-size: 13px;
-      margin-bottom: 12px;
-      line-height: 1.7;
+    .status-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 10px;
+      border-bottom: 1px solid #252d43;
+      font-size: 14px;
     }
 
-    .narration {
-      background: #0f1117;
-      border-radius: 8px;
-      padding: 13px;
-      line-height: 1.6;
-      color: #e5e7eb;
+    .status-icon {
+      width: 22px;
+      text-align: center;
+    }
+
+    .status-name {
+      flex: 1;
+    }
+
+    .ok {
+      color: #4ade80;
     }
 
     .error {
       color: #f87171;
     }
 
-    .success {
-      color: #4ade80;
+    .working {
+      color: #facc15;
     }
 
-    .empty {
-      text-align: center;
-      padding: 30px;
-      color: #9ca3af;
+    .preview {
+      margin-top: 15px;
+      padding: 15px;
+      background: #0c1221;
+      border-radius: 10px;
+      color: #d1d5db;
+      line-height: 1.6;
+      white-space: pre-wrap;
     }
 
-    .count {
+    .counter {
       display: inline-block;
-      background: #292f3a;
+      background: #252e48;
       padding: 5px 9px;
       border-radius: 7px;
-      font-size: 12px;
-      margin-left: 5px;
+      color: #cbd5e1;
+      font-size: 13px;
+      margin-top: 8px;
     }
 
-    @media (max-width: 600px) {
+    .download-box {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #245c3c;
+      background: #0d2117;
+      border-radius: 12px;
+    }
+
+    .download-box h3 {
+      margin-top: 0;
+    }
+
+    @media (max-width: 700px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+
       .container {
-        padding: 20px 12px;
+        width: 96%;
+        margin-top: 15px;
       }
 
-      .movie {
-        grid-template-columns: 70px 1fr;
-      }
-
-      .poster {
-        width: 70px;
-        height: 105px;
+      .card {
+        padding: 15px;
       }
     }
   </style>
@@ -177,226 +241,736 @@
 
 <div class="container">
 
-  <h1>🎬 Movie TTS Generator</h1>
-
-  <div class="subtitle">
-    TMDB Movie ID → Metadata → Short Indonesian Narration
-  </div>
+  <h1>🎬 Movie TTS V2</h1>
+  <p class="subtitle">
+    TMDB IDs → Indonesian narration → MP3 → ZIP
+  </p>
 
   <div class="card">
 
-    <label>TMDB Movie IDs</label>
-
-    <textarea
-      id="movieIds"
-      placeholder="Masukkan 1 ID per baris
-
-Contoh:
-550
-27205
-157336
-299536"></textarea>
-
-    <label style="margin-top:20px;">
-      TTS Narration Template
+    <label for="tmdbIds">
+      TMDB Movie IDs
     </label>
 
     <textarea
-      id="template"
-      class="template">Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
+      id="tmdbIds"
+      placeholder="Example:
+550
+27205
+157336
+603
 
-    <button id="generateBtn" onclick="generateMovies()">
-      🚀 Generate
-    </button>
+You can paste up to 100 IDs."
+    ></textarea>
 
-    <div id="status" class="status"></div>
+    <div class="counter">
+      <span id="idCount">0</span> / 100 IDs
+    </div>
+
+    <div class="help">
+      One ID per line, comma separated, or space separated.
+      Duplicate IDs are automatically removed.
+    </div>
 
   </div>
 
+  <div class="card">
+
+    <div class="row">
+
+      <div>
+        <label for="voice">
+          ElevenLabs Voice
+        </label>
+
+        <select id="voice">
+          <option value="">Loading voices...</option>
+        </select>
+
+        <div class="help">
+          Voices are loaded from your ElevenLabs account.
+        </div>
+      </div>
+
+      <div>
+        <label for="model">
+          TTS Model
+        </label>
+
+        <select id="model">
+          <option value="eleven_multilingual_v2">
+            Eleven Multilingual V2
+          </option>
+        </select>
+      </div>
+
+    </div>
+
+  </div>
 
   <div class="card">
 
-    <h2>
-      🎙️ Results
-      <span id="count" class="count">0</span>
-    </h2>
+    <label for="template">
+      Narration Template
+    </label>
 
-    <div id="results">
-      <div class="empty">
-        Masukkan TMDB ID lalu klik Generate.
+    <textarea id="template">Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
+
+    <div class="help">
+      Available variables:
+      <b>{TITLE}</b>,
+      <b>{YEAR}</b>,
+      <b>{ORIGINAL_TITLE}</b>
+    </div>
+
+    <div class="preview" id="preview">
+      Preview narration akan muncul di sini.
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <div class="buttons">
+
+      <button id="generateBtn">
+        🚀 Generate MP3
+      </button>
+
+      <button id="clearBtn" class="secondary">
+        Clear
+      </button>
+
+    </div>
+
+    <div class="progress-wrap">
+
+      <div class="progress-bg">
+        <div
+          class="progress-bar"
+          id="progressBar"
+        ></div>
       </div>
+
+      <div class="progress-text" id="progressText">
+        Ready.
+      </div>
+
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="download-box" id="downloadBox">
+
+      <h3>✅ Semua MP3 selesai</h3>
+
+      <p id="downloadInfo">
+        ZIP siap didownload.
+      </p>
+
+      <button
+        id="downloadBtn"
+        class="success"
+      >
+        ⬇️ DOWNLOAD ZIP
+      </button>
+
     </div>
 
   </div>
 
 </div>
 
+<!-- JSZip -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
 <script>
 
-async function generateMovies() {
+const tmdbIdsEl = document.getElementById("tmdbIds");
+const idCountEl = document.getElementById("idCount");
+const templateEl = document.getElementById("template");
+const voiceEl = document.getElementById("voice");
+const modelEl = document.getElementById("model");
+const previewEl = document.getElementById("preview");
 
-  const input = document.getElementById("movieIds");
-  const template = document.getElementById("template");
-  const button = document.getElementById("generateBtn");
-  const status = document.getElementById("status");
-  const results = document.getElementById("results");
-  const count = document.getElementById("count");
+const generateBtn = document.getElementById("generateBtn");
+const clearBtn = document.getElementById("clearBtn");
 
-  const ids = input.value
-    .split(/[\n,]+/)
+const progressBar = document.getElementById("progressBar");
+const progressText = document.getElementById("progressText");
+const statusEl = document.getElementById("status");
+
+const downloadBox = document.getElementById("downloadBox");
+const downloadBtn = document.getElementById("downloadBtn");
+const downloadInfo = document.getElementById("downloadInfo");
+
+let generatedZipBlob = null;
+
+
+/* =========================
+   PARSE IDS
+========================= */
+
+function getIds() {
+
+  const raw = tmdbIdsEl.value;
+
+  const ids = raw
+    .split(/[\s,;]+/)
     .map(x => x.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter(x => /^\d+$/.test(x));
 
-  if (!ids.length) {
-    alert("Masukkan minimal 1 TMDB Movie ID.");
-    return;
+  return [...new Set(ids)].slice(0, 100);
+}
+
+
+/* =========================
+   UPDATE COUNTER
+========================= */
+
+function updateCounter() {
+
+  const ids = getIds();
+
+  idCountEl.textContent = ids.length;
+
+  if (ids.length > 100) {
+    idCountEl.textContent = "100";
   }
-
-  button.disabled = true;
-
-  status.textContent =
-    "⏳ Mengambil data " + ids.length + " film dari TMDB...";
-
-  results.innerHTML = "";
-
-  let success = 0;
-
-  for (let i = 0; i < ids.length; i++) {
-
-    status.textContent =
-      `⏳ Processing ${i + 1}/${ids.length}...`;
-
-    try {
-
-      const response = await fetch(
-        "/api/movie?id=" + encodeURIComponent(ids[i])
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "TMDB error");
-      }
-
-      const narration = template.value
-        .replace(/\{TITLE\}/g, data.title || "")
-        .replace(/\{YEAR\}/g, data.year || "");
-
-      renderMovie(data, narration);
-
-      success++;
-
-    } catch (error) {
-
-      renderError(ids[i], error.message);
-
-    }
-
-  }
-
-  count.textContent = success;
-
-  status.textContent =
-    `✅ Selesai — ${success}/${ids.length} film berhasil.`;
-
-  button.disabled = false;
 }
 
 
-function renderMovie(movie, narration) {
-
-  const results = document.getElementById("results");
-
-  results.innerHTML += `
-
-    <div class="movie">
-
-      ${
-        movie.poster
-        ? `<img
-            class="poster"
-            src="${escapeHtml(movie.poster)}"
-            loading="lazy">`
-        : `<div class="poster"></div>`
-      }
-
-      <div>
-
-        <h3>
-          ${escapeHtml(movie.title)}
-          ${movie.year
-            ? ` (${escapeHtml(movie.year)})`
-            : ""}
-        </h3>
-
-        <div class="meta">
-
-          ⭐ Rating:
-          ${escapeHtml(movie.rating || "-")}
-
-          &nbsp; • &nbsp;
-
-          🎭 ${escapeHtml(movie.genres || "-")}
-
-          <br>
-
-          🎬 Director:
-          ${escapeHtml(movie.director || "-")}
-
-          &nbsp; • &nbsp;
-
-          ⏱️ ${escapeHtml(movie.runtime || "-")} min
-
-        </div>
-
-        <div class="narration">
-          ${escapeHtml(narration)}
-        </div>
-
-      </div>
-
-    </div>
-
-  `;
-}
-
-
-function renderError(id, message) {
-
-  const results = document.getElementById("results");
-
-  results.innerHTML += `
-
-    <div class="movie">
-
-      <div></div>
-
-      <div>
-
-        <h3>❌ TMDB ID ${escapeHtml(id)}</h3>
-
-        <div class="error">
-          ${escapeHtml(message)}
-        </div>
-
-      </div>
-
-    </div>
-
-  `;
-}
-
+/* =========================
+   ESCAPE HTML
+========================= */
 
 function escapeHtml(value) {
 
-  return String(value ?? "")
+  return String(value || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+
+/* =========================
+   CREATE NARRATION
+========================= */
+
+function makeNarration(movie) {
+
+  return templateEl.value
+    .replace(/\{TITLE\}/gi, movie.title || "")
+    .replace(/\{YEAR\}/gi, movie.year || "")
+    .replace(/\{ORIGINAL_TITLE\}/gi, movie.originalTitle || "");
+}
+
+
+/* =========================
+   PREVIEW
+========================= */
+
+function updatePreview() {
+
+  previewEl.textContent =
+    templateEl.value
+      .replace(/\{TITLE\}/gi, "The Example Movie")
+      .replace(/\{YEAR\}/gi, "2026")
+      .replace(/\{ORIGINAL_TITLE\}/gi, "The Example Movie");
+}
+
+
+/* =========================
+   LOAD VOICES
+========================= */
+
+async function loadVoices() {
+
+  try {
+
+    voiceEl.innerHTML =
+      `<option value="">Loading voices...</option>`;
+
+    const response = await fetch("/api/tts?voices=1");
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Failed to load voices"
+      );
+    }
+
+    voiceEl.innerHTML = "";
+
+    const voices = data.voices || [];
+
+    if (!voices.length) {
+      throw new Error("No ElevenLabs voices available.");
+    }
+
+    voices.forEach(voice => {
+
+      const option = document.createElement("option");
+
+      option.value = voice.voice_id;
+
+      option.textContent =
+        voice.name +
+        (voice.language
+          ? ` — ${voice.language}`
+          : "");
+
+      voiceEl.appendChild(option);
+
+    });
+
+    /*
+      Prefer an Indonesian verified voice if available.
+    */
+
+    const indonesian = voices.find(v =>
+      (v.languages || []).some(lang =>
+        String(lang).toLowerCase().includes("indonesian")
+      )
+    );
+
+    if (indonesian) {
+      voiceEl.value = indonesian.voice_id;
+    }
+
+  } catch (error) {
+
+    voiceEl.innerHTML =
+      `<option value="">Failed to load voices</option>`;
+
+    addStatus(
+      "❌",
+      "Voice loading error: " + error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+function addStatus(icon, text, type = "") {
+
+  const div = document.createElement("div");
+
+  div.className = "status-item";
+
+  div.innerHTML = `
+    <div class="status-icon ${type}">
+      ${icon}
+    </div>
+
+    <div class="status-name">
+      ${escapeHtml(text)}
+    </div>
+  `;
+
+  statusEl.appendChild(div);
+
+  div.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest"
+  });
+}
+
+
+/* =========================
+   GET MOVIE
+========================= */
+
+async function getMovie(id) {
+
+  const response = await fetch(
+    `/api/movie?id=${encodeURIComponent(id)}`
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.error ||
+      `TMDB error for ID ${id}`
+    );
+
+  }
+
+  return data;
+}
+
+
+/* =========================
+   GENERATE TTS
+========================= */
+
+async function generateTTS(text, voiceId, modelId) {
+
+  const response = await fetch("/api/tts", {
+
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify({
+      text,
+      voiceId,
+      modelId,
+      outputFormat: "mp3_22050_32"
+    })
+
+  });
+
+  if (!response.ok) {
+
+    let message =
+      `TTS failed (${response.status})`;
+
+    try {
+
+      const data = await response.json();
+
+      if (data.error) {
+        message = data.error;
+      }
+
+    } catch (_) {}
+
+    throw new Error(message);
+
+  }
+
+  return await response.blob();
+}
+
+
+/* =========================
+   SAFE FILENAME
+========================= */
+
+function slugify(text) {
+
+  return String(text || "movie")
+    .normalize("NFKD")
+    .replace(/[^\x00-\x7F]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .substring(0, 100) || "movie";
+}
+
+
+/* =========================
+   GENERATE ALL
+========================= */
+
+async function generateAll() {
+
+  const ids = getIds();
+
+  if (!ids.length) {
+
+    alert("Masukkan minimal 1 TMDB ID.");
+
+    return;
+  }
+
+  if (ids.length > 100) {
+
+    alert("Maksimal 100 TMDB ID per batch.");
+
+    return;
+  }
+
+  const voiceId = voiceEl.value;
+
+  if (!voiceId) {
+
+    alert("Pilih ElevenLabs voice terlebih dahulu.");
+
+    return;
+  }
+
+  const modelId = modelEl.value;
+
+  generateBtn.disabled = true;
+  clearBtn.disabled = true;
+
+  statusEl.innerHTML = "";
+
+  downloadBox.style.display = "none";
+
+  generatedZipBlob = null;
+
+  progressBar.style.width = "0%";
+
+  progressText.textContent =
+    `Starting ${ids.length} movie(s)...`;
+
+  const zip = new JSZip();
+
+  let success = 0;
+  let failed = 0;
+
+  /*
+    Sequential processing.
+    This is intentionally one-by-one so
+    the API is not hammered with 100
+    simultaneous requests.
+  */
+
+  for (let i = 0; i < ids.length; i++) {
+
+    const id = ids[i];
+
+    progressText.textContent =
+      `Processing ${i + 1}/${ids.length} — TMDB ${id}`;
+
+    try {
+
+      addStatus(
+        "⏳",
+        `[${i + 1}/${ids.length}] Getting TMDB ${id}...`,
+        "working"
+      );
+
+      const movie = await getMovie(id);
+
+      const narration =
+        makeNarration(movie);
+
+      addStatus(
+        "🎙️",
+        `[${i + 1}/${ids.length}] TTS: ${movie.title}`,
+        "working"
+      );
+
+      const audioBlob =
+        await generateTTS(
+          narration,
+          voiceId,
+          modelId
+        );
+
+      const year =
+        movie.year
+          ? `-${movie.year}`
+          : "";
+
+      const filename =
+        `${slugify(movie.title)}${year}-${movie.id}.mp3`;
+
+      const arrayBuffer =
+        await audioBlob.arrayBuffer();
+
+      zip.file(
+        filename,
+        arrayBuffer
+      );
+
+      success++;
+
+      addStatus(
+        "✅",
+        `[${i + 1}/${ids.length}] ${filename}`,
+        "ok"
+      );
+
+    } catch (error) {
+
+      failed++;
+
+      addStatus(
+        "❌",
+        `[${i + 1}/${ids.length}] TMDB ${id}: ${error.message}`,
+        "error"
+      );
+
+    }
+
+    const percent =
+      Math.round(
+        ((i + 1) / ids.length) * 100
+      );
+
+    progressBar.style.width =
+      percent + "%";
+  }
+
+
+  /* =========================
+     CREATE ZIP
+  ========================= */
+
+  progressText.textContent =
+    "Creating ZIP file...";
+
+  if (success === 0) {
+
+    progressText.textContent =
+      "No MP3 was generated.";
+
+    generateBtn.disabled = false;
+    clearBtn.disabled = false;
+
+    return;
+  }
+
+  generatedZipBlob =
+    await zip.generateAsync({
+      type: "blob",
+      compression: "STORE"
+    }, metadata => {
+
+      progressText.textContent =
+        `Creating ZIP ${Math.round(metadata.percent)}%`;
+
+    });
+
+
+  const zipSizeMB =
+    (
+      generatedZipBlob.size /
+      1024 /
+      1024
+    ).toFixed(2);
+
+  downloadInfo.textContent =
+    `${success} MP3 berhasil dibuat` +
+    (failed
+      ? ` • ${failed} gagal`
+      : "") +
+    ` • ZIP size ${zipSizeMB} MB`;
+
+  downloadBox.style.display =
+    "block";
+
+  progressBar.style.width =
+    "100%";
+
+  progressText.textContent =
+    `Finished: ${success} success, ${failed} failed.`;
+
+  generateBtn.disabled = false;
+  clearBtn.disabled = false;
+}
+
+
+/* =========================
+   DOWNLOAD
+========================= */
+
+function downloadZip() {
+
+  if (!generatedZipBlob) {
+    return;
+  }
+
+  const url =
+    URL.createObjectURL(
+      generatedZipBlob
+    );
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+
+  const date =
+    new Date()
+      .toISOString()
+      .slice(0, 10);
+
+  a.download =
+    `movie-tts-${date}.zip`;
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+
+/* =========================
+   CLEAR
+========================= */
+
+function clearAll() {
+
+  tmdbIdsEl.value = "";
+
+  statusEl.innerHTML = "";
+
+  progressBar.style.width = "0%";
+
+  progressText.textContent =
+    "Ready.";
+
+  downloadBox.style.display =
+    "none";
+
+  generatedZipBlob = null;
+
+  updateCounter();
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+tmdbIdsEl.addEventListener(
+  "input",
+  updateCounter
+);
+
+templateEl.addEventListener(
+  "input",
+  updatePreview
+);
+
+generateBtn.addEventListener(
+  "click",
+  generateAll
+);
+
+downloadBtn.addEventListener(
+  "click",
+  downloadZip
+);
+
+clearBtn.addEventListener(
+  "click",
+  clearAll
+);
+
+
+/* =========================
+   INIT
+========================= */
+
+updateCounter();
+updatePreview();
+loadVoices();
 
 </script>
 
