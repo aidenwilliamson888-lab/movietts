@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Movie TTS Generator</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f1117;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      color: #9ca3af;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: #181c25;
+      border: 1px solid #292f3a;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      resize: vertical;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #303744;
+      background: #0f1117;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #6366f1;
+    }
+
+    .template {
+      min-height: 100px;
+      margin-top: 15px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 13px 22px;
+      border: 0;
+      border-radius: 10px;
+      background: #6366f1;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 15px;
+      color: #9ca3af;
+    }
+
+    .movie {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 18px;
+      padding: 18px 0;
+      border-bottom: 1px solid #292f3a;
+    }
+
+    .movie:last-child {
+      border-bottom: 0;
+    }
+
+    .poster {
+      width: 90px;
+      height: 135px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #252a34;
+    }
+
+    .movie h3 {
+      margin: 0 0 8px;
+    }
+
+    .meta {
+      color: #aeb6c2;
+      font-size: 13px;
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+
+    .narration {
+      background: #0f1117;
+      border-radius: 8px;
+      padding: 13px;
+      line-height: 1.6;
+      color: #e5e7eb;
+    }
+
+    .error {
+      color: #f87171;
+    }
+
+    .success {
+      color: #4ade80;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px;
+      color: #9ca3af;
+    }
+
+    .count {
+      display: inline-block;
+      background: #292f3a;
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 12px;
+      margin-left: 5px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px 12px;
+      }
+
+      .movie {
+        grid-template-columns: 70px 1fr;
+      }
+
+      .poster {
+        width: 70px;
+        height: 105px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🎬 Movie TTS Generator</h1>
+
+  <div class="subtitle">
+    TMDB Movie ID → Metadata → Short Indonesian Narration
+  </div>
+
+  <div class="card">
+
+    <label>TMDB Movie IDs</label>
+
+    <textarea
+      id="movieIds"
+      placeholder="Masukkan 1 ID per baris
+
+Contoh:
+550
+27205
+157336
+299536"></textarea>
+
+    <label style="margin-top:20px;">
+      TTS Narration Template
+    </label>
+
+    <textarea
+      id="template"
+      class="template">Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
+
+    <button id="generateBtn" onclick="generateMovies()">
+      🚀 Generate
+    </button>
+
+    <div id="status" class="status"></div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>
+      🎙️ Results
+      <span id="count" class="count">0</span>
+    </h2>
+
+    <div id="results">
+      <div class="empty">
+        Masukkan TMDB ID lalu klik Generate.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+async function generateMovies() {
+
+  const input = document.getElementById("movieIds");
+  const template = document.getElementById("template");
+  const button = document.getElementById("generateBtn");
+  const status = document.getElementById("status");
+  const results = document.getElementById("results");
+  const count = document.getElementById("count");
+
+  const ids = input.value
+    .split(/[\n,]+/)
+    .map(x => x.trim())
+    .filter(Boolean);
+
+  if (!ids.length) {
+    alert("Masukkan minimal 1 TMDB Movie ID.");
+    return;
+  }
+
+  button.disabled = true;
+
+  status.textContent =
+    "⏳ Mengambil data " + ids.length + " film dari TMDB...";
+
+  results.innerHTML = "";
+
+  let success = 0;
+
+  for (let i = 0; i < ids.length; i++) {
+
+    status.textContent =
+      `⏳ Processing ${i + 1}/${ids.length}...`;
+
+    try {
+
+      const response = await fetch(
+        "/api/movie?id=" + encodeURIComponent(ids[i])
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "TMDB error");
+      }
+
+      const narration = template.value
+        .replace(/\{TITLE\}/g, data.title || "")
+        .replace(/\{YEAR\}/g, data.year || "");
+
+      renderMovie(data, narration);
+
+      success++;
+
+    } catch (error) {
+
+      renderError(ids[i], error.message);
+
+    }
+
+  }
+
+  count.textContent = success;
+
+  status.textContent =
+    `✅ Selesai — ${success}/${ids.length} film berhasil.`;
+
+  button.disabled = false;
+}
+
+
+function renderMovie(movie, narration) {
+
+  const results = document.getElementById("results");
+
+  results.innerHTML += `
+
+    <div class="movie">
+
+      ${
+        movie.poster
+        ? `<img
+            class="poster"
+            src="${escapeHtml(movie.poster)}"
+            loading="lazy">`
+        : `<div class="poster"></div>`
+      }
+
+      <div>
+
+        <h3>
+          ${escapeHtml(movie.title)}
+          ${movie.year
+            ? ` (${escapeHtml(movie.year)})`
+            : ""}
+        </h3>
+
+        <div class="meta">
+
+          ⭐ Rating:
+          ${escapeHtml(movie.rating || "-")}
+
+          &nbsp; • &nbsp;
+
+          🎭 ${escapeHtml(movie.genres || "-")}
+
+          <br>
+
+          🎬 Director:
+          ${escapeHtml(movie.director || "-")}
+
+          &nbsp; • &nbsp;
+
+          ⏱️ ${escapeHtml(movie.runtime || "-")} min
+
+        </div>
+
+        <div class="narration">
+          ${escapeHtml(narration)}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+}
+
+
+function renderError(id, message) {
+
+  const results = document.getElementById("results");
+
+  results.innerHTML += `
+
+    <div class="movie">
+
+      <div></div>
+
+      <div>
+
+        <h3>❌ TMDB ID ${escapeHtml(id)}</h3>
+
+        <div class="error">
+          ${escapeHtml(message)}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+}
+
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+</script>
+
+</body>
+</html>
