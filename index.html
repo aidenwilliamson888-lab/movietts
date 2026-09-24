@@ -1,2089 +1,1500 @@
 <!DOCTYPE html>
-<html lang="id">
-
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <meta charset="UTF-8">
+  <title>Movie TTS Generator V2.4</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>
-    Movie TTS Generator V2.3
-  </title>
-
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <style>
-
     * {
       box-sizing: border-box;
     }
 
-
     body {
-
       margin: 0;
-
-      padding: 30px 15px;
-
-      background: #0f1117;
-
-      color: #f5f5f5;
-
-      font-family:
-        Arial,
-        sans-serif;
-
+      font-family: Inter, Arial, sans-serif;
+      background: #0b1020;
+      color: #e8ecf7;
     }
-
 
     .container {
-
-      max-width: 1100px;
-
-      margin: auto;
-
+      width: min(1180px, calc(100% - 32px));
+      margin: 35px auto 70px;
     }
 
-
-    h1 {
-
-      margin: 0 0 8px;
-
-      font-size: 28px;
-
-    }
-
-
-    .subtitle {
-
-      color: #9ca3af;
-
+    .header {
       margin-bottom: 25px;
-
     }
 
-
-    .box {
-
-      background: #181c25;
-
-      border:
-        1px solid
-        #292f3a;
-
-      border-radius: 12px;
-
-      padding: 20px;
-
-      margin-bottom: 20px;
-
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
     }
 
+    .header p {
+      margin: 0;
+      color: #8f9ab3;
+      font-size: 14px;
+    }
+
+    .card {
+      background: #11182b;
+      border: 1px solid #202a43;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.15);
+    }
 
     .section-title {
-
-      margin-bottom: 18px;
-
-      padding-bottom: 10px;
-
-      border-bottom:
-        1px solid
-        #292f3a;
-
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
       font-size: 18px;
-
-      font-weight: bold;
-
+      font-weight: 700;
     }
 
-
-    .field {
-
+    .section-description {
+      color: #8994ad;
+      font-size: 13px;
       margin-bottom: 20px;
-
     }
-
-
-    .field:last-child {
-
-      margin-bottom: 0;
-
-    }
-
 
     label {
-
       display: block;
-
-      margin-bottom: 8px;
-
-      font-weight: bold;
-
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #b8c1d6;
     }
-
 
     input,
     textarea,
     select {
-
       width: 100%;
-
-      background: #0f1117;
-
-      color: #fff;
-
-      border:
-        1px solid
-        #343b48;
-
-      border-radius: 8px;
-
-      padding: 12px;
-
-      font-size: 14px;
-
+      border: 1px solid #293653;
+      background: #0c1324;
+      color: #f1f4fb;
+      border-radius: 10px;
+      padding: 12px 13px;
       outline: none;
-
-      font-family: inherit;
-
+      font-size: 14px;
+      transition: .2s;
     }
-
-
-    textarea {
-
-      min-height: 130px;
-
-      resize: vertical;
-
-      line-height: 1.5;
-
-    }
-
-
-    textarea.code {
-
-      font-family:
-        Consolas,
-        Monaco,
-        monospace;
-
-      font-size: 13px;
-
-    }
-
 
     input:focus,
     textarea:focus,
     select:focus {
-
-      border-color:
-        #667eea;
-
+      border-color: #657fff;
+      box-shadow: 0 0 0 3px rgba(101,127,255,.12);
     }
 
-
-    .small {
-
-      font-size: 12px;
-
-      color: #8b93a1;
-
-      margin-top: 7px;
-
+    textarea {
+      min-height: 130px;
+      resize: vertical;
       line-height: 1.5;
-
     }
 
-
-    .variables {
-
-      background: #10131a;
-
-      border:
-        1px solid
-        #292f3a;
-
-      border-radius: 8px;
-
-      padding: 12px;
-
-      margin-top: 10px;
-
-      font-size: 12px;
-
-      color: #b8c0ce;
-
-      line-height: 1.8;
-
+    .small-textarea {
+      min-height: 80px;
     }
 
-
-    .variables code {
-
-      color: #93c5fd;
-
-      background: #181c25;
-
-      padding: 2px 5px;
-
-      border-radius: 4px;
-
+    .field {
+      margin-bottom: 17px;
     }
 
-
-    .cta-box {
-
-      border:
-        1px solid
-        #343b48;
-
-      border-radius: 10px;
-
-      padding: 16px;
-
-      margin-top: 15px;
-
-      background: #141821;
-
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
     }
 
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
 
-    .cta-title {
+    .hint {
+      margin-top: 6px;
+      color: #68758f;
+      font-size: 11px;
+      line-height: 1.5;
+    }
 
+    .template-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .template-number {
+      width: 38px;
+      min-width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: #19233b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #aeb9d2;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .remove-template {
+      width: 38px;
+      min-width: 38px;
+      height: 38px;
+      border: 1px solid #3b2a38;
+      background: #211521;
+      color: #ef8ba6;
+      border-radius: 9px;
+      cursor: pointer;
       font-size: 16px;
-
-      font-weight: bold;
-
-      margin-bottom: 15px;
-
     }
 
-
-    .cta-number {
-
-      display: inline-block;
-
-      background: #667eea;
-
-      color: white;
-
-      border-radius: 5px;
-
-      padding: 3px 7px;
-
-      margin-right: 6px;
-
-      font-size: 12px;
-
+    .remove-template:hover {
+      background: #321927;
     }
-
 
     button {
-
-      width: 100%;
-
       border: 0;
-
-      border-radius: 8px;
-
-      padding: 14px;
-
-      font-size: 16px;
-
-      font-weight: bold;
-
+      border-radius: 10px;
       cursor: pointer;
-
-      background: #667eea;
-
-      color: white;
-
+      font-weight: 700;
+      transition: .2s;
     }
 
-
-    button:hover {
-
-      background: #5568d8;
-
+    .btn-secondary {
+      background: #1a2540;
+      color: #cbd5ec;
+      padding: 11px 15px;
+      border: 1px solid #293653;
     }
 
-
-    button:disabled {
-
-      opacity: 0.5;
-
-      cursor: not-allowed;
-
+    .btn-secondary:hover {
+      background: #22304f;
     }
 
-
-    .progress {
-
+    .btn-primary {
       width: 100%;
-
-      height: 12px;
-
-      background: #0b0d12;
-
-      border-radius: 20px;
-
-      overflow: hidden;
-
-      margin-top: 15px;
-
+      padding: 16px;
+      font-size: 16px;
+      background: #647cff;
+      color: white;
+      margin-top: 8px;
     }
 
+    .btn-primary:hover {
+      background: #758bff;
+    }
+
+    .btn-primary:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .template-info {
+      margin-top: 12px;
+      padding: 11px 13px;
+      background: #0d1528;
+      border: 1px solid #202c46;
+      border-radius: 9px;
+      color: #8f9bb5;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: #0c1324;
+      border: 1px solid #202b44;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stat-label {
+      color: #74819c;
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .progress-wrap {
+      margin-top: 15px;
+    }
 
     .progress-bar {
+      height: 10px;
+      background: #0a1020;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #1e2941;
+    }
 
-      height: 100%;
-
+    .progress-fill {
       width: 0%;
-
-      background: #667eea;
-
-      transition:
-        width 0.3s;
-
+      height: 100%;
+      background: #647cff;
+      transition: width .25s ease;
     }
 
-
-    .status {
-
-      margin-top: 10px;
-
-      color: #aeb6c5;
-
-      font-size: 14px;
-
-    }
-
-
-    .movie {
-
+    .progress-text {
       display: flex;
-
-      gap: 15px;
-
-      padding: 18px 0;
-
-      border-bottom:
-        1px solid
-        #292f3a;
-
+      justify-content: space-between;
+      color: #8793ad;
+      font-size: 12px;
+      margin-top: 7px;
     }
 
-
-    .movie:last-child {
-
-      border-bottom: none;
-
+    .result-card {
+      display: grid;
+      grid-template-columns: 75px 1fr;
+      gap: 16px;
+      background: #0d1528;
+      border: 1px solid #202c46;
+      border-radius: 13px;
+      padding: 14px;
+      margin-bottom: 10px;
     }
-
 
     .poster {
-
-      width: 70px;
-
-      height: 100px;
-
+      width: 75px;
+      height: 110px;
+      border-radius: 8px;
       object-fit: cover;
-
-      border-radius: 6px;
-
-      background: #252a34;
-
-      flex-shrink: 0;
-
+      background: #141c30;
     }
 
-
-    .movie-info {
-
-      flex: 1;
-
+    .result-main {
       min-width: 0;
-
     }
 
+    .result-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+
+    .result-id {
+      font-size: 11px;
+      color: #72809d;
+    }
+
+    .status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+
+    .status.success {
+      color: #80e0ae;
+      background: rgba(60,180,110,.1);
+    }
+
+    .status.error {
+      color: #ff8ea5;
+      background: rgba(255,70,100,.1);
+    }
 
     .movie-title {
-
       font-size: 17px;
-
-      font-weight: bold;
-
-      margin-bottom: 6px;
-
+      font-weight: 800;
+      margin-bottom: 4px;
     }
-
 
     .movie-meta {
-
-      color: #9ca3af;
-
-      font-size: 13px;
-
+      color: #7f8ba5;
+      font-size: 12px;
       margin-bottom: 12px;
-
     }
 
-
-    .output-block {
-
-      margin-top: 12px;
-
+    .result-section {
+      margin-top: 9px;
     }
 
-
-    .output-label {
-
-      color: #93c5fd;
-
-      font-size: 12px;
-
-      font-weight: bold;
-
-      margin-bottom: 5px;
-
+    .result-label {
+      color: #697793;
+      font-size: 10px;
       text-transform: uppercase;
-
+      letter-spacing: .7px;
+      margin-bottom: 4px;
     }
 
-
-    .output-content {
-
-      background: #10131a;
-
-      border:
-        1px solid
-        #292f3a;
-
-      border-radius: 7px;
-
-      padding: 10px;
-
-      color: #d1d5db;
-
-      font-size: 13px;
-
+    .result-value {
+      color: #cbd3e4;
+      font-size: 12px;
       line-height: 1.5;
-
-      white-space: pre-wrap;
-
       word-break: break-word;
-
     }
 
-
-    .code-output {
-
-      font-family:
-        Consolas,
-        Monaco,
-        monospace;
-
-      font-size: 12px;
-
-    }
-
-
-    .narration {
-
-      background: #10131a;
-
-      border:
-        1px solid
-        #292f3a;
-
-      border-radius: 7px;
-
-      padding: 10px;
-
-      color: #d1d5db;
-
-      font-size: 13px;
-
-      line-height: 1.5;
-
-      margin-top: 8px;
-
-    }
-
-
-    .success {
-
-      color: #4ade80;
-
-      margin-top: 10px;
-
-      font-size: 13px;
-
-    }
-
-
-    .error {
-
-      color: #f87171;
-
-      margin-top: 10px;
-
-      font-size: 13px;
-
-    }
-
-
-    .tip {
-
-      background: #10131a;
-
-      border-left:
-        3px solid
-        #667eea;
-
-      padding: 12px;
-
+    .template-used {
+      display: inline-block;
+      margin-top: 7px;
+      color: #93a3ff;
+      background: rgba(100,124,255,.08);
+      border: 1px solid rgba(100,124,255,.18);
       border-radius: 6px;
-
-      color: #b8c0ce;
-
-      font-size: 13px;
-
-      line-height: 1.6;
-
-      margin-top: 12px;
-
+      padding: 4px 7px;
+      font-size: 10px;
     }
 
-
-    .language-row {
-
-      display: flex;
-
-      gap: 10px;
-
-      align-items: center;
-
-    }
-
-
-    .language-status {
-
+    .error-box {
+      margin-top: 8px;
+      color: #ff9aad;
       font-size: 12px;
-
-      color: #8b93a1;
-
-      white-space: nowrap;
-
+      line-height: 1.5;
     }
 
+    .zip-box {
+      display: none;
+      padding: 15px;
+      background: #0d1a18;
+      border: 1px solid #214439;
+      border-radius: 12px;
+      margin-top: 15px;
+    }
 
-    @media (max-width: 600px) {
+    .zip-box.show {
+      display: block;
+    }
 
-      body {
+    .zip-box strong {
+      color: #85ddb0;
+    }
 
-        padding:
-          15px 10px;
+    .zip-btn {
+      margin-top: 10px;
+      background: #1d6b4a;
+      color: white;
+      padding: 10px 15px;
+    }
 
+    .empty {
+      text-align: center;
+      padding: 35px;
+      color: #66728a;
+      font-size: 13px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #202a43;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 760px) {
+      .container {
+        width: min(100% - 20px, 1180px);
+        margin-top: 20px;
       }
 
-
-      .box {
-
-        padding: 15px;
-
+      .card {
+        padding: 16px;
       }
 
-
-      .movie {
-
-        gap: 10px;
-
+      .grid,
+      .grid-3 {
+        grid-template-columns: 1fr;
       }
 
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .result-card {
+        grid-template-columns: 60px 1fr;
+      }
 
       .poster {
-
-        width: 55px;
-
-        height: 80px;
-
+        width: 60px;
+        height: 90px;
       }
 
-
-      h1 {
-
-        font-size: 23px;
-
+      .header h1 {
+        font-size: 24px;
       }
-
-
-      .language-row {
-
-        flex-direction: column;
-
-        align-items: stretch;
-
-      }
-
-
-      .language-status {
-
-        white-space: normal;
-
-      }
-
     }
-
   </style>
-
 </head>
-
 
 <body>
 
-
 <div class="container">
 
-
-  <h1>
-    🎬 Movie TTS Generator V2.3
-  </h1>
-
-
-  <div class="subtitle">
-
-    TMDB → Language → Metadata → Title → Description →
-    2 CTA → TTS → MP3 → ZIP
-
+  <div class="header">
+    <h1>🎬 Movie TTS Generator</h1>
+    <p>TMDB Metadata → Random Title → Description → ElevenLabs TTS → MP3 ZIP</p>
   </div>
 
+  <!-- ========================= -->
+  <!-- 1. MOVIE INPUT -->
+  <!-- ========================= -->
 
-  <!-- ================================================= -->
-  <!-- TMDB INPUT -->
-  <!-- ================================================= -->
-
-  <div class="box">
-
+  <div class="card">
 
     <div class="section-title">
-
-      🎬 TMDB Input
-
+      🎬 Movie Input
     </div>
 
+    <div class="section-description">
+      Masukkan TMDB Movie ID. Maksimal 100 ID per batch.
+    </div>
 
     <div class="field">
 
-      <label>
-        TMDB Movie IDs
-      </label>
-
+      <label>TMDB Movie IDs</label>
 
       <textarea
         id="tmdbIds"
-        placeholder="550
-238
+        placeholder="Contoh:
+550
 680
-278
-13
 155
-497
-603
-27205"
+238
+13"
       ></textarea>
 
-
-      <div class="small">
-
-        Maksimal 100 TMDB ID per proses.
-
-        Bisa dipisahkan dengan Enter,
-        koma, titik koma, atau spasi.
-
+      <div class="hint">
+        Bisa dipisahkan dengan baris baru, koma, atau spasi.
       </div>
 
     </div>
-
-
-    <!-- LANGUAGE -->
-
-    <div class="field">
-
-      <label>
-        🌎 TMDB Language
-      </label>
-
-
-      <div class="language-row">
-
-
-        <select
-          id="tmdbLanguage"
-        >
-
-          <option value="">
-            Loading TMDB languages...
-          </option>
-
-        </select>
-
-
-        <div
-          id="languageStatus"
-          class="language-status"
-        >
-          Loading...
-        </div>
-
-
-      </div>
-
-
-      <div class="small">
-
-        Pilihan bahasa diambil langsung dari
-        Primary Translations TMDB.
-
-        Title, overview, dan genre akan mengikuti
-        bahasa yang dipilih jika TMDB memiliki
-        terjemahannya.
-
-      </div>
-
-
-      <div class="variables">
-
-        Contoh:
-
-        <br>
-
-        🇺🇸 <code>en-US</code> → English (US)
-
-        <br>
-
-        🇮🇩 <code>id-ID</code> → Indonesian
-
-        <br>
-
-        🇪🇸 <code>es-ES</code> → Spanish (Spain)
-
-        <br>
-
-        🇲🇽 <code>es-MX</code> → Spanish (Mexico)
-
-        <br>
-
-        🇧🇷 <code>pt-BR</code> → Portuguese (Brazil)
-
-        <br>
-
-        🇯🇵 <code>ja-JP</code> → Japanese
-
-        <br>
-
-        🇰🇷 <code>ko-KR</code> → Korean
-
-      </div>
-
-    </div>
-
-
-    <!-- CTA BASE -->
-
-    <div class="field">
-
-
-      <label>
-        CTA Base URL
-      </label>
-
-
-      <input
-        id="ctaBaseUrl"
-        type="text"
-        value="https://movietts.pages.dev/"
-        placeholder="https://example.com/"
-      >
-
-
-      <div class="small">
-
-        TMDB ID otomatis ditambahkan
-        di belakang URL.
-
-      </div>
-
-
-      <div class="variables">
-
-        Contoh:
-
-        <br>
-
-        <code>
-          https://movietts.pages.dev/
-        </code>
-
-        +
-
-        <code>550</code>
-
-        <br>
-
-        =
-
-        <code>
-          https://movietts.pages.dev/550
-        </code>
-
-      </div>
-
-
-    </div>
-
 
   </div>
 
 
-  <!-- ================================================= -->
-  <!-- TITLE -->
-  <!-- ================================================= -->
+  <!-- ========================= -->
+  <!-- 2. TMDB SETTINGS -->
+  <!-- ========================= -->
 
-  <div class="box">
-
+  <div class="card">
 
     <div class="section-title">
-
-      📝 Title Template
-
+      🌎 TMDB Settings
     </div>
 
+    <div class="section-description">
+      Pilih bahasa metadata yang ingin digunakan.
+    </div>
 
     <div class="field">
 
+      <label>TMDB Language</label>
 
-      <label>
-        Title Template
-      </label>
+      <select id="language">
+        <option value="">Loading languages...</option>
+      </select>
 
-
-      <input
-        id="titleTemplate"
-        type="text"
-        value="{TITLE} ({YEAR}) - Movie Review"
-      >
-
-
-      <div class="variables">
-
-        <code>{TITLE}</code>
-        = Movie title
-
-        <br>
-
-        <code>{YEAR}</code>
-        = Release year
-
-        <br>
-
-        <code>{ID}</code>
-        = TMDB ID
-
+      <div class="hint">
+        Title, overview, genre dan metadata akan mengikuti terjemahan
+        yang tersedia di TMDB.
       </div>
 
-
     </div>
-
 
   </div>
 
 
-  <!-- ================================================= -->
-  <!-- CTA -->
-  <!-- ================================================= -->
+  <!-- ========================= -->
+  <!-- 3. TITLE TEMPLATES -->
+  <!-- ========================= -->
 
-  <div class="box">
-
+  <div class="card">
 
     <div class="section-title">
-
-      🔗 CTA Buttons
-
+      🏷️ Title Templates
     </div>
 
-
-    <!-- CTA 1 -->
-
-    <div class="cta-box">
-
-
-      <div class="cta-title">
-
-        <span class="cta-number">
-          CTA 1
-        </span>
-
-        First CTA Button
-
-      </div>
-
-
-      <div class="field">
-
-
-        <label>
-          Button 1 Text
-        </label>
-
-
-        <input
-          id="cta1Text"
-          type="text"
-          value="Watch Now"
-          placeholder="Watch Now"
-        >
-
-
-      </div>
-
-
-      <div class="field">
-
-
-        <label>
-          Button 1 HTML Template
-        </label>
-
-
-        <textarea
-          id="cta1Template"
-          class="code"
-        ><a href="{CTA_URL}" class="watch-btn">{CTA_TEXT}</a></textarea>
-
-
-        <div class="variables">
-
-          <code>{CTA_URL}</code>
-          = Automatic movie URL
-
-          <br>
-
-          <code>{CTA_TEXT}</code>
-          = Button text
-
-          <br>
-
-          <code>{ID}</code>
-          = TMDB ID
-
-        </div>
-
-
-      </div>
-
-
+    <div class="section-description">
+      Masukkan beberapa template. Setiap film hanya akan memilih
+      <strong>1 template secara random</strong>.
     </div>
 
+    <div id="titleTemplates"></div>
 
-    <!-- CTA 2 -->
+    <button
+      type="button"
+      class="btn-secondary"
+      id="addTemplateBtn"
+    >
+      ＋ Add Title Template
+    </button>
 
-    <div class="cta-box">
-
-
-      <div class="cta-title">
-
-        <span class="cta-number">
-          CTA 2
-        </span>
-
-        Second CTA Button
-
-      </div>
-
-
-      <div class="field">
-
-
-        <label>
-          Button 2 Text
-        </label>
-
-
-        <input
-          id="cta2Text"
-          type="text"
-          value="Download Now"
-          placeholder="Download Now"
-        >
-
-
-      </div>
-
-
-      <div class="field">
-
-
-        <label>
-          Button 2 HTML Template
-        </label>
-
-
-        <textarea
-          id="cta2Template"
-          class="code"
-        ><a href="{CTA_URL}" class="download-btn">{CTA_TEXT}</a></textarea>
-
-
-        <div class="variables">
-
-          <code>{CTA_URL}</code>
-          = Automatic movie URL
-
-          <br>
-
-          <code>{CTA_TEXT}</code>
-          = Button text
-
-          <br>
-
-          <code>{ID}</code>
-          = TMDB ID
-
-        </div>
-
-
-      </div>
-
-
-    </div>
-
-
-    <div class="tip">
-
-      💡 Kamu bebas mengganti teks maupun
-      HTML tombol.
-
+    <div class="template-info">
+      <strong>Random system:</strong><br>
+      Jika ada 5 template dan generate 100 film,
+      setiap film akan memilih 1 dari 5 template secara random.
+      Jadi hasil akhirnya tetap 100 film = 100 title.
       <br><br>
-
-      Contoh teks:
-
-      <strong>Watch Now</strong>,
-
-      <strong>Download Now</strong>,
-
-      <strong>Tonton Sekarang</strong>,
-
-      <strong>Play Movie</strong>.
-
+      Variables:
+      <strong>{TITLE}</strong>,
+      <strong>{YEAR}</strong>,
+      <strong>{ID}</strong>
     </div>
-
 
   </div>
 
 
-  <!-- ================================================= -->
-  <!-- DESCRIPTION -->
-  <!-- ================================================= -->
+  <!-- ========================= -->
+  <!-- 4. DESCRIPTION -->
+  <!-- ========================= -->
 
-  <div class="box">
-
+  <div class="card">
 
     <div class="section-title">
-
-      📄 Description Template
-
+      📝 Description
     </div>
 
+    <div class="section-description">
+      Template description untuk setiap movie.
+    </div>
 
     <div class="field">
 
-
-      <label>
-        Description Template
-      </label>
-
+      <label>Description Template</label>
 
       <textarea
         id="descriptionTemplate"
-      >Watch {TITLE} ({YEAR}).
+      >Watch {TITLE} ({YEAR}) online.
+
+{OVERVIEW}
 
 Genre: {GENRE}
 Director: {DIRECTOR}
 Rating: {RATING}
 
-{OVERVIEW}
-
 {CTA1}
 
 {CTA2}</textarea>
 
-
-      <div class="variables">
-
-
-        <code>{TITLE}</code>
-        = Movie title
-
-        <br>
-
-        <code>{YEAR}</code>
-        = Release year
-
-        <br>
-
-        <code>{ID}</code>
-        = TMDB ID
-
-        <br>
-
-        <code>{GENRE}</code>
-        = Genre sesuai bahasa TMDB
-
-        <br>
-
-        <code>{DIRECTOR}</code>
-        = Director
-
-        <br>
-
-        <code>{RATING}</code>
-        = TMDB rating
-
-        <br>
-
-        <code>{OVERVIEW}</code>
-        = TMDB overview sesuai bahasa
-
-        <br>
-
-        <code>{CTA1}</code>
-        = Full HTML CTA 1
-
-        <br>
-
-        <code>{CTA2}</code>
-        = Full HTML CTA 2
-
-        <br>
-
-        <code>{CTA_URL}</code>
-        = Automatic CTA URL
-
+      <div class="hint">
+        Variables:
+        {TITLE} {YEAR} {ID} {GENRE} {DIRECTOR}
+        {RATING} {OVERVIEW} {CTA1} {CTA2} {CTA_URL}
       </div>
 
-
     </div>
-
 
   </div>
 
 
-  <!-- ================================================= -->
-  <!-- TTS -->
-  <!-- ================================================= -->
+  <!-- ========================= -->
+  <!-- 5. CTA -->
+  <!-- ========================= -->
 
-  <div class="box">
-
+  <div class="card">
 
     <div class="section-title">
-
-      🎙️ ElevenLabs TTS
-
+      🔗 CTA Settings
     </div>
 
-
-    <!-- VOICE -->
+    <div class="section-description">
+      URL akan otomatis menjadi Base URL + TMDB ID.
+    </div>
 
     <div class="field">
 
-
-      <label>
-        ElevenLabs Voice ID
-      </label>
-
+      <label>CTA Base URL</label>
 
       <input
-        id="voiceId"
-        type="text"
-        value=""
-        placeholder="Paste ElevenLabs Voice ID here"
-      >
+        id="ctaBaseUrl"
+        value="https://example.pages.dev/"
+        placeholder="https://example.pages.dev/"
+      />
+
+      <div class="hint">
+        Contoh hasil:
+        https://example.pages.dev/550
+      </div>
+
+    </div>
 
 
-      <div class="small">
+    <div class="divider"></div>
 
-        Voice ID dimasukkan langsung di web,
-        jadi kamu bisa mengganti voice kapan saja
-        tanpa deploy ulang.
+
+    <div class="grid">
+
+      <div class="field">
+
+        <label>CTA Button 1 Text</label>
+
+        <input
+          id="cta1Text"
+          value="Watch Now"
+        />
+
+        <div class="hint">
+          Teks tombol yang digunakan pada {CTA1}
+        </div>
 
       </div>
 
 
-    </div>
+      <div class="field">
 
+        <label>CTA Button 2 Text</label>
 
-    <!-- MODEL -->
+        <input
+          id="cta2Text"
+          value="More Info"
+        />
 
-    <div class="field">
+        <div class="hint">
+          Teks tombol yang digunakan pada {CTA2}
+        </div>
 
-
-      <label>
-        TTS Model
-      </label>
-
-
-      <select id="model">
-
-
-        <option
-          value="eleven_multilingual_v2"
-        >
-
-          Eleven Multilingual v2
-
-        </option>
-
-
-      </select>
-
+      </div>
 
     </div>
 
 
-    <!-- FORMAT -->
+    <div class="grid">
 
-    <div class="field">
+      <div class="field">
 
+        <label>CTA Button 1 HTML</label>
 
-      <label>
-        MP3 Quality
-      </label>
-
-
-      <select id="format">
-
-
-        <option value="mp3_22050_32">
-
-          MP3 22.05 kHz / 32 kbps — Small
-
-        </option>
-
-
-        <option value="mp3_44100_64">
-
-          MP3 44.1 kHz / 64 kbps
-
-        </option>
-
-
-        <option value="mp3_44100_96">
-
-          MP3 44.1 kHz / 96 kbps
-
-        </option>
-
-
-        <option value="mp3_44100_128">
-
-          MP3 44.1 kHz / 128 kbps
-
-        </option>
-
-
-      </select>
-
-
-    </div>
-
-
-    <!-- NARRATION -->
-
-    <div class="field">
-
-
-      <label>
-        Audio Narration Template
-      </label>
-
-
-      <textarea
-        id="narrationTemplate"
-      >Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
-
-
-      <div class="variables">
-
-
-        <code>{TITLE}</code>
-
-        <br>
-
-        <code>{YEAR}</code>
-
-        <br>
-
-        <code>{GENRE}</code>
-
-        <br>
-
-        <code>{DIRECTOR}</code>
-
-        <br>
-
-        <code>{RATING}</code>
-
+        <textarea
+          id="cta1Template"
+          class="small-textarea"
+        ><a href="{CTA_URL}" target="_blank">{CTA_TEXT}</a></textarea>
 
       </div>
 
 
+      <div class="field">
+
+        <label>CTA Button 2 HTML</label>
+
+        <textarea
+          id="cta2Template"
+          class="small-textarea"
+        ><a href="{CTA_URL}" target="_blank">{CTA_TEXT}</a></textarea>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- 6. AUDIO / TTS -->
+  <!-- ========================= -->
+
+  <div class="card">
+
+    <div class="section-title">
+      🎙️ Audio / ElevenLabs
+    </div>
+
+    <div class="section-description">
+      API key tetap aman di Cloudflare Secret.
+      Voice ID bisa diganti langsung dari UI.
     </div>
 
 
-    <!-- GENERATE -->
+    <div class="grid">
+
+      <div class="field">
+
+        <label>Voice ID</label>
+
+        <input
+          id="voiceId"
+          placeholder="Masukkan ElevenLabs Voice ID"
+        />
+
+        <div class="hint">
+          Voice ID tidak perlu disimpan sebagai secret.
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>Model</label>
+
+        <select id="modelId">
+
+          <option value="eleven_multilingual_v2">
+            eleven_multilingual_v2
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="grid">
+
+      <div class="field">
+
+        <label>MP3 Quality</label>
+
+        <select id="outputFormat">
+
+          <option value="mp3_22050_32">
+            MP3 22050 Hz / 32 kbps — Small
+          </option>
+
+          <option value="mp3_44100_64">
+            MP3 44100 Hz / 64 kbps
+          </option>
+
+          <option value="mp3_44100_96">
+            MP3 44100 Hz / 96 kbps
+          </option>
+
+          <option value="mp3_44100_128">
+            MP3 44100 Hz / 128 kbps
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Narration Template</label>
+
+      <textarea id="narrationTemplate">Selamat datang di Movie Review. Hari ini kita membahas film {TITLE}, yang dirilis pada tahun {YEAR}. Jangan lupa subscribe untuk movie review terbaru.</textarea>
+
+      <div class="hint">
+        Variables:
+        {TITLE} {YEAR}
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- 7. GENERATE -->
+  <!-- ========================= -->
+
+  <div class="card">
+
+    <div class="section-title">
+      🚀 Generate
+    </div>
+
+    <div class="section-description">
+      Periksa semua pengaturan di atas sebelum mulai generate.
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="stat-label">MOVIES</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">SUCCESS</div>
+        <div class="stat-value" id="statSuccess">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">FAILED</div>
+        <div class="stat-value" id="statFailed">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">TEMPLATES</div>
+        <div class="stat-value" id="statTemplates">0</div>
+      </div>
+
+    </div>
+
 
     <button
       id="generateBtn"
-      onclick="generateAll()"
+      class="btn-primary"
     >
-
-      🚀 Generate MP3
-
+      🚀 Generate Movies
     </button>
 
 
-    <div class="progress">
+    <div class="progress-wrap">
 
+      <div class="progress-bar">
+        <div
+          id="progressFill"
+          class="progress-fill"
+        ></div>
+      </div>
+
+      <div class="progress-text">
+
+        <span id="progressText">
+          Ready
+        </span>
+
+        <span id="progressPercent">
+          0%
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="zipBox"
+      class="zip-box"
+    >
+      <strong>✓ Generation complete</strong>
 
       <div
-        id="progressBar"
-        class="progress-bar"
+        id="zipInfo"
+        style="margin-top:6px;font-size:12px;color:#8fa09b;"
       ></div>
 
+      <button
+        id="downloadZip"
+        class="zip-btn"
+      >
+        ⬇ Download MP3 ZIP
+      </button>
 
     </div>
-
-
-    <div
-      id="status"
-      class="status"
-    >
-
-      Ready.
-
-    </div>
-
 
   </div>
 
 
-  <!-- ================================================= -->
-  <!-- RESULTS -->
-  <!-- ================================================= -->
+  <!-- ========================= -->
+  <!-- 8. RESULTS -->
+  <!-- ========================= -->
 
-  <div class="box">
-
+  <div class="card">
 
     <div class="section-title">
-
       📦 Results
+    </div>
+
+    <div class="section-description">
+      Hasil metadata, title random dan audio setiap movie.
+    </div>
+
+    <div id="results">
+
+      <div class="empty">
+        Belum ada hasil.
+      </div>
 
     </div>
 
-
-    <div
-      id="results"
-    ></div>
-
-
   </div>
-
 
 </div>
 
 
 <script>
 
+  /* =====================================================
+     STATE
+  ===================================================== */
 
-// =====================================================
-// LANGUAGE NAME MAP
-//
-// Browser locale digunakan untuk menampilkan nama
-// bahasa secara lebih manusiawi.
-//
-// Kalau browser tidak mengenali kode tertentu,
-// kita tetap menampilkan code TMDB.
-// =====================================================
+  let titleTemplateCount = 0;
+  let zipBlob = null;
 
-function getLanguageName(
-  code
-) {
 
-  try {
+  /* =====================================================
+     ELEMENTS
+  ===================================================== */
 
-    const display =
-      new Intl.DisplayNames(
-        ["en"],
-        {
-          type: "language"
+  const tmdbIdsEl =
+    document.getElementById("tmdbIds");
+
+  const languageEl =
+    document.getElementById("language");
+
+  const titleTemplatesEl =
+    document.getElementById("titleTemplates");
+
+  const descriptionTemplateEl =
+    document.getElementById("descriptionTemplate");
+
+  const ctaBaseUrlEl =
+    document.getElementById("ctaBaseUrl");
+
+  const cta1TextEl =
+    document.getElementById("cta1Text");
+
+  const cta2TextEl =
+    document.getElementById("cta2Text");
+
+  const cta1TemplateEl =
+    document.getElementById("cta1Template");
+
+  const cta2TemplateEl =
+    document.getElementById("cta2Template");
+
+  const voiceIdEl =
+    document.getElementById("voiceId");
+
+  const modelIdEl =
+    document.getElementById("modelId");
+
+  const outputFormatEl =
+    document.getElementById("outputFormat");
+
+  const narrationTemplateEl =
+    document.getElementById("narrationTemplate");
+
+  const generateBtn =
+    document.getElementById("generateBtn");
+
+  const resultsEl =
+    document.getElementById("results");
+
+  const progressFill =
+    document.getElementById("progressFill");
+
+  const progressText =
+    document.getElementById("progressText");
+
+  const progressPercent =
+    document.getElementById("progressPercent");
+
+  const zipBox =
+    document.getElementById("zipBox");
+
+  const zipInfo =
+    document.getElementById("zipInfo");
+
+  const downloadZip =
+    document.getElementById("downloadZip");
+
+
+  /* =====================================================
+     TITLE TEMPLATE
+  ===================================================== */
+
+  function addTitleTemplate(value = "") {
+
+    titleTemplateCount++;
+
+    const index =
+      titleTemplateCount;
+
+    const row =
+      document.createElement("div");
+
+    row.className =
+      "template-row";
+
+    row.dataset.index =
+      index;
+
+    row.innerHTML = `
+
+      <div class="template-number">
+        ${index}
+      </div>
+
+      <input
+        type="text"
+        class="title-template"
+        placeholder="Template ${index}"
+        value="${escapeAttribute(value)}"
+      />
+
+      <button
+        type="button"
+        class="remove-template"
+        title="Remove template"
+      >
+        ×
+      </button>
+
+    `;
+
+    row
+      .querySelector(".remove-template")
+      .addEventListener(
+        "click",
+        () => {
+
+          row.remove();
+
+          renumberTemplates();
+
+          updateTemplateStats();
+
+        }
+      );
+
+    titleTemplatesEl.appendChild(row);
+
+    updateTemplateStats();
+  }
+
+
+  function renumberTemplates() {
+
+    const rows =
+      [...document.querySelectorAll(
+        ".template-row"
+      )];
+
+    rows.forEach(
+      (row, index) => {
+
+        row.querySelector(
+          ".template-number"
+        ).textContent =
+          index + 1;
+
+      }
+    );
+
+  }
+
+
+  function getTitleTemplates() {
+
+    return [
+      ...document.querySelectorAll(
+        ".title-template"
+      )
+    ]
+      .map(el => el.value.trim())
+      .filter(Boolean);
+
+  }
+
+
+  function updateTemplateStats() {
+
+    document.getElementById(
+      "statTemplates"
+    ).textContent =
+      getTitleTemplates().length;
+
+  }
+
+
+  document
+    .getElementById("addTemplateBtn")
+    .addEventListener(
+      "click",
+      () => addTitleTemplate()
+    );
+
+
+  /* =====================================================
+     DEFAULT TITLE TEMPLATES
+  ===================================================== */
+
+  addTitleTemplate(
+    "Watch {TITLE} ({YEAR}) Full Movie Online"
+  );
+
+  addTitleTemplate(
+    "{TITLE} {YEAR} Full Movie - Watch Online"
+  );
+
+  addTitleTemplate(
+    "Watch {TITLE} Full Movie {YEAR}"
+  );
+
+  addTitleTemplate(
+    "{TITLE} ({YEAR}) Full Movie HD"
+  );
+
+  addTitleTemplate(
+    "Watch {TITLE} {YEAR} Online"
+  );
+
+
+  /* =====================================================
+     TMDB LANGUAGES
+  ===================================================== */
+
+  async function loadLanguages() {
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/movie?action=languages"
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+          "Unable to load languages."
+        );
+      }
+
+      const languages =
+        Array.isArray(data.languages)
+          ? data.languages
+          : [];
+
+      languageEl.innerHTML = "";
+
+      const preferredOrder = [
+        "en-US",
+        "en-GB",
+        "id-ID",
+        "es-ES",
+        "es-MX",
+        "fr-FR",
+        "de-DE",
+        "it-IT",
+        "pt-BR",
+        "pt-PT"
+      ];
+
+      languages.sort(
+        (a, b) => {
+
+          const ai =
+            preferredOrder.indexOf(a);
+
+          const bi =
+            preferredOrder.indexOf(b);
+
+          if (ai !== -1 && bi !== -1) {
+            return ai - bi;
+          }
+
+          if (ai !== -1) return -1;
+          if (bi !== -1) return 1;
+
+          return a.localeCompare(b);
+
         }
       );
 
 
-    const languageCode =
-      code.split("-")[0];
+      for (const code of languages) {
+
+        const option =
+          document.createElement("option");
+
+        option.value =
+          code;
+
+        option.textContent =
+          getLanguageLabel(code);
+
+        languageEl.appendChild(option);
+
+      }
 
 
-    const name =
-      display.of(
-        languageCode
+      if (
+        languages.includes("en-US")
+      ) {
+
+        languageEl.value =
+          "en-US";
+
+      } else if (
+        languages.includes("id-ID")
+      ) {
+
+        languageEl.value =
+          "id-ID";
+
+      }
+
+    } catch (error) {
+
+      languageEl.innerHTML =
+        `<option value="en-US">
+          English (United States)
+        </option>`;
+
+      console.error(
+        "Language loading error:",
+        error
       );
-
-
-    if (name) {
-
-      return name;
 
     }
 
-  } catch (_) {}
-
-
-  return code;
-
-}
-
-
-// =====================================================
-// COUNTRY NAME
-// =====================================================
-
-function getCountryName(
-  code
-) {
-
-  if (!code) {
-    return "";
   }
 
 
-  try {
+  function getLanguageLabel(code) {
 
-    const display =
-      new Intl.DisplayNames(
-        ["en"],
-        {
-          type: "region"
-        }
-      );
+    try {
 
+      const lang =
+        code.split("-")[0];
 
-    return (
-      display.of(code) ||
-      code
-    );
+      const region =
+        code.split("-")[1];
 
-  } catch (_) {
+      const displayNames =
+        new Intl.DisplayNames(
+          ["en"],
+          {
+            type: "language"
+          }
+        );
 
-    return code;
+      const languageName =
+        displayNames.of(lang) ||
+        code;
+
+      if (!region) {
+        return `${languageName} (${code})`;
+      }
+
+      let regionName =
+        region;
+
+      try {
+
+        const regionDisplay =
+          new Intl.DisplayNames(
+            ["en"],
+            {
+              type: "region"
+            }
+          );
+
+        regionName =
+          regionDisplay.of(region) ||
+          region;
+
+      } catch (_) {}
+
+      return `${languageName} (${regionName}) — ${code}`;
+
+    } catch (_) {
+
+      return code;
+
+    }
 
   }
 
-}
 
+  /* =====================================================
+     GET MOVIE
+  ===================================================== */
 
-// =====================================================
-// FORMAT LANGUAGE LABEL
-// =====================================================
-
-function formatLanguageLabel(
-  code
-) {
-
-  const parts =
-    code.split("-");
-
-
-  const language =
-    getLanguageName(
-      code
-    );
-
-
-  if (
-    parts.length > 1
+  async function getMovie(
+    id,
+    language
   ) {
 
-    const country =
-      getCountryName(
-        parts[1]
-      );
-
-
-    return `${language} (${country}) — ${code}`;
-
-  }
-
-
-  return `${language} — ${code}`;
-
-}
-
-
-// =====================================================
-// LOAD TMDB LANGUAGES
-// =====================================================
-
-async function loadLanguages() {
-
-  const select =
-    document.getElementById(
-      "tmdbLanguage"
-    );
-
-
-  const status =
-    document.getElementById(
-      "languageStatus"
-    );
-
-
-  try {
-
-    status.textContent =
-      "Loading TMDB languages...";
-
+    const url =
+      `/api/movie?id=${encodeURIComponent(id)}` +
+      `&language=${encodeURIComponent(language)}`;
 
     const response =
-      await fetch(
-        "/api/movie?action=languages"
-      );
-
+      await fetch(url);
 
     const data =
       await response.json();
 
-
     if (!response.ok) {
 
       throw new Error(
-        data.error ||
-        "Failed to load languages."
+        data?.error ||
+        `TMDB error (${response.status})`
       );
 
     }
 
+    return data;
 
-    const languages =
-      Array.isArray(
-        data.languages
-      )
-        ? data.languages
-        : [];
+  }
 
 
-    if (!languages.length) {
+  /* =====================================================
+     RANDOM TITLE
+  ===================================================== */
 
+  function getRandomTitleTemplate(
+    templates
+  ) {
+
+    if (!templates.length) {
       throw new Error(
-        "TMDB returned no languages."
+        "Minimal 1 Title Template."
+      );
+    }
+
+    const index =
+      Math.floor(
+        Math.random() *
+        templates.length
       );
 
-    }
-
-
-    // Clear select
-
-    select.innerHTML =
-      "";
-
-
-    // Sort languages
-
-    languages.sort(
-      (a, b) =>
-        a.localeCompare(
-          b
-        )
-    );
-
-
-    // Add options
-
-    for (
-      const code of languages
-    ) {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-
-      option.value =
-        code;
-
-
-      option.textContent =
-        formatLanguageLabel(
-          code
-        );
-
-
-      select.appendChild(
-        option
-      );
-
-    }
-
-
-    // Prefer English US
-
-    if (
-      languages.includes(
-        "en-US"
-      )
-    ) {
-
-      select.value =
-        "en-US";
-
-    }
-
-    // Otherwise Indonesian
-
-    else if (
-      languages.includes(
-        "id-ID"
-      )
-    ) {
-
-      select.value =
-        "id-ID";
-
-    }
-
-
-    status.textContent =
-      `${languages.length} TMDB translations loaded`;
-
-  } catch (error) {
-
-    select.innerHTML = `
-
-      <option value="en-US">
-        English (United States) — en-US
-      </option>
-
-      <option value="id-ID">
-        Indonesian (Indonesia) — id-ID
-      </option>
-
-    `;
-
-
-    select.value =
-      "en-US";
-
-
-    status.textContent =
-      "Using fallback languages";
-
-
-    console.error(
-      error
-    );
-
-  }
-
-}
-
-
-// =====================================================
-// GET IDS
-// =====================================================
-
-function getIds() {
-
-  const raw =
-    document.getElementById(
-      "tmdbIds"
-    ).value;
-
-
-  const ids =
-    raw
-      .split(
-        /[\s,;]+/
-      )
-      .map(
-        x =>
-          x.trim()
-      )
-      .filter(Boolean)
-      .filter(
-        x =>
-          /^\d+$/.test(x)
-      );
-
-
-  return [
-    ...new Set(ids)
-  ];
-
-}
-
-
-// =====================================================
-// SLUGIFY
-// =====================================================
-
-function slugify(
-  text
-) {
-
-  return String(
-    text || ""
-  )
-
-    .toLowerCase()
-
-    .normalize(
-      "NFKD"
-    )
-
-    .replace(
-      /[\u0300-\u036f]/g,
-      ""
-    )
-
-    .replace(
-      /[^a-z0-9]+/g,
-      "-"
-    )
-
-    .replace(
-      /^-+|-+$/g,
-      ""
-    )
-
-    .substring(
-      0,
-      100
-    );
-
-}
-
-
-// =====================================================
-// BUILD CTA URL
-// =====================================================
-
-function buildCTAUrl(
-  baseUrl,
-  id
-) {
-
-  let base =
-    String(
-      baseUrl || ""
-    ).trim();
-
-
-  if (!base) {
-
-    return "";
+    return {
+      template:
+        templates[index],
+
+      index:
+        index + 1
+    };
 
   }
 
 
-  base =
-    base.replace(
-      /\/+$/,
-      ""
-    );
+  /* =====================================================
+     CTA
+  ===================================================== */
+
+  function buildCTAUrl(
+    baseUrl,
+    id
+  ) {
+
+    const base =
+      String(baseUrl || "")
+        .trim()
+        .replace(/\/+$/, "");
+
+    if (!base) {
+      return "";
+    }
+
+    return `${base}/${encodeURIComponent(id)}`;
+
+  }
 
 
-  return `${base}/${id}`;
-
-}
-
-
-// =====================================================
-// BUILD CTA BUTTON
-// =====================================================
-
-function buildCTAButton(
-  template,
-  text,
-  url,
-  id
-) {
-
-  return String(
-    template || ""
-  )
-
-    .replaceAll(
-      "{CTA_URL}",
-      url
-    )
-
-    .replaceAll(
-      "{CTA_TEXT}",
-      text
-    )
-
-    .replaceAll(
-      "{ID}",
-      id
-    );
-
-}
-
-
-// =====================================================
-// REPLACE VARIABLES
-// =====================================================
-
-function replaceVariables(
-  template,
-  movie,
-  extra = {}
-) {
-
-  return String(
-    template || ""
-  )
-
-    .replaceAll(
-      "{TITLE}",
-      movie.title || ""
-    )
-
-    .replaceAll(
-      "{YEAR}",
-      movie.year || ""
-    )
-
-    .replaceAll(
-      "{ID}",
-      movie.id || ""
-    )
-
-    .replaceAll(
-      "{GENRE}",
-      movie.genres || ""
-    )
-
-    .replaceAll(
-      "{DIRECTOR}",
-      movie.director || ""
-    )
-
-    .replaceAll(
-      "{RATING}",
-      movie.rating != null
-        ? Number(
-            movie.rating
-          ).toFixed(1)
-        : ""
-    )
-
-    .replaceAll(
-      "{OVERVIEW}",
-      movie.overview || ""
-    )
-
-    .replaceAll(
-      "{CTA_URL}",
-      extra.ctaUrl || ""
-    )
-
-    .replaceAll(
-      "{CTA1}",
-      extra.cta1 || ""
-    )
-
-    .replaceAll(
-      "{CTA2}",
-      extra.cta2 || ""
-    );
-
-}
-
-
-// =====================================================
-// BUILD TITLE
-// =====================================================
-
-function buildTitle(
-  movie
-) {
-
-  const template =
-    document.getElementById(
-      "titleTemplate"
-    ).value;
-
-
-  return replaceVariables(
+  function buildCTAButton(
     template,
+    text,
+    url,
+    id
+  ) {
+
+    return String(template || "")
+      .replaceAll(
+        "{CTA_URL}",
+        url
+      )
+      .replaceAll(
+        "{CTA_TEXT}",
+        text
+      )
+      .replaceAll(
+        "{ID}",
+        id
+      );
+
+  }
+
+
+  /* =====================================================
+     VARIABLES
+  ===================================================== */
+
+  function replaceVariables(
+    text,
     movie
-  );
+  ) {
 
-}
-
-
-// =====================================================
-// BUILD DESCRIPTION
-// =====================================================
-
-function buildDescription(
-  movie,
-  ctaUrl,
-  cta1,
-  cta2
-) {
-
-  const template =
-    document.getElementById(
-      "descriptionTemplate"
-    ).value;
-
-
-  return replaceVariables(
-    template,
-    movie,
-    {
-      ctaUrl,
-      cta1,
-      cta2
-    }
-  );
-
-}
-
-
-// =====================================================
-// BUILD NARRATION
-// =====================================================
-
-function buildNarration(
-  movie
-) {
-
-  const template =
-    document.getElementById(
-      "narrationTemplate"
-    ).value;
-
-
-  return replaceVariables(
-    template,
-    movie
-  );
-
-}
-
-
-// =====================================================
-// PROGRESS
-// =====================================================
-
-function setProgress(
-  current,
-  total
-) {
-
-  const percentage =
-    total > 0
-      ? Math.round(
-          (
-            current /
-            total
-          ) * 100
-        )
-      : 0;
-
-
-  document.getElementById(
-    "progressBar"
-  ).style.width =
-    percentage + "%";
-
-
-  document.getElementById(
-    "status"
-  ).textContent =
-    `${current} / ${total} selesai (${percentage}%)`;
-
-}
-
-
-// =====================================================
-// GET MOVIE
-// =====================================================
-
-async function getMovie(
-  id,
-  language
-) {
-
-  const response =
-    await fetch(
-      `/api/movie?id=${encodeURIComponent(id)}&language=${encodeURIComponent(language)}`
-    );
-
-
-  const data =
-    await response.json();
-
-
-  if (!response.ok) {
-
-    throw new Error(
-      data.error ||
-      `TMDB error ${response.status}`
-    );
+    return String(text || "")
+      .replaceAll(
+        "{TITLE}",
+        movie.title || ""
+      )
+      .replaceAll(
+        "{YEAR}",
+        movie.year || ""
+      )
+      .replaceAll(
+        "{ID}",
+        movie.id || ""
+      )
+      .replaceAll(
+        "{GENRE}",
+        movie.genres || ""
+      )
+      .replaceAll(
+        "{DIRECTOR}",
+        movie.director || ""
+      )
+      .replaceAll(
+        "{RATING}",
+        movie.rating ?? ""
+      )
+      .replaceAll(
+        "{OVERVIEW}",
+        movie.overview || ""
+      )
+      .replaceAll(
+        "{CTA_URL}",
+        movie.ctaUrl || ""
+      )
+      .replaceAll(
+        "{CTA1}",
+        movie.cta1 || ""
+      )
+      .replaceAll(
+        "{CTA2}",
+        movie.cta2 || ""
+      );
 
   }
 
 
-  return data;
+  /* =====================================================
+     TTS
+  ===================================================== */
 
-}
+  async function generateTTS(
+    text,
+    voiceId,
+    modelId,
+    outputFormat
+  ) {
 
+    const response =
+      await fetch(
+        "/api/tts",
+        {
+          method: "POST",
 
-// =====================================================
-// GENERATE SPEECH
-// =====================================================
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
 
-async function generateSpeech(
-  text,
-  voiceId,
-  modelId,
-  outputFormat
-) {
-
-  const response =
-    await fetch(
-      "/api/tts",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify({
+          body: JSON.stringify({
 
             text,
 
@@ -2095,217 +1506,198 @@ async function generateSpeech(
 
           })
 
-      }
-    );
+        }
+      );
 
 
-  if (!response.ok) {
+    if (!response.ok) {
 
-    let message =
-      `TTS error ${response.status}`;
+      let message =
+        `TTS error (${response.status})`;
+
+      try {
+
+        const data =
+          await response.json();
+
+        message =
+          data?.error ||
+          message;
+
+      } catch (_) {}
+
+      throw new Error(message);
+
+    }
 
 
-    try {
-
-      const data =
-        await response.json();
-
-
-      message =
-        data.error ||
-        message;
-
-    } catch (_) {}
-
-
-    throw new Error(
-      message
-    );
+    return await response.blob();
 
   }
 
 
-  return await response.blob();
+  /* =====================================================
+     IDS
+  ===================================================== */
 
-}
+  function getMovieIds() {
 
+    return tmdbIdsEl.value
+      .split(/[\s,]+/)
+      .map(
+        x => x.trim()
+      )
+      .filter(Boolean)
+      .filter(
+        (value, index, array) =>
+          array.indexOf(value) === index
+      );
 
-// =====================================================
-// ADD RESULT
-// =====================================================
-
-function addResult(
-  movie,
-  title,
-  description,
-  narration,
-  ctaUrl,
-  language,
-  status,
-  error = ""
-) {
-
-  const results =
-    document.getElementById(
-      "results"
-    );
+  }
 
 
-  const div =
-    document.createElement(
-      "div"
-    );
+  /* =====================================================
+     PROGRESS
+  ===================================================== */
 
-
-  div.className =
-    "movie";
-
-
-  const poster =
-    movie.poster
-
-      ? `
-        <img
-          class="poster"
-          src="${escapeHtml(movie.poster)}"
-          alt=""
-        >
-      `
-
-      : `
-        <div class="poster"></div>
-      `;
-
-
-  if (
-    status === "success"
+  function updateProgress(
+    current,
+    total
   ) {
 
-    div.innerHTML = `
+    const percent =
+      total
+        ? Math.round(
+            (current / total) * 100
+          )
+        : 0;
+
+    progressFill.style.width =
+      `${percent}%`;
+
+    progressPercent.textContent =
+      `${percent}%`;
+
+    progressText.textContent =
+      `${current} / ${total}`;
+
+  }
+
+
+  /* =====================================================
+     RENDER RESULT
+  ===================================================== */
+
+  function renderResult(
+    movie,
+    finalTitle,
+    description,
+    narration,
+    templateNumber,
+    audioBlob,
+    language
+  ) {
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "result-card";
+
+
+    const poster =
+      movie.poster
+        ? `<img
+             class="poster"
+             src="${escapeAttribute(movie.poster)}"
+             alt=""
+           />`
+        : `<div class="poster"></div>`;
+
+
+    card.innerHTML = `
 
       ${poster}
 
-      <div class="movie-info">
+      <div class="result-main">
+
+        <div class="result-top">
+
+          <div class="result-id">
+            TMDB #${escapeHtml(movie.id)}
+          </div>
+
+          <div class="status success">
+            ✓ SUCCESS
+          </div>
+
+        </div>
+
 
         <div class="movie-title">
-
-          ${escapeHtml(
-            movie.title
-          )}
-
+          ${escapeHtml(movie.title)}
         </div>
 
 
         <div class="movie-meta">
-
-          Language:
-          ${escapeHtml(
-            language
-          )}
-
-          <br>
-
-          Year:
-          ${escapeHtml(
-            movie.year || "-"
-          )}
-
-          ${
-            movie.genres
-
-              ? " • " +
-                escapeHtml(
-                  movie.genres
-                )
-
-              : ""
-          }
-
-          ${
-            movie.rating != null
-
-              ? " • ⭐ " +
-                escapeHtml(
-                  movie.rating
-                )
-
-              : ""
-          }
-
+          ${escapeHtml(movie.year || "-")}
+          • ⭐ ${escapeHtml(movie.rating ?? "-")}
+          • ${escapeHtml(movie.genres || "-")}
         </div>
 
 
-        <div class="output-block">
+        <div class="result-section">
 
-          <div class="output-label">
+          <div class="result-label">
             Generated Title
           </div>
 
-          <div class="output-content">
+          <div class="result-value">
+            ${escapeHtml(finalTitle)}
+          </div>
 
-            ${escapeHtml(
-              title
-            )}
+          <span class="template-used">
+            🎲 Template ${templateNumber}
+          </span>
 
+        </div>
+
+
+        <div class="result-section">
+
+          <div class="result-label">
+            Language
+          </div>
+
+          <div class="result-value">
+            ${escapeHtml(language)}
           </div>
 
         </div>
 
 
-        <div class="output-block">
+        <div class="result-section">
 
-          <div class="output-label">
-            CTA URL
+          <div class="result-label">
+            Narration
           </div>
 
-          <div class="output-content">
-
-            ${escapeHtml(
-              ctaUrl
-            )}
-
+          <div class="result-value">
+            ${escapeHtml(narration)}
           </div>
 
         </div>
 
 
-        <div class="output-block">
+        <div class="result-section">
 
-          <div class="output-label">
-            Generated Description
+          <div class="result-label">
+            Audio
           </div>
 
-          <div class="output-content code-output">
-
-            ${escapeHtml(
-              description
-            )}
-
+          <div class="result-value">
+            ${formatBytes(audioBlob.size)}
           </div>
-
-        </div>
-
-
-        <div class="output-block">
-
-          <div class="output-label">
-            Audio Narration
-          </div>
-
-          <div class="narration">
-
-            ${escapeHtml(
-              narration
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="success">
-
-          ✓ MP3 berhasil dibuat
 
         </div>
 
@@ -2313,618 +1705,597 @@ function addResult(
 
     `;
 
+
+    resultsEl.prepend(card);
+
   }
 
 
-  else {
+  function renderError(
+    id,
+    error
+  ) {
 
-    div.innerHTML = `
+    const card =
+      document.createElement("div");
 
-      ${poster}
+    card.className =
+      "result-card";
 
-      <div class="movie-info">
+
+    card.innerHTML = `
+
+      <div class="poster"></div>
+
+      <div class="result-main">
+
+        <div class="result-top">
+
+          <div class="result-id">
+            TMDB #${escapeHtml(id)}
+          </div>
+
+          <div class="status error">
+            ✕ FAILED
+          </div>
+
+        </div>
 
         <div class="movie-title">
-
-          ${escapeHtml(
-            movie.title ||
-            "TMDB Movie"
-          )}
-
+          Generation failed
         </div>
 
-
-        <div class="error">
-
-          ✕
+        <div class="error-box">
           ${escapeHtml(
-            error
+            error?.message ||
+            String(error)
           )}
-
         </div>
 
       </div>
 
     `;
 
-  }
 
-
-  results.appendChild(
-    div
-  );
-
-}
-
-
-// =====================================================
-// ESCAPE HTML
-// =====================================================
-
-function escapeHtml(
-  text
-) {
-
-  return String(
-    text || ""
-  )
-
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
-
-}
-
-
-// =====================================================
-// GENERATE ALL
-// =====================================================
-
-async function generateAll() {
-
-  const button =
-    document.getElementById(
-      "generateBtn"
-    );
-
-
-  // ---------------------------------------------------
-  // INPUT
-  // ---------------------------------------------------
-
-  const ids =
-    getIds();
-
-
-  const language =
-    document.getElementById(
-      "tmdbLanguage"
-    ).value;
-
-
-  const voiceId =
-    document.getElementById(
-      "voiceId"
-    )
-    .value
-    .trim();
-
-
-  const ctaBaseUrl =
-    document.getElementById(
-      "ctaBaseUrl"
-    )
-    .value
-    .trim();
-
-
-  const cta1Text =
-    document.getElementById(
-      "cta1Text"
-    )
-    .value
-    .trim();
-
-
-  const cta1Template =
-    document.getElementById(
-      "cta1Template"
-    ).value;
-
-
-  const cta2Text =
-    document.getElementById(
-      "cta2Text"
-    )
-    .value
-    .trim();
-
-
-  const cta2Template =
-    document.getElementById(
-      "cta2Template"
-    ).value;
-
-
-  const modelId =
-    document.getElementById(
-      "model"
-    ).value;
-
-
-  const outputFormat =
-    document.getElementById(
-      "format"
-    ).value;
-
-
-  // ---------------------------------------------------
-  // VALIDATION
-  // ---------------------------------------------------
-
-  if (!ids.length) {
-
-    alert(
-      "Masukkan minimal 1 TMDB ID."
-    );
-
-    return;
+    resultsEl.prepend(card);
 
   }
 
 
-  if (
-    ids.length > 100
-  ) {
+  /* =====================================================
+     MAIN GENERATOR
+  ===================================================== */
 
-    alert(
-      "Maksimal 100 TMDB ID per proses."
+  async function generateAll() {
+
+    const ids =
+      getMovieIds();
+
+    const templates =
+      getTitleTemplates();
+
+    const language =
+      languageEl.value;
+
+    const voiceId =
+      voiceIdEl.value.trim();
+
+    const modelId =
+      modelIdEl.value;
+
+    const outputFormat =
+      outputFormatEl.value;
+
+
+    if (!ids.length) {
+
+      alert(
+        "Masukkan minimal 1 TMDB ID."
+      );
+
+      return;
+
+    }
+
+
+    if (ids.length > 100) {
+
+      alert(
+        "Maksimal 100 TMDB ID per batch."
+      );
+
+      return;
+
+    }
+
+
+    if (!templates.length) {
+
+      alert(
+        "Masukkan minimal 1 Title Template."
+      );
+
+      return;
+
+    }
+
+
+    if (!language) {
+
+      alert(
+        "Pilih TMDB Language."
+      );
+
+      return;
+
+    }
+
+
+    if (!voiceId) {
+
+      alert(
+        "Masukkan ElevenLabs Voice ID."
+      );
+
+      return;
+
+    }
+
+
+    generateBtn.disabled =
+      true;
+
+    generateBtn.textContent =
+      "⏳ Generating...";
+
+
+    resultsEl.innerHTML = "";
+
+
+    zipBox.classList.remove(
+      "show"
     );
 
-    return;
 
-  }
-
-
-  if (!language) {
-
-    alert(
-      "Pilih bahasa TMDB terlebih dahulu."
-    );
-
-    return;
-
-  }
+    zipBlob = null;
 
 
-  if (!voiceId) {
+    let success = 0;
 
-    alert(
-      "Masukkan Voice ID ElevenLabs."
-    );
-
-    return;
-
-  }
+    let failed = 0;
 
 
-  if (!ctaBaseUrl) {
+    document.getElementById(
+      "statTotal"
+    ).textContent =
+      ids.length;
 
-    alert(
-      "Masukkan CTA Base URL."
-    );
+    document.getElementById(
+      "statSuccess"
+    ).textContent =
+      "0";
 
-    return;
-
-  }
-
-
-  if (!cta1Text) {
-
-    alert(
-      "Isi teks CTA Button 1."
-    );
-
-    return;
-
-  }
+    document.getElementById(
+      "statFailed"
+    ).textContent =
+      "0";
 
 
-  if (!cta2Text) {
-
-    alert(
-      "Isi teks CTA Button 2."
-    );
-
-    return;
-
-  }
-
-
-  if (
-    !cta1Template.trim()
-  ) {
-
-    alert(
-      "Isi HTML Template CTA 1."
-    );
-
-    return;
-
-  }
-
-
-  if (
-    !cta2Template.trim()
-  ) {
-
-    alert(
-      "Isi HTML Template CTA 2."
-    );
-
-    return;
-
-  }
-
-
-  // ---------------------------------------------------
-  // DISABLE
-  // ---------------------------------------------------
-
-  button.disabled =
-    true;
-
-
-  button.textContent =
-    "⏳ Generating...";
-
-
-  document.getElementById(
-    "results"
-  ).innerHTML =
-    "";
-
-
-  document.getElementById(
-    "progressBar"
-  ).style.width =
-    "0%";
-
-
-  const zip =
-    new JSZip();
-
-
-  let successCount =
-    0;
-
-
-  let errorCount =
-    0;
-
-
-  // ---------------------------------------------------
-  // LOOP
-  // ---------------------------------------------------
-
-  for (
-    let i = 0;
-    i < ids.length;
-    i++
-  ) {
-
-    const id =
-      ids[i];
-
-
-    setProgress(
-      i,
+    updateProgress(
+      0,
       ids.length
     );
 
 
-    try {
+    const zip =
+      new JSZip();
 
-      // -----------------------------------------------
-      // GET TMDB
-      // -----------------------------------------------
 
-      const movie =
-        await getMovie(
-          id,
+    for (
+      let i = 0;
+      i < ids.length;
+      i++
+    ) {
+
+      const id =
+        ids[i];
+
+
+      progressText.textContent =
+        `Processing ${i + 1} / ${ids.length}`;
+
+
+      try {
+
+        /* -------------------------
+           TMDB
+        ------------------------- */
+
+        const movie =
+          await getMovie(
+            id,
+            language
+          );
+
+
+        /* -------------------------
+           RANDOM TITLE TEMPLATE
+        ------------------------- */
+
+        const selected =
+          getRandomTitleTemplate(
+            templates
+          );
+
+
+        const finalTitle =
+          replaceVariables(
+            selected.template,
+            movie
+          );
+
+
+        /* -------------------------
+           CTA
+        ------------------------- */
+
+        const ctaUrl =
+          buildCTAUrl(
+            ctaBaseUrlEl.value,
+            movie.id
+          );
+
+
+        const cta1 =
+          buildCTAButton(
+            cta1TemplateEl.value,
+            cta1TextEl.value,
+            ctaUrl,
+            movie.id
+          );
+
+
+        const cta2 =
+          buildCTAButton(
+            cta2TemplateEl.value,
+            cta2TextEl.value,
+            ctaUrl,
+            movie.id
+          );
+
+
+        /* -------------------------
+           DESCRIPTION
+        ------------------------- */
+
+        const movieForDescription =
+          {
+            ...movie,
+            ctaUrl,
+            cta1,
+            cta2
+          };
+
+
+        const description =
+          replaceVariables(
+            descriptionTemplateEl.value,
+            movieForDescription
+          );
+
+
+        /* -------------------------
+           NARRATION
+        ------------------------- */
+
+        const narration =
+          replaceVariables(
+            narrationTemplateEl.value,
+            movie
+          );
+
+
+        /* -------------------------
+           TTS
+        ------------------------- */
+
+        const audio =
+          await generateTTS(
+            narration,
+            voiceId,
+            modelId,
+            outputFormat
+          );
+
+
+        /* -------------------------
+           SAFE FILENAME
+        ------------------------- */
+
+        const filename =
+          buildAudioFilename(
+            movie,
+            i + 1
+          );
+
+
+        zip.file(
+          filename,
+          audio
+        );
+
+
+        /* -------------------------
+           RESULT
+        ------------------------- */
+
+        renderResult(
+          movie,
+          finalTitle,
+          description,
+          narration,
+          selected.index,
+          audio,
           language
         );
 
 
-      // -----------------------------------------------
-      // CTA URL
-      // -----------------------------------------------
+        success++;
 
-      const ctaUrl =
-        buildCTAUrl(
-          ctaBaseUrl,
-          movie.id
+
+        document.getElementById(
+          "statSuccess"
+        ).textContent =
+          success;
+
+
+      } catch (error) {
+
+        failed++;
+
+
+        renderError(
+          id,
+          error
         );
 
 
-      // -----------------------------------------------
-      // CTA 1
-      // -----------------------------------------------
+        document.getElementById(
+          "statFailed"
+        ).textContent =
+          failed;
 
-      const cta1 =
-        buildCTAButton(
-          cta1Template,
-          cta1Text,
-          ctaUrl,
-          movie.id
-        );
+      }
 
 
-      // -----------------------------------------------
-      // CTA 2
-      // -----------------------------------------------
-
-      const cta2 =
-        buildCTAButton(
-          cta2Template,
-          cta2Text,
-          ctaUrl,
-          movie.id
-        );
-
-
-      // -----------------------------------------------
-      // TITLE
-      // -----------------------------------------------
-
-      const finalTitle =
-        buildTitle(
-          movie
-        );
-
-
-      // -----------------------------------------------
-      // DESCRIPTION
-      // -----------------------------------------------
-
-      const finalDescription =
-        buildDescription(
-          movie,
-          ctaUrl,
-          cta1,
-          cta2
-        );
-
-
-      // -----------------------------------------------
-      // NARRATION
-      // -----------------------------------------------
-
-      const narration =
-        buildNarration(
-          movie
-        );
-
-
-      // -----------------------------------------------
-      // TTS
-      // -----------------------------------------------
-
-      const audioBlob =
-        await generateSpeech(
-          narration,
-          voiceId,
-          modelId,
-          outputFormat
-        );
-
-
-      // -----------------------------------------------
-      // FILENAME
-      // -----------------------------------------------
-
-      const filename =
-        `${slugify(movie.title)}-${movie.year || "unknown"}-${movie.id}.mp3`;
-
-
-      // -----------------------------------------------
-      // ADD ZIP
-      // -----------------------------------------------
-
-      zip.file(
-        filename,
-        audioBlob
-      );
-
-
-      // -----------------------------------------------
-      // RESULT
-      // -----------------------------------------------
-
-      addResult(
-        movie,
-        finalTitle,
-        finalDescription,
-        narration,
-        ctaUrl,
-        language,
-        "success"
-      );
-
-
-      successCount++;
-
-
-    }
-
-
-    catch (
-      error
-    ) {
-
-      errorCount++;
-
-
-      addResult(
-        {
-          title:
-            `TMDB ID ${id}`,
-
-          year: "",
-
-          genres: "",
-
-          rating: null
-        },
-
-        "",
-
-        "",
-
-        "",
-
-        "",
-
-        language,
-
-        "error",
-
-        error?.message ||
-          "Unknown error"
+      updateProgress(
+        i + 1,
+        ids.length
       );
 
     }
 
 
-    setProgress(
-      i + 1,
-      ids.length
-    );
+    /* =================================================
+       ZIP
+    ================================================= */
+
+    if (success > 0) {
+
+      progressText.textContent =
+        "Creating ZIP...";
+
+
+      zipBlob =
+        await zip.generateAsync({
+          type: "blob",
+          compression: "DEFLATE",
+          compressionOptions: {
+            level: 6
+          }
+        });
+
+
+      zipInfo.textContent =
+        `${success} MP3 file(s) ready. ` +
+        `${failed} failed.`;
+
+
+      zipBox.classList.add(
+        "show"
+      );
+
+    }
+
+
+    progressText.textContent =
+      `Completed — ${success} success, ${failed} failed`;
+
+
+    generateBtn.disabled =
+      false;
+
+    generateBtn.textContent =
+      "🚀 Generate Movies";
 
   }
 
 
-  // ---------------------------------------------------
-  // CREATE ZIP
-  // ---------------------------------------------------
+  /* =====================================================
+     DOWNLOAD ZIP
+  ===================================================== */
 
-  if (
-    successCount > 0
+  downloadZip.addEventListener(
+    "click",
+    () => {
+
+      if (!zipBlob) {
+        return;
+      }
+
+      const url =
+        URL.createObjectURL(
+          zipBlob
+        );
+
+      const a =
+        document.createElement("a");
+
+      a.href =
+        url;
+
+      a.download =
+        `movie-tts-${languageEl.value}-${Date.now()}.zip`;
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+
+      setTimeout(
+        () =>
+          URL.revokeObjectURL(url),
+        1000
+      );
+
+    }
+  );
+
+
+  /* =====================================================
+     HELPERS
+  ===================================================== */
+
+  function buildAudioFilename(
+    movie,
+    number
   ) {
 
-    document.getElementById(
-      "status"
-    ).textContent =
-      `Membuat ZIP... ${successCount} MP3 berhasil, ${errorCount} gagal.`;
+    const title =
+      movie.title ||
+      `movie-${movie.id}`;
+
+    const slug =
+      slugify(title);
+
+    return `${String(number).padStart(3, "0")}-${slug}-${movie.id}.mp3`;
+
+  }
 
 
-    const zipBlob =
-      await zip.generateAsync({
+  function slugify(text) {
 
-        type:
-          "blob",
+    return String(text || "")
+      .normalize("NFKD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
+      .replace(
+        /[^a-zA-Z0-9]+/g,
+        "-"
+      )
+      .replace(
+        /^-+|-+$/g,
+        ""
+      )
+      .toLowerCase()
+      .slice(0, 80);
 
-        compression:
-          "STORE"
-
-      });
+  }
 
 
-    const url =
-      URL.createObjectURL(
-        zipBlob
+  function formatBytes(bytes) {
+
+    if (!bytes) {
+      return "0 B";
+    }
+
+    const units = [
+      "B",
+      "KB",
+      "MB",
+      "GB"
+    ];
+
+    const index =
+      Math.floor(
+        Math.log(bytes) /
+        Math.log(1024)
       );
 
-
-    const a =
-      document.createElement(
-        "a"
-      );
-
-
-    a.href =
-      url;
-
-
-    a.download =
-      `movie-tts-${language}-${Date.now()}.zip`;
-
-
-    document.body.appendChild(
-      a
-    );
-
-
-    a.click();
-
-
-    a.remove();
-
-
-    URL.revokeObjectURL(
-      url
+    return (
+      (bytes /
+        Math.pow(
+          1024,
+          index
+        )).toFixed(1)
+      + " " +
+      units[index]
     );
 
   }
 
 
-  // ---------------------------------------------------
-  // FINISHED
-  // ---------------------------------------------------
+  function escapeHtml(value) {
 
-  document.getElementById(
-    "status"
-  ).textContent =
-    `Selesai — ${successCount} berhasil, ${errorCount} gagal. Language: ${language}`;
-
-
-  button.disabled =
-    false;
-
-
-  button.textContent =
-    "🚀 Generate MP3";
-
-}
-
-
-// =====================================================
-// INITIALIZE
-// =====================================================
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    loadLanguages();
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
 
   }
-);
+
+
+  function escapeAttribute(value) {
+
+    return escapeHtml(value);
+
+  }
+
+
+  /* =====================================================
+     INPUT EVENTS
+  ===================================================== */
+
+  tmdbIdsEl.addEventListener(
+    "input",
+    () => {
+
+      const total =
+        getMovieIds().length;
+
+      document.getElementById(
+        "statTotal"
+      ).textContent =
+        total;
+
+    }
+  );
+
+
+  /* =====================================================
+     GENERATE EVENT
+  ===================================================== */
+
+  generateBtn.addEventListener(
+    "click",
+    generateAll
+  );
+
+
+  /* =====================================================
+     INITIAL
+  ===================================================== */
+
+  loadLanguages();
+
+  updateTemplateStats();
 
 </script>
 
-
 </body>
-
 </html>
