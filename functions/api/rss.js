@@ -240,13 +240,13 @@ export async function onRequestGet(context) {
       "episodic";
 
     const ownerXml =
-      author || email
-        ? `
+  author || email
+    ? `
       <itunes:owner>
         <itunes:name>${xmlEscape(author)}</itunes:name>
         <itunes:email>${xmlEscape(email)}</itunes:email>
       </itunes:owner>`
-        : "";
+    : "";
 
     const artworkXml =
       artwork
