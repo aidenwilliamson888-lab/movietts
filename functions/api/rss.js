@@ -73,22 +73,35 @@ async function getManifest(env) {
 }
 
 function formatDuration(value) {
-  if (value === null || value === undefined || value === "") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
     return "";
   }
 
   const totalMinutes = Number(value);
 
-  if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) {
+  if (
+    !Number.isFinite(totalMinutes) ||
+    totalMinutes <= 0
+  ) {
     return "";
   }
 
-  const totalSeconds = Math.round(totalMinutes * 60);
+  const totalSeconds = Math.round(
+    totalMinutes * 60
+  );
 
-  const hours = Math.floor(totalSeconds / 3600);
+  const hours = Math.floor(
+    totalSeconds / 3600
+  );
+
   const minutes = Math.floor(
     (totalSeconds % 3600) / 60
   );
+
   const seconds = totalSeconds % 60;
 
   return [
@@ -109,14 +122,19 @@ function formatPubDate(dateValue) {
 }
 
 function normalizeBoolean(value) {
-  return value === true ||
+  return (
+    value === true ||
     value === "true" ||
     value === 1 ||
-    value === "1";
+    value === "1"
+  );
 }
 
 function buildEpisodeXml(episode, config) {
-  const title = episode.title || episode.movie_title || "Untitled Episode";
+  const title =
+    episode.title ||
+    episode.movie_title ||
+    "Untitled Episode";
 
   const description =
     episode.description ||
@@ -155,12 +173,14 @@ function buildEpisodeXml(episode, config) {
 
   const episodeImage =
     poster
-      ? `\n      <itunes:image href="${xmlEscape(poster)}" />`
+      ? `
+      <itunes:image href="${xmlEscape(poster)}" />`
       : "";
 
   const durationXml =
     duration
-      ? `\n      <itunes:duration>${xmlEscape(duration)}</itunes:duration>`
+      ? `
+      <itunes:duration>${xmlEscape(duration)}</itunes:duration>`
       : "";
 
   const length =
@@ -171,6 +191,7 @@ function buildEpisodeXml(episode, config) {
   return `
     <item>
       <title>${xmlEscape(title)}</title>
+
       <description>${xmlEscape(description)}</description>
 
       <guid isPermaLink="false">${xmlEscape(guid)}</guid>
@@ -184,19 +205,22 @@ function buildEpisodeXml(episode, config) {
       />
 
       <itunes:episodeType>full</itunes:episodeType>${durationXml}${episodeImage}
+
     </item>`;
 }
 
 export async function onRequestGet(context) {
   try {
-    const [config, manifest] = await Promise.all([
-      getConfig(context.env),
-      getManifest(context.env)
-    ]);
+    const [config, manifest] =
+      await Promise.all([
+        getConfig(context.env),
+        getManifest(context.env)
+      ]);
 
-    const episodes = Array.isArray(manifest.episodes)
-      ? manifest.episodes
-      : [];
+    const episodes =
+      Array.isArray(manifest.episodes)
+        ? manifest.episodes
+        : [];
 
     const podcastTitle =
       config.podcast_title ||
@@ -239,34 +263,52 @@ export async function onRequestGet(context) {
       config.podcast_type ||
       "episodic";
 
+    /*
+     * Podcast owner information.
+     */
     const ownerXml =
-  author || email
-    ? `
+      author || email
+        ? `
       <itunes:owner>
         <itunes:name>${xmlEscape(author)}</itunes:name>
         <itunes:email>${xmlEscape(email)}</itunes:email>
       </itunes:owner>`
-    : "";
+        : "";
+
+    /*
+     * IMPORTANT:
+     * Spotify looks for <itunes:email>
+     * in the RSS feed when verifying ownership.
+     */
+    const emailXml =
+      email
+        ? `
+    <itunes:email>${xmlEscape(email)}</itunes:email>`
+        : "";
 
     const artworkXml =
       artwork
         ? `
-      <itunes:image href="${xmlEscape(artwork)}" />`
+    <itunes:image href="${xmlEscape(artwork)}" />`
         : "";
 
     const categoryXml =
       category
         ? `
-      <itunes:category text="${xmlEscape(category)}" />`
+    <itunes:category text="${xmlEscape(category)}" />`
         : "";
 
-    const items = episodes
-      .filter(Boolean)
-      .map(episode =>
-        buildEpisodeXml(episode, config)
-      )
-      .filter(Boolean)
-      .join("\n");
+    const items =
+      episodes
+        .filter(Boolean)
+        .map(episode =>
+          buildEpisodeXml(
+            episode,
+            config
+          )
+        )
+        .filter(Boolean)
+        .join("\n");
 
     const lastBuildDate =
       episodes.length > 0
@@ -294,7 +336,7 @@ export async function onRequestGet(context) {
 
     <generator>Movie Podcast Generator V2.6</generator>
 
-    <itunes:author>${xmlEscape(author)}</itunes:author>
+    <itunes:author>${xmlEscape(author)}</itunes:author>${emailXml}
 
     <itunes:summary>${xmlEscape(podcastDescription)}</itunes:summary>
 
@@ -314,21 +356,31 @@ export async function onRequestGet(context) {
 
 </rss>`;
 
-    return new Response(rss, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/rss+xml; charset=utf-8",
-        "Cache-Control": "no-cache, no-store, must-revalidate"
+    return new Response(
+      rss,
+      {
+        status: 200,
+        headers: {
+          "Content-Type":
+            "application/rss+xml; charset=utf-8",
+
+          "Cache-Control":
+            "no-cache, no-store, must-revalidate"
+        }
       }
-    });
+    );
 
   } catch (error) {
     return new Response(
-      `RSS generation error: ${error.message || "Unknown error"}`,
+      `RSS generation error: ${
+        error.message ||
+        "Unknown error"
+      }`,
       {
         status: 500,
         headers: {
-          "Content-Type": "text/plain; charset=utf-8"
+          "Content-Type":
+            "text/plain; charset=utf-8"
         }
       }
     );
