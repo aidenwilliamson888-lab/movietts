@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Movie Podcast Generator V2.8</title>
+<title>Movie Podcast Generator V2.9</title>
 
 <meta name="description"
 content="TMDB Movie Podcast Generator with ElevenLabs TTS, Cloudflare R2 storage and independent RSS generation.">
@@ -541,671 +541,871 @@ small{
 
 <div class="container">
 
-    <header class="header">
-        <h1>
-            Movie Podcast Generator
-            <span class="version">V2.8</span>
-        </h1>
-        <p>
-            TMDB → ElevenLabs TTS → Cloudflare R2 → Live RSS.
-            Generate movie podcast episodes and download everything as a ZIP.
-        </p>
-    </header>
+<header class="header">
+    <h1>
+        Movie Podcast Generator
+        <span class="version">V2.9</span>
+    </h1>
+    <p>
+        TMDB → ElevenLabs TTS → Cloudflare R2 → Live RSS.
+        Generate movie podcast episodes and download everything as a ZIP.
+    </p>
+</header>
 
 
-    <!-- MOVIE SOURCE -->
-    <section class="card">
+<!-- MOVIE SOURCE -->
+<section class="card">
 
-        <h2>1. Movie Source</h2>
-        <div class="card-description">
-            Enter TMDB movie IDs. Maximum 500 unique IDs per generation.
-        </div>
+    <h2>1. Movie Source</h2>
 
-        <div class="grid">
+    <div class="card-description">
+        Enter TMDB movie IDs. Maximum 500 unique IDs per generation.
+    </div>
 
-            <div class="field full">
-                <label for="tmdbIds">TMDB Movie IDs</label>
+    <div class="grid">
 
-                <textarea
-                    id="tmdbIds"
-                    placeholder="Example:
+        <div class="field full">
+
+            <label for="tmdbIds">TMDB Movie IDs</label>
+
+            <textarea
+                id="tmdbIds"
+                placeholder="Example:
 550
 603
 680
 157
 27205"></textarea>
 
-                <div class="counter" id="idCounter">0 / 500 IDs</div>
-
-                <div class="help">
-                    You can paste IDs separated by spaces, commas or new lines.
-                    Duplicate IDs are automatically removed.
-                </div>
+            <div class="counter" id="idCounter">
+                0 / 500 IDs
             </div>
 
-            <div class="field">
-                <label for="tmdbLanguage">TMDB Language</label>
-
-                <select id="tmdbLanguage">
-                    <option value="en-US">English (US)</option>
-                    <option value="en-GB">English (UK)</option>
-                    <option value="es-ES">Spanish (Spain)</option>
-                    <option value="es-MX">Spanish (Mexico)</option>
-                    <option value="fr-FR">French</option>
-                    <option value="de-DE">German</option>
-                    <option value="it-IT">Italian</option>
-                    <option value="pt-PT">Portuguese (Portugal)</option>
-                    <option value="pt-BR">Portuguese (Brazil)</option>
-                    <option value="nl-NL">Dutch</option>
-                    <option value="sv-SE">Swedish</option>
-                    <option value="da-DK">Danish</option>
-                    <option value="no-NO">Norwegian</option>
-                    <option value="fi-FI">Finnish</option>
-                    <option value="pl-PL">Polish</option>
-                    <option value="cs-CZ">Czech</option>
-                    <option value="hu-HU">Hungarian</option>
-                    <option value="ro-RO">Romanian</option>
-                    <option value="bg-BG">Bulgarian</option>
-                    <option value="tr-TR">Turkish</option>
-                    <option value="el-GR">Greek</option>
-                    <option value="ko-KR">Korean</option>
-                    <option value="ja-JP">Japanese</option>
-                    <option value="zh-CN">Chinese</option>
-                    <option value="th-TH">Thai</option>
-                    <option value="vi-VN">Vietnamese</option>
-                </select>
+            <div class="help">
+                You can paste IDs separated by spaces, commas or new lines.
+                Duplicate IDs are automatically removed.
             </div>
 
-        </div>
-    </section>
-
-
-    <!-- ELEVENLABS -->
-    <section class="card">
-
-        <h2>2. ElevenLabs</h2>
-        <div class="card-description">
-            Configure the ElevenLabs voice and audio output.
-        </div>
-
-        <div class="grid">
-
-            <div class="field">
-                <label for="voiceId">ElevenLabs Voice ID</label>
-
-                <input
-                    id="voiceId"
-                    type="text"
-                    placeholder="Enter Voice ID">
-
-                <div class="help">
-                    The API key remains server-side in <code>/api/tts</code>.
-                </div>
-            </div>
-
-            <div class="field">
-                <label>Credit Status</label>
-
-                <div class="credit-box">
-
-                    <div class="credit" id="creditUsedBox">
-                        <div class="name">Terpakai</div>
-                        <div class="value" id="creditUsed">-</div>
-                    </div>
-
-                    <div class="credit" id="creditRemainingBox">
-                        <div class="name">Sisa</div>
-                        <div class="value" id="creditRemaining">-</div>
-                    </div>
-
-                    <div class="credit" id="creditLimitBox">
-                        <div class="name">Limit</div>
-                        <div class="value" id="creditLimit">-</div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="field">
-                <label>Credit</label>
-
-                <button
-                    type="button"
-                    class="btn-small"
-                    id="refreshCreditBtn">
-                    ↻ Refresh Credit
-                </button>
-
-                <div class="help" id="creditStatus">
-                    Click refresh to check current ElevenLabs character usage.
-                </div>
-            </div>
-
-            <div class="field">
-                <label for="modelId">Model</label>
-
-                <select id="modelId">
-                    <option value="eleven_multilingual_v2">
-                        Eleven Multilingual v2
-                    </option>
-
-                    <option value="eleven_turbo_v2_5">
-                        Eleven Turbo v2.5
-                    </option>
-
-                    <option value="eleven_flash_v2_5">
-                        Eleven Flash v2.5
-                    </option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label for="outputFormat">Output Format</label>
-
-                <select id="outputFormat">
-                    <option value="mp3_22050_32">MP3 22050 Hz / 32 kbps</option>
-                    <option value="mp3_44100_64">MP3 44100 Hz / 64 kbps</option>
-                    <option value="mp3_44100_96">MP3 44100 Hz / 96 kbps</option>
-                    <option value="mp3_44100_128">MP3 44100 Hz / 128 kbps</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label>Title Mode</label>
-
-                <div class="switch-row">
-                    <div>
-                        <strong>Random title template</strong>
-                        <div class="help">
-                            Randomly selects one title template per movie.
-                        </div>
-                    </div>
-
-                    <label class="switch">
-                        <input type="checkbox" id="randomTitle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-
-    <!-- TITLE -->
-    <section class="card">
-
-        <h2>3. Episode Title Templates</h2>
-
-        <div class="card-description">
-            Available variables:
-            <code>{TITLE}</code>,
-            <code>{YEAR}</code>,
-            <code>{ID}</code>.
-        </div>
-
-        <div class="template-list" id="titleTemplates"></div>
-
-        <div class="actions">
-            <button type="button" id="addTitleTemplate">
-                + Add Template
-            </button>
-        </div>
-
-        <div style="margin-top:15px">
-
-            <label>Preview</label>
-
-            <div class="preview" id="titlePreview">
-                Movie title preview will appear here.
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- CTA -->
-    <section class="card">
-
-        <h2>4. CTA</h2>
-
-        <div class="card-description">
-            CTA URL is fixed automatically from the TMDB movie ID.
-            You don't need to enter the URL manually.
-        </div>
-
-        <div class="grid">
-
-            <div class="cta-fixed">
-
-                <div class="fixed-label">CTA 1</div>
-
-                <div class="field">
-
-                    <label for="cta1Text">CTA Text</label>
-
-                    <input
-                        id="cta1Text"
-                        value="Watch Full Movie">
-
-                </div>
-
-                <div style="height:10px"></div>
-
-                <div class="field">
-
-                    <label>CTA URL</label>
-
-                    <input
-                        value="https://movietts.pages.dev/{ID}"
-                        readonly
-                        class="readonly">
-
-                    <div class="help">
-                        Automatically becomes
-                        <strong>https://movietts.pages.dev/{TMDB-ID}</strong>
-                    </div>
-
-                </div>
-
-                <div style="height:10px"></div>
-
-                <div class="field">
-
-                    <label>CTA HTML</label>
-
-                    <textarea
-                        id="cta1Html"
-                        readonly
-                        class="readonly"></textarea>
-
-                </div>
-
-            </div>
-
-
-            <div class="cta-fixed">
-
-                <div class="fixed-label">CTA 2</div>
-
-                <div class="field">
-
-                    <label for="cta2Text">CTA Text</label>
-
-                    <input
-                        id="cta2Text"
-                        value="Watch Now">
-
-                </div>
-
-                <div style="height:10px"></div>
-
-                <div class="field">
-
-                    <label>CTA URL</label>
-
-                    <input
-                        value="https://movietts.pages.dev/{ID}"
-                        readonly
-                        class="readonly">
-
-                    <div class="help">
-                        Automatically becomes
-                        <strong>https://movietts.pages.dev/{TMDB-ID}</strong>
-                    </div>
-
-                </div>
-
-                <div style="height:10px"></div>
-
-                <div class="field">
-
-                    <label>CTA HTML</label>
-
-                    <textarea
-                        id="cta2Html"
-                        readonly
-                        class="readonly"></textarea>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- DESCRIPTION -->
-    <section class="card">
-
-        <h2>5. Episode Description</h2>
-
-        <div class="card-description">
-            Build the RSS episode description using movie information and CTA.
         </div>
 
         <div class="field">
 
-            <label for="descriptionTemplate">
-                Description Template
+            <label for="tmdbLanguage">
+                TMDB Language
             </label>
 
-            <textarea id="descriptionTemplate"></textarea>
+            <select id="tmdbLanguage">
 
-            <div class="help">
-                Variables:
-                {TITLE},
-                {ORIGINAL_TITLE},
-                {ORIGINAL_LANGUAGE},
-                {YEAR},
-                {OVERVIEW},
-                {RATING},
-                {DIRECTOR},
-                {RUNTIME},
-                {CAST},
-                {ID},
-                {CTA1},
-                {CTA2}
-            </div>
+                <option value="en-US">English (US)</option>
+                <option value="en-GB">English (UK)</option>
+                <option value="es-ES">Spanish (Spain)</option>
+                <option value="es-MX">Spanish (Mexico)</option>
+                <option value="fr-FR">French</option>
+                <option value="de-DE">German</option>
+                <option value="it-IT">Italian</option>
+                <option value="pt-PT">Portuguese (Portugal)</option>
+                <option value="pt-BR">Portuguese (Brazil)</option>
+                <option value="nl-NL">Dutch</option>
+                <option value="sv-SE">Swedish</option>
+                <option value="da-DK">Danish</option>
+                <option value="no-NO">Norwegian</option>
+                <option value="fi-FI">Finnish</option>
+                <option value="pl-PL">Polish</option>
+                <option value="cs-CZ">Czech</option>
+                <option value="hu-HU">Hungarian</option>
+                <option value="ro-RO">Romanian</option>
+                <option value="bg-BG">Bulgarian</option>
+                <option value="tr-TR">Turkish</option>
+                <option value="el-GR">Greek</option>
+                <option value="ko-KR">Korean</option>
+                <option value="ja-JP">Japanese</option>
+                <option value="zh-CN">Chinese</option>
+                <option value="th-TH">Thai</option>
+                <option value="vi-VN">Vietnamese</option>
 
-        </div>
-
-    </section>
-
-
-    <!-- TTS -->
-    <section class="card">
-
-        <h2>6. TTS Narration</h2>
-
-        <div class="card-description">
-            The generated text is sent to ElevenLabs. Keep narration reasonably
-            short because the API endpoint limits the TTS input.
-        </div>
-
-        <div class="field">
-
-            <label for="ttsTemplate">
-                Narration Template
-            </label>
-
-            <textarea id="ttsTemplate"></textarea>
-
-            <div class="help">
-                Same movie variables are available.
-                Maximum supported text by the current TTS worker: 1500 characters.
-            </div>
+            </select>
 
         </div>
 
-        <div style="margin-top:12px">
-
-            <label>Narration Preview</label>
-
-            <div class="preview" id="ttsPreview">
-                Narration preview will appear here.
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- PODCAST -->
-    <section class="card">
-
-        <h2>7. Podcast Settings</h2>
-
-        <div class="card-description">
-            These values are stored through <code>/api/podcast-config</code>
-            and are used by the live RSS feed.
-        </div>
-
-        <div class="grid">
-
-            <div class="field">
-                <label for="podcastTitle">Podcast Title</label>
-                <input id="podcastTitle">
-            </div>
-
-            <div class="field">
-                <label for="podcastAuthor">Author</label>
-                <input id="podcastAuthor">
-            </div>
-
-            <div class="field full">
-                <label for="podcastDescription">Podcast Description</label>
-                <textarea id="podcastDescription"></textarea>
-            </div>
-
-            <div class="field">
-                <label for="podcastEmail">Owner Email</label>
-                <input id="podcastEmail" type="email">
-            </div>
-
-            <div class="field">
-                <label for="podcastArtwork">Artwork URL</label>
-                <input id="podcastArtwork" type="url">
-            </div>
-
-            <div class="field">
-                <label for="podcastWebsite">Website URL</label>
-                <input id="podcastWebsite" type="url">
-            </div>
-
-            <div class="field">
-                <label for="podcastCategory">Category</label>
-                <input id="podcastCategory">
-            </div>
-
-            <div class="field">
-                <label for="podcastLanguage">Podcast Language</label>
-                <input
-                    id="podcastLanguage"
-                    value="en-us"
-                    placeholder="en-us">
-            </div>
-
-            <div class="field">
-                <label for="podcastType">Podcast Type</label>
-
-                <select id="podcastType">
-                    <option value="episodic">Episodic</option>
-                    <option value="serial">Serial</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label for="podcastExplicit">Explicit</label>
-
-                <select id="podcastExplicit">
-                    <option value="false">No</option>
-                    <option value="true">Yes</option>
-                </select>
-            </div>
-
-        </div>
-
-        <div class="actions">
-
-            <button
-                type="button"
-                id="savePodcastBtn">
-                Save Podcast Settings
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- GENERATE -->
-    <section class="card">
-
-        <h2>8. Generate Podcast</h2>
-
-        <div class="card-description">
-            Episodes are generated sequentially to avoid unnecessary API pressure.
-        </div>
-
-        <div class="actions">
-
-            <button
-                type="button"
-                class="btn-primary"
-                id="generateBtn">
-                🎙 Generate Podcast
-            </button>
-
-            <button
-                type="button"
-                class="btn-purple"
-                id="rssBtn"
-                disabled>
-                Generate rss.xml
-            </button>
-
-            <button
-                type="button"
-                class="btn-success"
-                id="downloadZipBtn"
-                disabled>
-                Download ZIP
-            </button>
-
-        </div>
-
-        <div class="progress-wrap" id="progressWrap">
-
-            <div class="progress-top">
-                <span id="progressText">Preparing...</span>
-                <span id="progressPercent">0%</span>
-            </div>
-
-            <div class="progress">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- RSS -->
-    <section class="card">
-
-        <h2>9. RSS Engine</h2>
-
-        <div class="card-description">
-            RSS is not saved as a server snapshot. The live feed is generated
-            from podcast configuration + manifest.
-        </div>
-
-        <div class="status" id="rssStatus">
-            No RSS generated yet.
-        </div>
-
-        <div
-            class="rss-info"
-            id="rssInfo"
-            style="margin-top:15px">
-
-            <div class="field">
-
-                <label>Live RSS Feed URL</label>
-
-                <div class="rss-url" id="liveRSSUrl"></div>
-
-                <div class="help">
-                    Use this URL in your podcast host. It points to
-                    <code>/api/rss</code> and does not require an RSS snapshot.
-                </div>
-
-            </div>
-
-            <div style="height:12px"></div>
-
-            <div class="actions">
-
-                <button
-                    type="button"
-                    class="btn-small"
-                    id="copyRSSBtn">
-                    Copy RSS URL
-                </button>
-
-                <button
-                    type="button"
-                    class="btn-small"
-                    id="openRSSBtn">
-                    Open Live RSS
-                </button>
-
-                <button
-                    type="button"
-                    class="btn-small"
-                    id="downloadRSSBtn">
-                    Download rss.xml
-                </button>
-
-            </div>
-
-            <div style="height:12px"></div>
-
-            <small id="rssMeta"></small>
-
-        </div>
-
-    </section>
-
-
-    <!-- STATUS -->
-    <section class="card">
-
-        <h2>10. Status</h2>
-
-        <div class="status" id="mainStatus">
-
-            <div class="status-title">
-                Ready
-            </div>
-
-            <div>
-                Configure your movie IDs and settings, then click Generate Podcast.
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- EPISODES -->
-    <section class="card">
-
-        <h2>11. Generated Episodes</h2>
-
-        <div class="card-description">
-            Generated audio files and metadata from the current browser session.
-        </div>
-
-        <div
-            class="episode-list"
-            id="episodeList">
-
-            <div class="status">
-                No episodes generated yet.
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <div class="footer">
-        Movie Podcast Generator V2.8
     </div>
+
+</section>
+
+
+<!-- ELEVENLABS -->
+<section class="card">
+
+    <h2>2. ElevenLabs</h2>
+
+    <div class="card-description">
+        Configure the ElevenLabs voice and audio output.
+    </div>
+
+    <div class="grid">
+
+        <div class="field">
+
+            <label for="voiceId">
+                ElevenLabs Voice ID
+            </label>
+
+            <input
+                id="voiceId"
+                type="text"
+                placeholder="Enter Voice ID">
+
+            <div class="help">
+                The API key remains server-side in
+                <code>/api/tts</code>.
+            </div>
+
+        </div>
+
+        <div class="field">
+
+            <label>Credit Status</label>
+
+            <div class="credit-box">
+
+                <div class="credit" id="creditUsedBox">
+                    <div class="name">Terpakai</div>
+                    <div class="value" id="creditUsed">-</div>
+                </div>
+
+                <div class="credit" id="creditRemainingBox">
+                    <div class="name">Sisa</div>
+                    <div class="value" id="creditRemaining">-</div>
+                </div>
+
+                <div class="credit" id="creditLimitBox">
+                    <div class="name">Limit</div>
+                    <div class="value" id="creditLimit">-</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="field">
+
+            <label>Credit</label>
+
+            <button
+                type="button"
+                class="btn-small"
+                id="refreshCreditBtn">
+                ↻ Refresh Credit
+            </button>
+
+            <div
+                class="help"
+                id="creditStatus">
+                Click refresh to check current ElevenLabs
+                character usage.
+            </div>
+
+        </div>
+
+        <div class="field">
+
+            <label for="modelId">Model</label>
+
+            <select id="modelId">
+
+                <option value="eleven_multilingual_v2">
+                    Eleven Multilingual v2
+                </option>
+
+                <option value="eleven_turbo_v2_5">
+                    Eleven Turbo v2.5
+                </option>
+
+                <option value="eleven_flash_v2_5">
+                    Eleven Flash v2.5
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="field">
+
+            <label for="outputFormat">
+                Output Format
+            </label>
+
+            <select id="outputFormat">
+                <option value="mp3_22050_32">
+                    MP3 22050 Hz / 32 kbps
+                </option>
+
+                <option value="mp3_44100_64">
+                    MP3 44100 Hz / 64 kbps
+                </option>
+
+                <option value="mp3_44100_96">
+                    MP3 44100 Hz / 96 kbps
+                </option>
+
+                <option value="mp3_44100_128">
+                    MP3 44100 Hz / 128 kbps
+                </option>
+            </select>
+
+        </div>
+
+        <div class="field">
+
+            <label>Title Mode</label>
+
+            <div class="switch-row">
+
+                <div>
+
+                    <strong>
+                        Random title template
+                    </strong>
+
+                    <div class="help">
+                        Randomly selects one title
+                        template per movie.
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="randomTitle">
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- TITLE -->
+<section class="card">
+
+    <h2>3. Episode Title Templates</h2>
+
+    <div class="card-description">
+        Available variables:
+        <code>{TITLE}</code>,
+        <code>{YEAR}</code>,
+        <code>{ID}</code>.
+    </div>
+
+    <div
+        class="template-list"
+        id="titleTemplates">
+    </div>
+
+    <div class="actions">
+
+        <button
+            type="button"
+            id="addTitleTemplate">
+            + Add Template
+        </button>
+
+    </div>
+
+    <div style="margin-top:15px">
+
+        <label>Preview</label>
+
+        <div
+            class="preview"
+            id="titlePreview">
+            Movie title preview will appear here.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CTA -->
+<section class="card">
+
+    <h2>4. CTA</h2>
+
+    <div class="card-description">
+        Enter your CTA URL template. Use
+        <code>{ID}</code> where the TMDB movie ID should be inserted.
+        The URL is automatically converted for every movie.
+    </div>
+
+    <div class="grid">
+
+
+        <!-- CTA 1 -->
+        <div class="cta-fixed">
+
+            <div class="fixed-label">
+                CTA 1
+            </div>
+
+            <div class="field">
+
+                <label for="cta1Text">
+                    CTA Text
+                </label>
+
+                <input
+                    id="cta1Text"
+                    value="Watch Full Movie">
+
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="field">
+
+                <label for="cta1Url">
+                    CTA URL Template
+                </label>
+
+                <input
+                    id="cta1Url"
+                    type="url"
+                    value="https://onpreps.live/movie/{ID}"
+                    placeholder="https://example.com/movie/{ID}">
+
+                <div class="help">
+                    Example:
+                    <strong>
+                        https://onpreps.live/movie/{ID}
+                    </strong>
+                    <br>
+                    TMDB 550 →
+                    https://onpreps.live/movie/550
+                </div>
+
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="field">
+
+                <label>
+                    CTA HTML
+                </label>
+
+                <textarea
+                    id="cta1Html"
+                    readonly
+                    class="readonly"></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- CTA 2 -->
+        <div class="cta-fixed">
+
+            <div class="fixed-label">
+                CTA 2
+            </div>
+
+            <div class="field">
+
+                <label for="cta2Text">
+                    CTA Text
+                </label>
+
+                <input
+                    id="cta2Text"
+                    value="Watch Now">
+
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="field">
+
+                <label for="cta2Url">
+                    CTA URL Template
+                </label>
+
+                <input
+                    id="cta2Url"
+                    type="url"
+                    value="https://onpreps.live/movie/{ID}"
+                    placeholder="https://example.com/movie/{ID}">
+
+                <div class="help">
+                    Example:
+                    <strong>
+                        https://onpreps.live/movie/{ID}
+                    </strong>
+                    <br>
+                    TMDB 603 →
+                    https://onpreps.live/movie/603
+                </div>
+
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="field">
+
+                <label>
+                    CTA HTML
+                </label>
+
+                <textarea
+                    id="cta2Html"
+                    readonly
+                    class="readonly"></textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- DESCRIPTION -->
+<section class="card">
+
+    <h2>5. Episode Description</h2>
+
+    <div class="card-description">
+        Build the RSS episode description using movie information and CTA.
+    </div>
+
+    <div class="field">
+
+        <label for="descriptionTemplate">
+            Description Template
+        </label>
+
+        <textarea
+            id="descriptionTemplate"></textarea>
+
+        <div class="help">
+            Variables:
+            {TITLE},
+            {ORIGINAL_TITLE},
+            {ORIGINAL_LANGUAGE},
+            {YEAR},
+            {OVERVIEW},
+            {RATING},
+            {DIRECTOR},
+            {RUNTIME},
+            {CAST},
+            {ID},
+            {CTA1},
+            {CTA2}
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- TTS -->
+<section class="card">
+
+    <h2>6. TTS Narration</h2>
+
+    <div class="card-description">
+        The generated text is sent to ElevenLabs. Keep narration
+        reasonably short because the API endpoint limits the TTS input.
+    </div>
+
+    <div class="field">
+
+        <label for="ttsTemplate">
+            Narration Template
+        </label>
+
+        <textarea
+            id="ttsTemplate"></textarea>
+
+        <div class="help">
+            Same movie variables are available.
+            Maximum supported text by the current TTS worker:
+            1500 characters.
+        </div>
+
+    </div>
+
+    <div style="margin-top:12px">
+
+        <label>Narration Preview</label>
+
+        <div
+            class="preview"
+            id="ttsPreview">
+            Narration preview will appear here.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- PODCAST -->
+<section class="card">
+
+    <h2>7. Podcast Settings</h2>
+
+    <div class="card-description">
+        These values are stored through
+        <code>/api/podcast-config</code>
+        and are used by the live RSS feed.
+    </div>
+
+    <div class="grid">
+
+        <div class="field">
+
+            <label for="podcastTitle">
+                Podcast Title
+            </label>
+
+            <input id="podcastTitle">
+
+        </div>
+
+        <div class="field">
+
+            <label for="podcastAuthor">
+                Author
+            </label>
+
+            <input id="podcastAuthor">
+
+        </div>
+
+        <div class="field full">
+
+            <label for="podcastDescription">
+                Podcast Description
+            </label>
+
+            <textarea
+                id="podcastDescription"></textarea>
+
+        </div>
+
+        <div class="field">
+
+            <label for="podcastEmail">
+                Owner Email
+            </label>
+
+            <input
+                id="podcastEmail"
+                type="email">
+
+        </div>
+
+        <div class="field">
+
+            <label for="podcastArtwork">
+                Artwork URL
+            </label>
+
+            <input
+                id="podcastArtwork"
+                type="url">
+
+        </div>
+
+        <div class="field">
+
+            <label for="podcastWebsite">
+                Website URL
+            </label>
+
+            <input
+                id="podcastWebsite"
+                type="url">
+
+        </div>
+
+        <div class="field">
+
+            <label for="podcastCategory">
+                Category
+            </label>
+
+            <input id="podcastCategory">
+
+        </div>
+
+        <div class="field">
+
+            <label for="podcastLanguage">
+                Podcast Language
+            </label>
+
+            <input
+                id="podcastLanguage"
+                value="en-us"
+                placeholder="en-us">
+
+        </div>
+
+        <div class="field">
+
+            <label for="podcastType">
+                Podcast Type
+            </label>
+
+            <select id="podcastType">
+
+                <option value="episodic">
+                    Episodic
+                </option>
+
+                <option value="serial">
+                    Serial
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="field">
+
+            <label for="podcastExplicit">
+                Explicit
+            </label>
+
+            <select id="podcastExplicit">
+
+                <option value="false">
+                    No
+                </option>
+
+                <option value="true">
+                    Yes
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <div class="actions">
+
+        <button
+            type="button"
+            id="savePodcastBtn">
+            Save Podcast Settings
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- GENERATE -->
+<section class="card">
+
+    <h2>8. Generate Podcast</h2>
+
+    <div class="card-description">
+        Episodes are generated sequentially to avoid unnecessary API pressure.
+    </div>
+
+    <div class="actions">
+
+        <button
+            type="button"
+            class="btn-primary"
+            id="generateBtn">
+            🎙 Generate Podcast
+        </button>
+
+        <button
+            type="button"
+            class="btn-purple"
+            id="rssBtn"
+            disabled>
+            Generate rss.xml
+        </button>
+
+        <button
+            type="button"
+            class="btn-success"
+            id="downloadZipBtn"
+            disabled>
+            Download ZIP
+        </button>
+
+    </div>
+
+    <div
+        class="progress-wrap"
+        id="progressWrap">
+
+        <div class="progress-top">
+
+            <span id="progressText">
+                Preparing...
+            </span>
+
+            <span id="progressPercent">
+                0%
+            </span>
+
+        </div>
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="progressBar">
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- RSS -->
+<section class="card">
+
+    <h2>9. RSS Engine</h2>
+
+    <div class="card-description">
+        RSS is not saved as a server snapshot. The live feed is generated
+        from podcast configuration + manifest.
+    </div>
+
+    <div
+        class="status"
+        id="rssStatus">
+        No RSS generated yet.
+    </div>
+
+    <div
+        class="rss-info"
+        id="rssInfo"
+        style="margin-top:15px">
+
+        <div class="field">
+
+            <label>
+                Live RSS Feed URL
+            </label>
+
+            <div
+                class="rss-url"
+                id="liveRSSUrl">
+            </div>
+
+            <div class="help">
+                Use this URL in your podcast host. It points to
+                <code>/api/rss</code> and does not require an RSS snapshot.
+            </div>
+
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="actions">
+
+            <button
+                type="button"
+                class="btn-small"
+                id="copyRSSBtn">
+                Copy RSS URL
+            </button>
+
+            <button
+                type="button"
+                class="btn-small"
+                id="openRSSBtn">
+                Open Live RSS
+            </button>
+
+            <button
+                type="button"
+                class="btn-small"
+                id="downloadRSSBtn">
+                Download rss.xml
+            </button>
+
+        </div>
+
+        <div style="height:12px"></div>
+
+        <small id="rssMeta"></small>
+
+    </div>
+
+</section>
+
+
+<!-- STATUS -->
+<section class="card">
+
+    <h2>10. Status</h2>
+
+    <div
+        class="status"
+        id="mainStatus">
+
+        <div class="status-title">
+            Ready
+        </div>
+
+        <div>
+            Configure your movie IDs and settings,
+            then click Generate Podcast.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- EPISODES -->
+<section class="card">
+
+    <h2>11. Generated Episodes</h2>
+
+    <div class="card-description">
+        Generated audio files and metadata from the current browser session.
+    </div>
+
+    <div
+        class="episode-list"
+        id="episodeList">
+
+        <div class="status">
+            No episodes generated yet.
+        </div>
+
+    </div>
+
+</section>
+
+
+<div class="footer">
+    Movie Podcast Generator V2.9
+</div>
 
 </div>
 
@@ -1218,15 +1418,14 @@ small{
    CONSTANTS
 ========================================================= */
 
-const APP_VERSION = "2.8";
+const APP_VERSION = "2.9";
 
 const MAX_EPISODES_PER_RSS = 500;
 
 const MAX_TTS_TEXT = 1500;
 
-const LOCAL_STORAGE_KEY = "moviePodcastGeneratorV28";
-
-const CTA_BASE_URL = "https://movietts.pages.dev/";
+const LOCAL_STORAGE_KEY =
+    "moviePodcastGeneratorV28";
 
 const DEFAULT_ARTWORK =
     "https://movietts.pages.dev/default-podcast-artwork.jpg";
@@ -1234,18 +1433,25 @@ const DEFAULT_ARTWORK =
 
 /*
  * CTA HTML IS FIXED.
- * Only URL / TEXT / title variables are replaced.
+ *
+ * Only URL and TEXT are replaced.
  */
 const FIXED_CTA_HTML =
     '<p><a href="{URL}" target="_blank" rel="noopener noreferrer">{TEXT}</a></p>';
 
 
 const DEFAULT_TITLE_TEMPLATES = [
+
     "WATCH {TITLE} ({YEAR}) FULL MOVIE REVIEW",
+
     "{TITLE} ({YEAR}) MOVIE REVIEW - STORY, CAST & RATING",
+
     "{TITLE} {YEAR} FULL MOVIE REVIEW | EVERYTHING YOU NEED TO KNOW",
+
     "MOVIE REVIEW: {TITLE} ({YEAR}) - STORY, CAST & DETAILS",
+
     "{TITLE} ({YEAR}) - FULL MOVIE REVIEW & BREAKDOWN"
+
 ];
 
 
@@ -1296,16 +1502,16 @@ let generationRunning = false;
 let creditLoading = false;
 
 let latestCredit = {
-    used: null,
-    remaining: null,
-    limit: null
+    used:null,
+    remaining:null,
+    limit:null
 };
 
 let latestRSS = {
-    url: "",
-    filename: "rss.xml",
-    date: "",
-    episodeCount: 0
+    url:"",
+    filename:"rss.xml",
+    date:"",
+    episodeCount:0
 };
 
 let latestRSSXML = "";
@@ -1315,7 +1521,8 @@ let latestRSSXML = "";
    DOM
 ========================================================= */
 
-const $ = id => document.getElementById(id);
+const $ = id =>
+    document.getElementById(id);
 
 
 /* =========================================================
@@ -1324,13 +1531,16 @@ const $ = id => document.getElementById(id);
 
 function formatNumber(value){
 
-    const number = Number(value);
+    const number =
+        Number(value);
 
     if(!Number.isFinite(number)){
         return "-";
     }
 
-    return new Intl.NumberFormat("en-US").format(number);
+    return new Intl.NumberFormat(
+        "en-US"
+    ).format(number);
 }
 
 
@@ -1366,15 +1576,22 @@ function normalizeText(value){
 
 function sleep(ms){
 
-    return new Promise(resolve => setTimeout(resolve,ms));
+    return new Promise(
+        resolve => setTimeout(resolve,ms)
+    );
 }
 
 
-function setStatus(message,type=""){
+function setStatus(
+    message,
+    type=""
+){
 
-    const box = $("mainStatus");
+    const box =
+        $("mainStatus");
 
-    box.className = "status";
+    box.className =
+        "status";
 
     if(type){
         box.classList.add(type);
@@ -1382,66 +1599,103 @@ function setStatus(message,type=""){
 
     box.innerHTML =
         `<div class="status-title">${escapeHtml(
-            type === "error" ? "Error" :
-            type === "success" ? "Success" :
-            type === "warning" ? "Warning" :
-            "Status"
+            type === "error"
+                ? "Error"
+                : type === "success"
+                    ? "Success"
+                    : type === "warning"
+                        ? "Warning"
+                        : "Status"
         )}</div>
         <div>${escapeHtml(message)}</div>`;
 }
 
 
-function setRSSStatus(message,type=""){
+function setRSSStatus(
+    message,
+    type=""
+){
 
-    const box = $("rssStatus");
+    const box =
+        $("rssStatus");
 
-    box.className = "status";
+    box.className =
+        "status";
 
     if(type){
         box.classList.add(type);
     }
 
-    box.textContent = message;
+    box.textContent =
+        message;
 }
 
 
-function downloadBlob(blob,filename){
+function downloadBlob(
+    blob,
+    filename
+){
 
-    const url = URL.createObjectURL(blob);
+    const url =
+        URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
+    const a =
+        document.createElement("a");
 
-    a.href = url;
-    a.download = filename;
+    a.href =
+        url;
+
+    a.download =
+        filename;
 
     document.body.appendChild(a);
+
     a.click();
+
     a.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url),1000);
-}
-
-
-function downloadText(text,filename,mime="text/plain;charset=utf-8"){
-
-    const blob = new Blob(
-        [text],
-        {type:mime}
+    setTimeout(
+        () => URL.revokeObjectURL(url),
+        1000
     );
-
-    downloadBlob(blob,filename);
 }
 
 
-async function readJSONResponse(response){
+function downloadText(
+    text,
+    filename,
+    mime="text/plain;charset=utf-8"
+){
 
-    const text = await response.text();
+    const blob =
+        new Blob(
+            [text],
+            {type:mime}
+        );
+
+    downloadBlob(
+        blob,
+        filename
+    );
+}
+
+
+async function readJSONResponse(
+    response
+){
+
+    const text =
+        await response.text();
 
     let data = null;
 
     try{
-        data = JSON.parse(text);
+
+        data =
+            JSON.parse(text);
+
     }catch{
+
         throw new Error(
             `Invalid JSON response (${response.status}): ${text.slice(0,500)}`
         );
@@ -1466,27 +1720,105 @@ async function readJSONResponse(response){
    CTA
 ========================================================= */
 
-function getCTAUrl(movieId){
+/*
+ * Convert:
+ *
+ * https://example.com/movie/{ID}
+ *
+ * into:
+ *
+ * https://example.com/movie/550
+ */
+function buildCTAUrl(
+    urlTemplate,
+    movieId
+){
 
-    return `${CTA_BASE_URL}${encodeURIComponent(movieId)}`;
+    let url =
+        String(urlTemplate || "")
+            .trim();
+
+    const id =
+        String(movieId ?? "");
+
+    return url.replace(
+        /\{ID\}/gi,
+        encodeURIComponent(id)
+    );
 }
 
 
-function createCTA(text,movie){
+/*
+ * Create final CTA HTML for an actual movie.
+ */
+function createCTA(
+    text,
+    urlTemplate,
+    movie
+){
 
-    const movieId = movie?.id ?? "";
+    const movieId =
+        movie?.id ?? "";
 
-    const url = getCTAUrl(movieId);
+    const url =
+        buildCTAUrl(
+            urlTemplate,
+            movieId
+        );
 
-    let html = FIXED_CTA_HTML;
+    let html =
+        FIXED_CTA_HTML;
 
-    html = html.replace(/\{URL\}/gi,url);
+    html =
+        html.replace(
+            /\{URL\}/gi,
+            url
+        );
 
-    html = html.replace(/\{TEXT\}/gi,normalizeText(text));
+    html =
+        html.replace(
+            /\{TEXT\}/gi,
+            normalizeText(text)
+        );
 
-    html = html.replace(/\(title\)/gi,movie?.title || "");
+    return html;
+}
 
-    html = html.replace(/\{ID\}/gi,String(movieId));
+
+/*
+ * Preview CTA.
+ *
+ * Keep {ID} visible in the preview.
+ */
+function previewCTA(
+    text,
+    urlTemplate
+){
+
+    let url =
+        String(urlTemplate || "")
+            .trim();
+
+    url =
+        url.replace(
+            /\{ID\}/gi,
+            "{ID}"
+        );
+
+    let html =
+        FIXED_CTA_HTML;
+
+    html =
+        html.replace(
+            /\{URL\}/gi,
+            url
+        );
+
+    html =
+        html.replace(
+            /\{TEXT\}/gi,
+            normalizeText(text)
+        );
 
     return html;
 }
@@ -1494,27 +1826,16 @@ function createCTA(text,movie){
 
 function updateFixedCTAHTML(){
 
-    const exampleMovie = {
-        id:"TMDB-ID",
-        title:"Movie Title"
-    };
-
     $("cta1Html").value =
-        createCTA(
+        previewCTA(
             $("cta1Text").value,
-            exampleMovie
-        ).replace(
-            "https://movietts.pages.dev/TMDB-ID",
-            "https://movietts.pages.dev/{ID}"
+            $("cta1Url").value
         );
 
     $("cta2Html").value =
-        createCTA(
+        previewCTA(
             $("cta2Text").value,
-            exampleMovie
-        ).replace(
-            "https://movietts.pages.dev/TMDB-ID",
-            "https://movietts.pages.dev/{ID}"
+            $("cta2Url").value
         );
 }
 
@@ -1523,9 +1844,13 @@ function updateFixedCTAHTML(){
    VARIABLE REPLACEMENT
 ========================================================= */
 
-function replaceVariables(template,movie){
+function replaceVariables(
+    template,
+    movie
+){
 
-    const safeMovie = movie || {};
+    const safeMovie =
+        movie || {};
 
     const values = {
 
@@ -1535,60 +1860,103 @@ function replaceVariables(template,movie){
             "",
 
         ORIGINAL_TITLE:
-            safeMovie.original_title || "",
+            safeMovie.original_title ||
+            "",
 
         ORIGINAL_LANGUAGE:
-            safeMovie.original_language || "",
+            safeMovie.original_language ||
+            "",
 
         YEAR:
             safeMovie.release_date
-                ? String(safeMovie.release_date).slice(0,4)
+                ? String(
+                    safeMovie.release_date
+                ).slice(0,4)
                 : "",
 
         OVERVIEW:
-            safeMovie.overview || "",
+            safeMovie.overview ||
+            "",
 
         RATING:
             safeMovie.vote_average != null
-                ? Number(safeMovie.vote_average).toFixed(1)
+                ? Number(
+                    safeMovie.vote_average
+                ).toFixed(1)
                 : "",
 
         DIRECTOR:
-            safeMovie.director || "Unknown",
+            safeMovie.director ||
+            "Unknown",
 
         RUNTIME:
-            safeMovie.runtime ?? "",
+            safeMovie.runtime ??
+            "",
 
         CAST:
-            Array.isArray(safeMovie.cast)
-                ? safeMovie.cast.slice(0,10).join(", ")
-                : (safeMovie.cast || ""),
+            Array.isArray(
+                safeMovie.cast
+            )
+                ? safeMovie.cast
+                    .slice(0,10)
+                    .join(", ")
+                : (
+                    safeMovie.cast ||
+                    ""
+                ),
 
         ID:
-            safeMovie.id || ""
+            safeMovie.id ||
+            ""
     };
 
-    values.CTA1 = createCTA(
-        $("cta1Text").value,
-        safeMovie
-    );
 
-    values.CTA2 = createCTA(
-        $("cta2Text").value,
-        safeMovie
-    );
-
-    let result = String(template ?? "");
-
-    Object.entries(values).forEach(([key,value]) => {
-
-        const regex = new RegExp(
-            "\\{" + key + "\\}",
-            "gi"
+    /*
+     * CTA 1
+     */
+    values.CTA1 =
+        createCTA(
+            $("cta1Text").value,
+            $("cta1Url").value,
+            safeMovie
         );
 
-        result = result.replace(regex,String(value ?? ""));
-    });
+
+    /*
+     * CTA 2
+     */
+    values.CTA2 =
+        createCTA(
+            $("cta2Text").value,
+            $("cta2Url").value,
+            safeMovie
+        );
+
+
+    let result =
+        String(template ?? "");
+
+
+    Object.entries(values)
+        .forEach(
+            ([key,value]) => {
+
+                const regex =
+                    new RegExp(
+                        "\\{" +
+                        key +
+                        "\\}",
+                        "gi"
+                    );
+
+                result =
+                    result.replace(
+                        regex,
+                        String(value ?? "")
+                    );
+            }
+        );
+
 
     return result.trim();
 }
@@ -1600,27 +1968,49 @@ function replaceVariables(template,movie){
 
 function slugify(value){
 
-    let text = String(value ?? "")
-        .normalize("NFKD")
-        .replace(/[\u0300-\u036f]/g,"");
+    let text =
+        String(value ?? "")
+            .normalize("NFKD")
+            .replace(
+                /[\u0300-\u036f]/g,
+                ""
+            );
 
-    text = text
-        .replace(/[^a-zA-Z0-9]+/g,"-")
-        .replace(/^-+|-+$/g,"")
-        .toLowerCase();
+    text =
+        text
+            .replace(
+                /[^a-zA-Z0-9]+/g,
+                "-"
+            )
+            .replace(
+                /^-+|-+$/g,
+                ""
+            )
+            .toLowerCase();
 
     if(!text){
         text = "movie";
     }
 
-    return text.slice(0,80);
+    return text.slice(
+        0,
+        80
+    );
 }
 
 
-function createAudioFilename(index,movie){
+function createAudioFilename(
+    index,
+    movie
+){
 
     const number =
-        String(index + 1).padStart(3,"0");
+        String(
+            index + 1
+        ).padStart(
+            3,
+            "0"
+        );
 
     const slug =
         slugify(
@@ -1639,24 +2029,35 @@ function createAudioFilename(index,movie){
 
 function getMovieIds(){
 
-    const raw = $("tmdbIds").value || "";
+    const raw =
+        $("tmdbIds").value ||
+        "";
 
-    const ids = raw
-        .split(/[\s,;]+/)
-        .map(x => x.trim())
-        .filter(Boolean);
+    const ids =
+        raw
+            .split(
+                /[\s,;]+/
+            )
+            .map(
+                x => x.trim()
+            )
+            .filter(Boolean);
 
     const unique = [];
 
-    const seen = new Set();
+    const seen =
+        new Set();
 
-    for(const id of ids){
+    for(
+        const id of ids
+    ){
 
         if(seen.has(id)){
             continue;
         }
 
         seen.add(id);
+
         unique.push(id);
     }
 
@@ -1666,13 +2067,15 @@ function getMovieIds(){
 
 function updateIDCounter(){
 
-    const ids = getMovieIds();
+    const ids =
+        getMovieIds();
 
     $("idCounter").textContent =
         `${ids.length} / ${MAX_EPISODES_PER_RSS} IDs`;
 
     $("idCounter").style.color =
-        ids.length > MAX_EPISODES_PER_RSS
+        ids.length >
+        MAX_EPISODES_PER_RSS
             ? "var(--danger)"
             : "";
 }
@@ -1684,73 +2087,103 @@ function updateIDCounter(){
 
 function renderTitleTemplates(){
 
-    const container = $("titleTemplates");
+    const container =
+        $("titleTemplates");
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
-    const templates = getTitleTemplates();
+    const templates =
+        getTitleTemplates();
 
-    templates.forEach((template,index) => {
+    templates.forEach(
+        (template,index) => {
 
-        const row =
-            document.createElement("div");
+            const row =
+                document.createElement(
+                    "div"
+                );
 
-        row.className = "template-row";
+            row.className =
+                "template-row";
 
-        const input =
-            document.createElement("input");
+            const input =
+                document.createElement(
+                    "input"
+                );
 
-        input.type = "text";
+            input.type =
+                "text";
 
-        input.value = template;
+            input.value =
+                template;
 
-        input.dataset.template = "title";
+            input.dataset.template =
+                "title";
 
-        input.addEventListener(
-            "input",
-            () => {
-                updateTitlePreview();
-                saveLocalSettings();
-            }
-        );
+            input.addEventListener(
+                "input",
+                () => {
 
-        const remove =
-            document.createElement("button");
+                    updateTitlePreview();
 
-        remove.type = "button";
-
-        remove.textContent = "×";
-
-        remove.className = "btn-danger";
-
-        remove.addEventListener(
-            "click",
-            () => {
-
-                const current =
-                    getTitleTemplates();
-
-                if(current.length <= 1){
-                    return;
+                    saveLocalSettings();
                 }
+            );
 
-                current.splice(index,1);
 
-                setTitleTemplates(current);
+            const remove =
+                document.createElement(
+                    "button"
+                );
 
-                renderTitleTemplates();
+            remove.type =
+                "button";
 
-                updateTitlePreview();
+            remove.textContent =
+                "×";
 
-                saveLocalSettings();
-            }
-        );
+            remove.className =
+                "btn-danger";
 
-        row.appendChild(input);
-        row.appendChild(remove);
+            remove.addEventListener(
+                "click",
+                () => {
 
-        container.appendChild(row);
-    });
+                    const current =
+                        getTitleTemplates();
+
+                    if(
+                        current.length <= 1
+                    ){
+                        return;
+                    }
+
+                    current.splice(
+                        index,
+                        1
+                    );
+
+                    setTitleTemplates(
+                        current
+                    );
+
+                    renderTitleTemplates();
+
+                    updateTitlePreview();
+
+                    saveLocalSettings();
+                }
+            );
+
+
+            row.appendChild(input);
+
+            row.appendChild(remove);
+
+            container.appendChild(row);
+        }
+    );
 }
 
 
@@ -1761,89 +2194,130 @@ function getTitleTemplates(){
             '#titleTemplates input[data-template="title"]'
         )
     )
-    .map(input => input.value.trim())
+    .map(
+        input => input.value.trim()
+    )
     .filter(Boolean);
 }
 
 
-function setTitleTemplates(templates){
+function setTitleTemplates(
+    templates
+){
 
-    const container = $("titleTemplates");
+    const container =
+        $("titleTemplates");
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
-    templates.forEach(template => {
+    templates.forEach(
+        template => {
 
-        const row =
-            document.createElement("div");
-
-        row.className = "template-row";
-
-        const input =
-            document.createElement("input");
-
-        input.type = "text";
-
-        input.value = template;
-
-        input.dataset.template = "title";
-
-        input.addEventListener(
-            "input",
-            () => {
-                updateTitlePreview();
-                saveLocalSettings();
-            }
-        );
-
-        const remove =
-            document.createElement("button");
-
-        remove.type = "button";
-
-        remove.textContent = "×";
-
-        remove.className = "btn-danger";
-
-        remove.addEventListener(
-            "click",
-            () => {
-
-                const current =
-                    getTitleTemplates();
-
-                if(current.length <= 1){
-                    return;
-                }
-
-                current.splice(
-                    current.indexOf(template),
-                    1
+            const row =
+                document.createElement(
+                    "div"
                 );
 
-                setTitleTemplates(current);
+            row.className =
+                "template-row";
 
-                updateTitlePreview();
+            const input =
+                document.createElement(
+                    "input"
+                );
 
-                saveLocalSettings();
-            }
-        );
+            input.type =
+                "text";
 
-        row.appendChild(input);
-        row.appendChild(remove);
+            input.value =
+                template;
 
-        container.appendChild(row);
-    });
+            input.dataset.template =
+                "title";
+
+            input.addEventListener(
+                "input",
+                () => {
+
+                    updateTitlePreview();
+
+                    saveLocalSettings();
+                }
+            );
+
+
+            const remove =
+                document.createElement(
+                    "button"
+                );
+
+            remove.type =
+                "button";
+
+            remove.textContent =
+                "×";
+
+            remove.className =
+                "btn-danger";
+
+            remove.addEventListener(
+                "click",
+                () => {
+
+                    const current =
+                        getTitleTemplates();
+
+                    if(
+                        current.length <= 1
+                    ){
+                        return;
+                    }
+
+                    const index =
+                        current.indexOf(
+                            template
+                        );
+
+                    if(index >= 0){
+
+                        current.splice(
+                            index,
+                            1
+                        );
+                    }
+
+                    setTitleTemplates(
+                        current
+                    );
+
+                    updateTitlePreview();
+
+                    saveLocalSettings();
+                }
+            );
+
+
+            row.appendChild(input);
+
+            row.appendChild(remove);
+
+            container.appendChild(row);
+        }
+    );
 }
 
 
 function updateTitlePreview(){
 
-    const templates = getTitleTemplates();
+    const templates =
+        getTitleTemplates();
 
     if(!templates.length){
+
         $("titlePreview").textContent =
             "Add at least one title template.";
+
         return;
     }
 
@@ -1851,14 +2325,21 @@ function updateTitlePreview(){
         templates[0];
 
     const sample = {
+
         id:"550",
+
         title:"Fight Club",
+
         original_title:"Fight Club",
+
         release_date:"1999-10-15"
     };
 
     $("titlePreview").textContent =
-        replaceVariables(template,sample);
+        replaceVariables(
+            template,
+            sample
+        );
 }
 
 
@@ -1891,8 +2372,14 @@ function getSettings(){
         cta1Text:
             $("cta1Text").value,
 
+        cta1Url:
+            $("cta1Url").value.trim(),
+
         cta2Text:
             $("cta2Text").value,
+
+        cta2Url:
+            $("cta2Url").value.trim(),
 
         descriptionTemplate:
             $("descriptionTemplate").value,
@@ -1911,32 +2398,47 @@ function getPodcastSettings(){
             $("podcastTitle").value.trim(),
 
         podcast_description:
-            $("podcastDescription").value.trim(),
+            $("podcastDescription")
+                .value
+                .trim(),
 
         author:
-            $("podcastAuthor").value.trim(),
+            $("podcastAuthor")
+                .value
+                .trim(),
 
         email:
-            $("podcastEmail").value.trim(),
+            $("podcastEmail")
+                .value
+                .trim(),
 
         artwork_url:
-            $("podcastArtwork").value.trim() ||
+            $("podcastArtwork")
+                .value
+                .trim() ||
             DEFAULT_ARTWORK,
 
         website_url:
-            $("podcastWebsite").value.trim() ||
+            $("podcastWebsite")
+                .value
+                .trim() ||
             location.origin,
 
         category:
-            $("podcastCategory").value.trim() ||
+            $("podcastCategory")
+                .value
+                .trim() ||
             "TV & Film",
 
         language:
-            $("podcastLanguage").value.trim() ||
+            $("podcastLanguage")
+                .value
+                .trim() ||
             "en-us",
 
         explicit:
-            $("podcastExplicit").value === "true",
+            $("podcastExplicit")
+                .value === "true",
 
         podcast_type:
             $("podcastType").value
@@ -1991,49 +2493,82 @@ function loadLocalSettings(){
         const data =
             JSON.parse(raw);
 
+
         if(data.tmdbLanguage)
             $("tmdbLanguage").value =
                 data.tmdbLanguage;
+
 
         if(data.voiceId)
             $("voiceId").value =
                 data.voiceId;
 
+
         if(data.modelId)
             $("modelId").value =
                 data.modelId;
+
 
         if(data.outputFormat)
             $("outputFormat").value =
                 data.outputFormat;
 
-        if(typeof data.randomTitle === "boolean")
+
+        if(
+            typeof data.randomTitle ===
+            "boolean"
+        ){
+
             $("randomTitle").checked =
                 data.randomTitle;
+        }
 
-        if(Array.isArray(data.titleTemplates)){
+
+        if(
+            Array.isArray(
+                data.titleTemplates
+            )
+        ){
+
             setTitleTemplates(
                 data.titleTemplates
             );
         }
 
+
         if(data.cta1Text)
             $("cta1Text").value =
                 data.cta1Text;
+
+
+        if(data.cta1Url)
+            $("cta1Url").value =
+                data.cta1Url;
+
 
         if(data.cta2Text)
             $("cta2Text").value =
                 data.cta2Text;
 
+
+        if(data.cta2Url)
+            $("cta2Url").value =
+                data.cta2Url;
+
+
         if(data.descriptionTemplate)
             $("descriptionTemplate").value =
                 data.descriptionTemplate;
+
 
         if(data.ttsTemplate)
             $("ttsTemplate").value =
                 data.ttsTemplate;
 
-        const p = data.podcast;
+
+        const p =
+            data.podcast;
+
 
         if(p){
 
@@ -2069,9 +2604,16 @@ function loadLocalSettings(){
                 $("podcastLanguage").value =
                     p.language;
 
-            if(typeof p.explicit === "boolean")
+            if(
+                typeof p.explicit ===
+                "boolean"
+            ){
+
                 $("podcastExplicit").value =
-                    p.explicit ? "true" : "false";
+                    p.explicit
+                        ? "true"
+                        : "false";
+            }
 
             if(p.podcast_type)
                 $("podcastType").value =
@@ -2092,7 +2634,9 @@ function loadLocalSettings(){
    PODCAST CONFIG API
 ========================================================= */
 
-async function savePodcastSettings(showStatus=true){
+async function savePodcastSettings(
+    showStatus=true
+){
 
     const podcast =
         getPodcastSettings();
@@ -2100,6 +2644,7 @@ async function savePodcastSettings(showStatus=true){
     if(!podcast.podcast_title){
 
         if(showStatus){
+
             setStatus(
                 "Podcast Title is required.",
                 "error"
@@ -2111,22 +2656,32 @@ async function savePodcastSettings(showStatus=true){
         );
     }
 
+
     const response =
         await fetch(
             "/api/podcast-config",
             {
+
                 method:"POST",
 
                 headers:{
-                    "Content-Type":"application/json"
+                    "Content-Type":
+                        "application/json"
                 },
 
-                body:JSON.stringify(podcast)
+                body:
+                    JSON.stringify(
+                        podcast
+                    )
             }
         );
 
+
     const data =
-        await readJSONResponse(response);
+        await readJSONResponse(
+            response
+        );
+
 
     if(data.success === false){
 
@@ -2136,7 +2691,9 @@ async function savePodcastSettings(showStatus=true){
         );
     }
 
+
     saveLocalSettings();
+
 
     if(showStatus){
 
@@ -2145,6 +2702,7 @@ async function savePodcastSettings(showStatus=true){
             "success"
         );
     }
+
 
     return data;
 }
@@ -2163,61 +2721,86 @@ async function loadPodcastSettings(){
                 }
             );
 
+
         if(!response.ok){
             return;
         }
 
+
         const data =
             await response.json();
+
 
         const p =
             data?.config ||
             data?.podcast ||
             data;
 
-        if(!p || typeof p !== "object"){
+
+        if(
+            !p ||
+            typeof p !== "object"
+        ){
             return;
         }
+
 
         if(p.podcast_title)
             $("podcastTitle").value =
                 p.podcast_title;
 
+
         if(p.podcast_description)
             $("podcastDescription").value =
                 p.podcast_description;
+
 
         if(p.author)
             $("podcastAuthor").value =
                 p.author;
 
+
         if(p.email)
             $("podcastEmail").value =
                 p.email;
+
 
         if(p.artwork_url)
             $("podcastArtwork").value =
                 p.artwork_url;
 
+
         if(p.website_url)
             $("podcastWebsite").value =
                 p.website_url;
+
 
         if(p.category)
             $("podcastCategory").value =
                 p.category;
 
+
         if(p.language)
             $("podcastLanguage").value =
                 p.language;
 
-        if(typeof p.explicit === "boolean")
+
+        if(
+            typeof p.explicit ===
+            "boolean"
+        ){
+
             $("podcastExplicit").value =
-                p.explicit ? "true" : "false";
+                p.explicit
+                    ? "true"
+                    : "false";
+        }
+
 
         if(p.podcast_type)
             $("podcastType").value =
                 p.podcast_type;
+
 
         saveLocalSettings();
 
@@ -2237,27 +2820,20 @@ async function loadPodcastSettings(){
 
 function extractCreditPayload(data){
 
-    /*
-     * Support both:
-     *
-     * {
-     *   success:true,
-     *   character_count:123,
-     *   character_limit:10000
-     * }
-     *
-     * and nested data.
-     */
+    let source =
+        data;
 
-    let source = data;
 
     if(
         data &&
         data.data &&
         typeof data.data === "object"
     ){
-        source = data.data;
+
+        source =
+            data.data;
     }
+
 
     /*
      * IMPORTANT:
@@ -2265,8 +2841,6 @@ function extractCreditPayload(data){
      * Terpakai = character_count
      * Limit    = character_limit
      * Sisa     = character_limit - character_count
-     *
-     * Do NOT reverse these values.
      */
 
     const usedRaw =
@@ -2274,31 +2848,41 @@ function extractCreditPayload(data){
         source?.used ??
         source?.characters_used;
 
+
     const limitRaw =
         source?.character_limit ??
         source?.limit ??
         source?.characters_limit;
+
 
     const explicitRemaining =
         source?.remaining_characters ??
         source?.remaining ??
         source?.characters_remaining;
 
+
     const used =
         Number(usedRaw);
+
 
     const limit =
         Number(limitRaw);
 
+
     let remaining;
+
 
     if(
         explicitRemaining !== undefined &&
-        Number.isFinite(Number(explicitRemaining))
+        Number.isFinite(
+            Number(explicitRemaining)
+        )
     ){
 
         remaining =
-            Number(explicitRemaining);
+            Number(
+                explicitRemaining
+            );
 
     }else if(
         Number.isFinite(limit) &&
@@ -2306,14 +2890,20 @@ function extractCreditPayload(data){
     ){
 
         remaining =
-            Math.max(0,limit-used);
+            Math.max(
+                0,
+                limit - used
+            );
 
     }else{
 
-        remaining = NaN;
+        remaining =
+            NaN;
     }
 
+
     return {
+
         used:
             Number.isFinite(used)
                 ? used
@@ -2332,23 +2922,39 @@ function extractCreditPayload(data){
 }
 
 
-async function refreshElevenLabsCredit(silent=false){
+async function refreshElevenLabsCredit(
+    silent=false
+){
 
     if(creditLoading){
         return;
     }
 
-    creditLoading = true;
 
-    $("creditUsedBox").classList.add("loading");
-    $("creditRemainingBox").classList.add("loading");
-    $("creditLimitBox").classList.add("loading");
+    creditLoading =
+        true;
+
+
+    $("creditUsedBox")
+        .classList
+        .add("loading");
+
+    $("creditRemainingBox")
+        .classList
+        .add("loading");
+
+    $("creditLimitBox")
+        .classList
+        .add("loading");
+
 
     if(!silent){
 
-        $("creditStatus").textContent =
+        $("creditStatus")
+            .textContent =
             "Refreshing ElevenLabs credit...";
     }
+
 
     try{
 
@@ -2357,16 +2963,24 @@ async function refreshElevenLabsCredit(silent=false){
                 "/api/elevenlabs-credits?t=" +
                 Date.now(),
                 {
+
                     method:"GET",
+
                     cache:"no-store",
+
                     headers:{
-                        "Cache-Control":"no-cache"
+                        "Cache-Control":
+                            "no-cache"
                     }
                 }
             );
 
+
         const data =
-            await readJSONResponse(response);
+            await readJSONResponse(
+                response
+            );
+
 
         if(data.success === false){
 
@@ -2376,25 +2990,42 @@ async function refreshElevenLabsCredit(silent=false){
             );
         }
 
+
         const credit =
-            extractCreditPayload(data);
+            extractCreditPayload(
+                data
+            );
 
-        latestCredit = credit;
 
-        /*
-         * Correct display mapping.
-         */
-        $("creditUsed").textContent =
-            formatNumber(credit.used);
+        latestCredit =
+            credit;
 
-        $("creditRemaining").textContent =
-            formatNumber(credit.remaining);
 
-        $("creditLimit").textContent =
-            formatNumber(credit.limit);
+        $("creditUsed")
+            .textContent =
+            formatNumber(
+                credit.used
+            );
 
-        $("creditStatus").textContent =
+
+        $("creditRemaining")
+            .textContent =
+            formatNumber(
+                credit.remaining
+            );
+
+
+        $("creditLimit")
+            .textContent =
+            formatNumber(
+                credit.limit
+            );
+
+
+        $("creditStatus")
+            .textContent =
             "Credit updated successfully.";
+
 
     }catch(error){
 
@@ -2403,18 +3034,31 @@ async function refreshElevenLabsCredit(silent=false){
             error
         );
 
-        $("creditStatus").textContent =
+
+        $("creditStatus")
+            .textContent =
             silent
                 ? "Credit unavailable."
                 : `Credit error: ${error.message}`;
 
+
     }finally{
 
-        creditLoading = false;
+        creditLoading =
+            false;
 
-        $("creditUsedBox").classList.remove("loading");
-        $("creditRemainingBox").classList.remove("loading");
-        $("creditLimitBox").classList.remove("loading");
+
+        $("creditUsedBox")
+            .classList
+            .remove("loading");
+
+        $("creditRemainingBox")
+            .classList
+            .remove("loading");
+
+        $("creditLimitBox")
+            .classList
+            .remove("loading");
     }
 }
 
@@ -2423,11 +3067,15 @@ async function refreshElevenLabsCredit(silent=false){
    TMDB API
 ========================================================= */
 
-async function fetchMovie(id,language){
+async function fetchMovie(
+    id,
+    language
+){
 
     const url =
         `/api/movie?id=${encodeURIComponent(id)}` +
         `&language=${encodeURIComponent(language)}`;
+
 
     const response =
         await fetch(
@@ -2438,8 +3086,12 @@ async function fetchMovie(id,language){
             }
         );
 
+
     const data =
-        await readJSONResponse(response);
+        await readJSONResponse(
+            response
+        );
+
 
     if(data.success === false){
 
@@ -2449,25 +3101,28 @@ async function fetchMovie(id,language){
         );
     }
 
+
     const movie =
         data.movie ||
         data.data ||
         data;
 
-    if(!movie || typeof movie !== "object"){
+
+    if(
+        !movie ||
+        typeof movie !== "object"
+    ){
 
         throw new Error(
             `Invalid movie response for ID ${id}`
         );
     }
 
-    /*
-     * Normalize common TMDB response shape.
-     */
 
     movie.id =
         movie.id ??
         id;
+
 
     movie.title =
         movie.title ||
@@ -2475,46 +3130,66 @@ async function fetchMovie(id,language){
         movie.original_title ||
         `Movie ${id}`;
 
+
     movie.original_title =
         movie.original_title ||
         movie.title;
+
 
     movie.release_date =
         movie.release_date ||
         movie.first_air_date ||
         "";
 
+
     movie.overview =
         movie.overview ||
         "";
+
 
     movie.vote_average =
         movie.vote_average ??
         0;
 
+
     movie.runtime =
         movie.runtime ??
         0;
+
 
     movie.director =
         movie.director ||
         "Unknown";
 
-    if(!Array.isArray(movie.cast)){
 
-        if(Array.isArray(movie.credits?.cast)){
+    if(
+        !Array.isArray(
+            movie.cast
+        )
+    ){
+
+        if(
+            Array.isArray(
+                movie.credits?.cast
+            )
+        ){
 
             movie.cast =
                 movie.credits.cast
                     .slice(0,10)
-                    .map(person => person.name)
+                    .map(
+                        person =>
+                            person.name
+                    )
                     .filter(Boolean);
 
         }else{
 
-            movie.cast = [];
+            movie.cast =
+                [];
         }
     }
+
 
     return movie;
 }
@@ -2533,6 +3208,7 @@ async function generateTTS(
     let narration =
         normalizeText(text);
 
+
     if(!narration){
 
         throw new Error(
@@ -2540,7 +3216,11 @@ async function generateTTS(
         );
     }
 
-    if(narration.length > MAX_TTS_TEXT){
+
+    if(
+        narration.length >
+        MAX_TTS_TEXT
+    ){
 
         narration =
             narration.slice(
@@ -2549,44 +3229,53 @@ async function generateTTS(
             );
     }
 
+
     const response =
         await fetch(
             "/api/tts",
             {
+
                 method:"POST",
 
                 headers:{
-                    "Content-Type":"application/json"
+                    "Content-Type":
+                        "application/json"
                 },
 
-                body:JSON.stringify({
+                body:
+                    JSON.stringify({
 
-                    text:narration,
+                        text:
+                            narration,
 
-                    voiceId:
-                        settings.voiceId,
+                        voiceId:
+                            settings.voiceId,
 
-                    modelId:
-                        settings.modelId,
+                        modelId:
+                            settings.modelId,
 
-                    outputFormat:
-                        settings.outputFormat,
+                        outputFormat:
+                            settings.outputFormat,
 
-                    fileName:
-                        fileName
-                })
+                        fileName:
+                            fileName
+                    })
             }
         );
+
 
     if(!response.ok){
 
         let errorText =
             await response.text();
 
+
         try{
 
             const json =
-                JSON.parse(errorText);
+                JSON.parse(
+                    errorText
+                );
 
             errorText =
                 json.error ||
@@ -2595,13 +3284,16 @@ async function generateTTS(
 
         }catch{}
 
+
         throw new Error(
             `TTS HTTP ${response.status}: ${errorText.slice(0,800)}`
         );
     }
 
+
     const audio =
         await response.arrayBuffer();
+
 
     if(!audio.byteLength){
 
@@ -2609,6 +3301,7 @@ async function generateTTS(
             "TTS returned an empty audio file."
         );
     }
+
 
     return {
 
@@ -2635,12 +3328,14 @@ async function generateTTS(
         outputFormat:
             response.headers.get(
                 "X-Output-Format"
-            ) || settings.outputFormat,
+            ) ||
+            settings.outputFormat,
 
         modelId:
             response.headers.get(
                 "X-Model-ID"
-            ) || settings.modelId
+            ) ||
+            settings.modelId
     };
 }
 
@@ -2649,10 +3344,14 @@ async function generateTTS(
    EPISODE
 ========================================================= */
 
-function selectTitleTemplate(settings){
+function selectTitleTemplate(
+    settings
+){
 
     const templates =
-        settings.titleTemplates || [];
+        settings.titleTemplates ||
+        [];
+
 
     if(!templates.length){
 
@@ -2661,15 +3360,18 @@ function selectTitleTemplate(settings){
         );
     }
 
+
     if(settings.randomTitle){
 
         const index =
             Math.floor(
-                Math.random() * templates.length
+                Math.random() *
+                templates.length
             );
 
         return templates[index];
     }
+
 
     return templates[0];
 }
@@ -2698,7 +3400,11 @@ function createNarration(
             movie
         );
 
-    if(text.length > MAX_TTS_TEXT){
+
+    if(
+        text.length >
+        MAX_TTS_TEXT
+    ){
 
         text =
             text.slice(
@@ -2706,6 +3412,7 @@ function createNarration(
                 MAX_TTS_TEXT
             );
     }
+
 
     return text;
 }
@@ -2718,7 +3425,10 @@ async function generateEpisode(
 ){
 
     const titleTemplate =
-        selectTitleTemplate(settings);
+        selectTitleTemplate(
+            settings
+        );
+
 
     const title =
         replaceVariables(
@@ -2726,11 +3436,13 @@ async function generateEpisode(
             movie
         );
 
+
     const description =
         createEpisodeDescription(
             settings,
             movie
         );
+
 
     const narration =
         createNarration(
@@ -2738,11 +3450,13 @@ async function generateEpisode(
             movie
         );
 
+
     const fileName =
         createAudioFilename(
             index,
             movie
         );
+
 
     const tts =
         await generateTTS(
@@ -2751,15 +3465,19 @@ async function generateEpisode(
             fileName
         );
 
+
     const now =
         new Date();
+
 
     const audioUrl =
         tts.audioUrl ||
         `https://audio.onsports.online/episodes/${encodeURIComponent(fileName)}`;
 
+
     const guid =
         `movie-${movie.id}-${fileName}`;
+
 
     return {
 
@@ -2777,7 +3495,9 @@ async function generateEpisode(
 
         year:
             movie.release_date
-                ? String(movie.release_date).slice(0,4)
+                ? String(
+                    movie.release_date
+                ).slice(0,4)
                 : "",
 
         audio_filename:
@@ -2805,11 +3525,15 @@ async function generateEpisode(
             now.toISOString(),
 
         language:
-            $("podcastLanguage").value.trim() ||
+            $("podcastLanguage")
+                .value
+                .trim() ||
             "en-us",
 
         category:
-            $("podcastCategory").value.trim() ||
+            $("podcastCategory")
+                .value
+                .trim() ||
             "TV & Film",
 
         tmdb_id:
@@ -2827,7 +3551,9 @@ async function generateEpisode(
    MANIFEST
 ========================================================= */
 
-function createManifestEpisode(episode){
+function createManifestEpisode(
+    episode
+){
 
     return {
 
@@ -2884,9 +3610,12 @@ function createManifestEpisode(episode){
 
 async function syncManifest(){
 
-    if(!generatedEpisodes.length){
+    if(
+        !generatedEpisodes.length
+    ){
         return null;
     }
+
 
     const payload = {
 
@@ -2902,22 +3631,32 @@ async function syncManifest(){
             )
     };
 
+
     const response =
         await fetch(
             "/api/manifest",
             {
+
                 method:"POST",
 
                 headers:{
-                    "Content-Type":"application/json"
+                    "Content-Type":
+                        "application/json"
                 },
 
-                body:JSON.stringify(payload)
+                body:
+                    JSON.stringify(
+                        payload
+                    )
             }
         );
 
+
     const data =
-        await readJSONResponse(response);
+        await readJSONResponse(
+            response
+        );
+
 
     if(data.success === false){
 
@@ -2927,6 +3666,7 @@ async function syncManifest(){
         );
     }
 
+
     return data;
 }
 
@@ -2935,14 +3675,26 @@ async function syncManifest(){
    RSS XML
 ========================================================= */
 
-function formatRSSDate(dateString){
+function formatRSSDate(
+    dateString
+){
 
     const date =
-        new Date(dateString);
+        new Date(
+            dateString
+        );
 
-    if(Number.isNaN(date.getTime())){
-        return new Date().toUTCString();
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return new Date()
+            .toUTCString();
     }
+
 
     return date.toUTCString();
 }
@@ -2951,7 +3703,9 @@ function formatRSSDate(dateString){
 function normalizeArtworkUrl(){
 
     return (
-        $("podcastArtwork").value.trim() ||
+        $("podcastArtwork")
+            .value
+            .trim() ||
         DEFAULT_ARTWORK
     );
 }
@@ -2964,43 +3718,59 @@ function buildRSSXML(
     const podcast =
         getPodcastSettings();
 
+
     const artwork =
         podcast.artwork_url ||
         DEFAULT_ARTWORK;
+
 
     const website =
         podcast.website_url ||
         location.origin;
 
+
     const feedUrl =
         `${location.origin}/api/rss`;
+
 
     const lastBuildDate =
         episodes.length
             ? formatRSSDate(
                 episodes
-                    .map(e => e.generated_at)
+                    .map(
+                        e =>
+                            e.generated_at
+                    )
                     .sort()
                     .reverse()[0]
             )
-            : new Date().toUTCString();
+            : new Date()
+                .toUTCString();
+
 
     const items =
-        episodes.map(episode => {
+        episodes
+            .map(
+                episode => {
 
-            const pubDate =
-                formatRSSDate(
-                    episode.generated_at
-                );
+                    const pubDate =
+                        formatRSSDate(
+                            episode.generated_at
+                        );
 
-            const description =
-                episode.description ||
-                "";
 
-            const enclosureLength =
-                Number(episode.audio_size) || 0;
+                    const description =
+                        episode.description ||
+                        "";
 
-            return `
+
+                    const enclosureLength =
+                        Number(
+                            episode.audio_size
+                        ) || 0;
+
+
+                    return `
     <item>
       <title>${escapeXML(episode.title)}</title>
       <description>${escapeXML(description)}</description>
@@ -3014,10 +3784,14 @@ function buildRSSXML(
       <itunes:duration>${escapeXML(episode.duration || "")}</itunes:duration>
       <itunes:episode>${escapeXML(episode.id || "")}</itunes:episode>
       <itunes:image href="${escapeXML(
-          episode.poster || artwork
+          episode.poster ||
+          artwork
       )}"/>
     </item>`;
-        }).join("\n");
+                }
+            )
+            .join("\n");
+
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
@@ -3026,23 +3800,30 @@ function buildRSSXML(
 
   <channel>
 
-    <title>${escapeXML(podcast.podcast_title)}</title>
+    <title>${escapeXML(
+        podcast.podcast_title
+    )}</title>
 
-    <link>${escapeXML(website)}</link>
+    <link>${escapeXML(
+        website
+    )}</link>
 
     <description>${escapeXML(
         podcast.podcast_description
     )}</description>
 
     <language>${escapeXML(
-        podcast.language || "en-us"
+        podcast.language ||
+        "en-us"
     )}</language>
 
     <lastBuildDate>${escapeXML(
         lastBuildDate
     )}</lastBuildDate>
 
-    <generator>Movie Podcast Generator V${APP_VERSION}</generator>
+    <generator>
+      Movie Podcast Generator V${APP_VERSION}
+    </generator>
 
     <atom:link
       href="${escapeXML(feedUrl)}"
@@ -3058,35 +3839,51 @@ function buildRSSXML(
     )}</itunes:summary>
 
     <itunes:explicit>${
-        podcast.explicit ? "true" : "false"
+        podcast.explicit
+            ? "true"
+            : "false"
     }</itunes:explicit>
 
     <itunes:type>${escapeXML(
-        podcast.podcast_type || "episodic"
+        podcast.podcast_type ||
+        "episodic"
     )}</itunes:type>
 
     <itunes:category
       text="${escapeXML(
-        podcast.category || "TV & Film"
+          podcast.category ||
+          "TV & Film"
       )}"/>
 
-    <itunes:image href="${escapeXML(artwork)}"/>
+    <itunes:image
+      href="${escapeXML(artwork)}"/>
 
     <image>
-      <url>${escapeXML(artwork)}</url>
+
+      <url>${escapeXML(
+          artwork
+      )}</url>
+
       <title>${escapeXML(
           podcast.podcast_title
       )}</title>
-      <link>${escapeXML(website)}</link>
+
+      <link>${escapeXML(
+          website
+      )}</link>
+
     </image>
 
     <itunes:owner>
+
       <itunes:name>${escapeXML(
           podcast.author
       )}</itunes:name>
+
       <itunes:email>${escapeXML(
           podcast.email
       )}</itunes:email>
+
     </itunes:owner>
 
 ${items}
@@ -3103,25 +3900,34 @@ ${items}
 
 async function generateRSS(){
 
-    if(!generatedEpisodes.length){
+    if(
+        !generatedEpisodes.length
+    ){
 
         throw new Error(
             "Generate at least one episode first."
         );
     }
 
-    await savePodcastSettings(false);
+
+    await savePodcastSettings(
+        false
+    );
+
 
     /*
      * IMPORTANT:
+     *
      * No /api/rss/create call.
      * No server RSS snapshot.
      */
+
 
     latestRSSXML =
         buildRSSXML(
             generatedEpisodes
         );
+
 
     latestRSS = {
 
@@ -3138,13 +3944,16 @@ async function generateRSS(){
             generatedEpisodes.length
     };
 
+
     showRSSInfo();
+
 
     setRSSStatus(
         `rss.xml generated locally for ${generatedEpisodes.length} episode(s). ` +
         `Live feed is available at /api/rss.`,
         "success"
     );
+
 
     return latestRSSXML;
 }
@@ -3154,21 +3963,30 @@ function showRSSInfo(){
 
     if(!latestRSS.url){
 
-        $("rssInfo").classList.remove(
-            "visible"
-        );
+        $("rssInfo")
+            .classList
+            .remove(
+                "visible"
+            );
 
         return;
     }
 
-    $("rssInfo").classList.add(
-        "visible"
-    );
 
-    $("liveRSSUrl").textContent =
+    $("rssInfo")
+        .classList
+        .add(
+            "visible"
+        );
+
+
+    $("liveRSSUrl")
+        .textContent =
         latestRSS.url;
 
-    $("rssMeta").textContent =
+
+    $("rssMeta")
+        .textContent =
         `Episodes: ${latestRSS.episodeCount} · ` +
         `Generated: ${new Date(
             latestRSS.date
@@ -3182,25 +4000,38 @@ function showRSSInfo(){
 
 async function buildZip(){
 
-    if(!generatedEpisodes.length){
+    if(
+        !generatedEpisodes.length
+    ){
         return null;
     }
+
 
     const zip =
         new JSZip();
 
+
     const episodesFolder =
-        zip.folder("episodes");
+        zip.folder(
+            "episodes"
+        );
+
 
     const metadataFolder =
-        zip.folder("metadata");
+        zip.folder(
+            "metadata"
+        );
 
-    for(const episode of generatedEpisodes){
+
+    for(
+        const episode of generatedEpisodes
+    ){
 
         episodesFolder.file(
             episode.audio_filename,
             episode.audio
         );
+
 
         const metadata = {
 
@@ -3256,6 +4087,7 @@ async function buildZip(){
                 episode.narration
         };
 
+
         metadataFolder.file(
             `${episode.audio_filename}.json`,
             JSON.stringify(
@@ -3274,6 +4106,7 @@ async function buildZip(){
                 generatedEpisodes
             );
     }
+
 
     zip.file(
         "rss.xml",
@@ -3301,6 +4134,17 @@ async function buildZip(){
             2
         )
     );
+
+
+    const cta1Template =
+        $("cta1Url")
+            .value
+            .trim();
+
+    const cta2Template =
+        $("cta2Url")
+            .value
+            .trim();
 
 
     zip.file(
@@ -3348,23 +4192,44 @@ ${location.origin}/api/rss
 CTA
 ===
 
-CTA URLs are automatically generated from the TMDB ID:
+CTA 1 URL Template:
+${cta1Template}
 
-https://movietts.pages.dev/{TMDB-ID}
+CTA 2 URL Template:
+${cta2Template}
+
+The {ID} placeholder is automatically replaced
+with the TMDB movie ID.
+
+Example:
+
+https://example.com/movie/{ID}
+
+TMDB 550 becomes:
+
+https://example.com/movie/550
 `
     );
 
 
     generatedZip =
         await zip.generateAsync({
+
             type:"blob",
+
             compression:"DEFLATE",
+
             compressionOptions:{
                 level:6
             }
+
         });
 
-    $("downloadZipBtn").disabled = false;
+
+    $("downloadZipBtn")
+        .disabled =
+        false;
+
 
     return generatedZip;
 }
@@ -3379,7 +4244,10 @@ function renderEpisodes(){
     const container =
         $("episodeList");
 
-    if(!generatedEpisodes.length){
+
+    if(
+        !generatedEpisodes.length
+    ){
 
         container.innerHTML =
             `<div class="status">
@@ -3389,16 +4257,23 @@ function renderEpisodes(){
         return;
     }
 
-    container.innerHTML = "";
+
+    container.innerHTML =
+        "";
+
 
     generatedEpisodes.forEach(
         (episode,index) => {
 
             const item =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             item.className =
                 "episode";
+
 
             item.innerHTML = `
 
@@ -3455,44 +4330,57 @@ function renderEpisodes(){
                 </div>
             `;
 
-            container.appendChild(item);
+
+            container.appendChild(
+                item
+            );
         }
     );
+
 
     container
         .querySelectorAll(
             "[data-download-index]"
         )
-        .forEach(button => {
+        .forEach(
+            button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+                button.addEventListener(
+                    "click",
+                    () => {
 
-                    const index =
-                        Number(
-                            button.dataset.downloadIndex
+                        const index =
+                            Number(
+                                button.dataset
+                                    .downloadIndex
+                            );
+
+
+                        const episode =
+                            generatedEpisodes[
+                                index
+                            ];
+
+
+                        if(!episode){
+                            return;
+                        }
+
+
+                        downloadBlob(
+                            new Blob(
+                                [episode.audio],
+                                {
+                                    type:
+                                        "audio/mpeg"
+                                }
+                            ),
+                            episode.audio_filename
                         );
-
-                    const episode =
-                        generatedEpisodes[index];
-
-                    if(!episode){
-                        return;
                     }
-
-                    downloadBlob(
-                        new Blob(
-                            [episode.audio],
-                            {
-                                type:"audio/mpeg"
-                            }
-                        ),
-                        episode.audio_filename
-                    );
-                }
-            );
-        });
+                );
+            }
+        );
 }
 
 
@@ -3537,8 +4425,10 @@ function updateTTSPreview(){
     const movie =
         createPreviewMovie();
 
+
     const settings =
         getSettings();
+
 
     const text =
         createNarration(
@@ -3546,7 +4436,9 @@ function updateTTSPreview(){
             movie
         );
 
-    $("ttsPreview").textContent =
+
+    $("ttsPreview")
+        .textContent =
         text;
 }
 
@@ -3564,17 +4456,25 @@ function updateProgress(
     const percent =
         total
             ? Math.round(
-                (current / total) * 100
+                (current / total) *
+                100
             )
             : 0;
 
-    $("progressBar").style.width =
+
+    $("progressBar")
+        .style
+        .width =
         `${percent}%`;
 
-    $("progressPercent").textContent =
+
+    $("progressPercent")
+        .textContent =
         `${percent}%`;
 
-    $("progressText").textContent =
+
+    $("progressText")
+        .textContent =
         label ||
         `${current} / ${total}`;
 }
@@ -3586,27 +4486,51 @@ async function startGeneration(){
         return;
     }
 
-    generationRunning = true;
 
-    $("generateBtn").disabled = true;
-    $("rssBtn").disabled = true;
-    $("downloadZipBtn").disabled = true;
+    generationRunning =
+        true;
+
+
+    $("generateBtn")
+        .disabled =
+        true;
+
+
+    $("rssBtn")
+        .disabled =
+        true;
+
+
+    $("downloadZipBtn")
+        .disabled =
+        true;
+
 
     $("progressWrap")
-        .classList.add("show");
+        .classList
+        .add("show");
 
-    generatedEpisodes = [];
 
-    generatedZip = null;
+    generatedEpisodes =
+        [];
 
-    latestRSSXML = "";
+
+    generatedZip =
+        null;
+
+
+    latestRSSXML =
+        "";
+
 
     renderEpisodes();
+
 
     try{
 
         const ids =
             getMovieIds();
+
 
         if(!ids.length){
 
@@ -3615,7 +4539,11 @@ async function startGeneration(){
             );
         }
 
-        if(ids.length > MAX_EPISODES_PER_RSS){
+
+        if(
+            ids.length >
+            MAX_EPISODES_PER_RSS
+        ){
 
             throw new Error(
                 `Maximum ${MAX_EPISODES_PER_RSS} movie IDs per generation.`
@@ -3635,7 +4563,9 @@ async function startGeneration(){
         }
 
 
-        if(!settings.titleTemplates.length){
+        if(
+            !settings.titleTemplates.length
+        ){
 
             throw new Error(
                 "At least one title template is required."
@@ -3647,7 +4577,9 @@ async function startGeneration(){
             getPodcastSettings();
 
 
-        if(!podcast.podcast_title){
+        if(
+            !podcast.podcast_title
+        ){
 
             throw new Error(
                 "Podcast Title is required."
@@ -3660,7 +4592,9 @@ async function startGeneration(){
         );
 
 
-        await savePodcastSettings(false);
+        await savePodcastSettings(
+            false
+        );
 
 
         const language =
@@ -3725,10 +4659,12 @@ async function startGeneration(){
 
 
             /*
-             * Refresh credit after every
-             * successful TTS generation.
+             * Refresh credit after
+             * every successful TTS.
              */
-            await refreshElevenLabsCredit(true);
+            await refreshElevenLabsCredit(
+                true
+            );
 
 
             updateProgress(
@@ -3771,7 +4707,9 @@ async function startGeneration(){
         await buildZip();
 
 
-        await refreshElevenLabsCredit(true);
+        await refreshElevenLabsCredit(
+            true
+        );
 
 
     }catch(error){
@@ -3781,26 +4719,38 @@ async function startGeneration(){
             error
         );
 
+
         setStatus(
             error.message ||
             "Generation failed.",
             "error"
         );
 
+
     }finally{
 
-        generationRunning = false;
+        generationRunning =
+            false;
 
-        $("generateBtn").disabled = false;
 
-        $("rssBtn").disabled =
+        $("generateBtn")
+            .disabled =
+            false;
+
+
+        $("rssBtn")
+            .disabled =
             generatedEpisodes.length === 0;
 
-        $("downloadZipBtn").disabled =
+
+        $("downloadZipBtn")
+            .disabled =
             generatedEpisodes.length === 0;
+
 
         $("progressWrap")
-            .classList.remove("show");
+            .classList
+            .remove("show");
     }
 }
 
@@ -3823,31 +4773,43 @@ $("rssBtn")
 
             try{
 
-                $("rssBtn").disabled = true;
+                $("rssBtn")
+                    .disabled =
+                    true;
+
 
                 await generateRSS();
 
+
                 await syncManifest();
 
+
                 await buildZip();
+
 
                 setStatus(
                     "rss.xml generated successfully. The live RSS URL is ready.",
                     "success"
                 );
 
+
             }catch(error){
 
-                console.error(error);
+                console.error(
+                    error
+                );
+
 
                 setRSSStatus(
                     error.message,
                     "error"
                 );
 
+
             }finally{
 
-                $("rssBtn").disabled =
+                $("rssBtn")
+                    .disabled =
                     generatedEpisodes.length === 0;
             }
         }
@@ -3867,13 +4829,15 @@ $("downloadZipBtn")
                         await buildZip();
                 }
 
+
                 if(generatedZip){
 
                     downloadBlob(
                         generatedZip,
-                        "movie-podcast-v2.8.zip"
+                        "movie-podcast-v2.9.zip"
                     );
                 }
+
 
             }catch(error){
 
@@ -3893,7 +4857,9 @@ $("downloadRSSBtn")
 
             if(!latestRSSXML){
 
-                if(!generatedEpisodes.length){
+                if(
+                    !generatedEpisodes.length
+                ){
 
                     setRSSStatus(
                         "Generate episodes first.",
@@ -3903,11 +4869,13 @@ $("downloadRSSBtn")
                     return;
                 }
 
+
                 latestRSSXML =
                     buildRSSXML(
                         generatedEpisodes
                     );
             }
+
 
             downloadText(
                 latestRSSXML,
@@ -3927,22 +4895,30 @@ $("copyRSSBtn")
                 return;
             }
 
+
             try{
 
                 await navigator.clipboard.writeText(
                     latestRSS.url
                 );
 
-                $("copyRSSBtn").textContent =
+
+                $("copyRSSBtn")
+                    .textContent =
                     "Copied!";
+
 
                 setTimeout(
                     () => {
-                        $("copyRSSBtn").textContent =
+
+                        $("copyRSSBtn")
+                            .textContent =
                             "Copy RSS URL";
+
                     },
                     1500
                 );
+
 
             }catch{
 
@@ -3976,7 +4952,10 @@ $("refreshCreditBtn")
     .addEventListener(
         "click",
         () => {
-            refreshElevenLabsCredit(false);
+
+            refreshElevenLabsCredit(
+                false
+            );
         }
     );
 
@@ -3988,10 +4967,15 @@ $("savePodcastBtn")
 
             try{
 
-                $("savePodcastBtn").disabled =
+                $("savePodcastBtn")
+                    .disabled =
                     true;
 
-                await savePodcastSettings(true);
+
+                await savePodcastSettings(
+                    true
+                );
+
 
             }catch(error){
 
@@ -4000,9 +4984,11 @@ $("savePodcastBtn")
                     "error"
                 );
 
+
             }finally{
 
-                $("savePodcastBtn").disabled =
+                $("savePodcastBtn")
+                    .disabled =
                     false;
             }
         }
@@ -4017,15 +5003,19 @@ $("addTitleTemplate")
             const templates =
                 getTitleTemplates();
 
+
             templates.push(
                 "{TITLE} ({YEAR}) MOVIE REVIEW"
             );
+
 
             setTitleTemplates(
                 templates
             );
 
+
             updateTitlePreview();
+
 
             saveLocalSettings();
         }
@@ -4038,6 +5028,7 @@ $("tmdbIds")
         () => {
 
             updateIDCounter();
+
             saveLocalSettings();
         }
     );
@@ -4077,10 +5068,15 @@ $("randomTitle")
         () => {
 
             updateTitlePreview();
+
             saveLocalSettings();
         }
     );
 
+
+/* =========================================================
+   CTA EVENTS
+========================================================= */
 
 $("cta1Text")
     .addEventListener(
@@ -4088,7 +5084,23 @@ $("cta1Text")
         () => {
 
             updateFixedCTAHTML();
+
             updateTTSPreview();
+
+            saveLocalSettings();
+        }
+    );
+
+
+$("cta1Url")
+    .addEventListener(
+        "input",
+        () => {
+
+            updateFixedCTAHTML();
+
+            updateTTSPreview();
+
             saveLocalSettings();
         }
     );
@@ -4100,7 +5112,23 @@ $("cta2Text")
         () => {
 
             updateFixedCTAHTML();
+
             updateTTSPreview();
+
+            saveLocalSettings();
+        }
+    );
+
+
+$("cta2Url")
+    .addEventListener(
+        "input",
+        () => {
+
+            updateFixedCTAHTML();
+
+            updateTTSPreview();
+
             saveLocalSettings();
         }
     );
@@ -4119,6 +5147,7 @@ $("ttsTemplate")
         () => {
 
             updateTTSPreview();
+
             saveLocalSettings();
         }
     );
@@ -4133,25 +5162,29 @@ $("ttsTemplate")
     "podcastWebsite",
     "podcastCategory",
     "podcastLanguage"
-].forEach(id => {
+].forEach(
+    id => {
 
-    $(id).addEventListener(
-        "input",
-        saveLocalSettings
-    );
-});
+        $(id).addEventListener(
+            "input",
+            saveLocalSettings
+        );
+    }
+);
 
 
 [
     "podcastType",
     "podcastExplicit"
-].forEach(id => {
+].forEach(
+    id => {
 
-    $(id).addEventListener(
-        "change",
-        saveLocalSettings
-    );
-});
+        $(id).addEventListener(
+            "change",
+            saveLocalSettings
+        );
+    }
+);
 
 
 /* =========================================================
@@ -4164,38 +5197,74 @@ function initializeDefaults(){
         DEFAULT_TITLE_TEMPLATES
     );
 
-    $("descriptionTemplate").value =
+
+    $("descriptionTemplate")
+        .value =
         DEFAULT_DESCRIPTION_TEMPLATE;
 
-    $("ttsTemplate").value =
+
+    $("ttsTemplate")
+        .value =
         DEFAULT_TTS_TEMPLATE;
 
-    $("podcastTitle").value =
+
+    $("podcastTitle")
+        .value =
         "Movie Review Podcast";
 
-    $("podcastAuthor").value =
+
+    $("podcastAuthor")
+        .value =
         "Movie Podcast";
 
-    $("podcastDescription").value =
+
+    $("podcastDescription")
+        .value =
         "Movie reviews, stories, cast details and everything you need to know about popular movies.";
 
-    $("podcastCategory").value =
+
+    $("podcastCategory")
+        .value =
         "TV & Film";
 
-    $("podcastLanguage").value =
+
+    $("podcastLanguage")
+        .value =
         "en-us";
 
-    $("podcastType").value =
+
+    $("podcastType")
+        .value =
         "episodic";
 
-    $("podcastExplicit").value =
+
+    $("podcastExplicit")
+        .value =
         "false";
 
-    $("podcastArtwork").value =
+
+    $("podcastArtwork")
+        .value =
         DEFAULT_ARTWORK;
 
-    $("podcastWebsite").value =
+
+    $("podcastWebsite")
+        .value =
         location.origin;
+
+
+    /*
+     * Default CTA URL templates.
+     */
+    $("cta1Url")
+        .value =
+        "https://onpreps.live/movie/{ID}";
+
+
+    $("cta2Url")
+        .value =
+        "https://onpreps.live/movie/{ID}";
+
 
     updateFixedCTAHTML();
 
@@ -4211,13 +5280,19 @@ async function init(){
 
     initializeDefaults();
 
+
+    /*
+     * Load browser settings.
+     */
     loadLocalSettings();
+
 
     /*
      * Fixed CTA HTML is always restored.
      * User cannot accidentally modify it.
      */
     updateFixedCTAHTML();
+
 
     updateTitlePreview();
 
@@ -4229,19 +5304,27 @@ async function init(){
 
     showRSSInfo();
 
+
     /*
-     * Load server-side podcast config if available.
+     * Load server-side podcast config
+     * if available.
      */
     await loadPodcastSettings();
 
+
     /*
-     * Refresh credit on startup.
+     * Refresh ElevenLabs credit
+     * on startup.
      */
-    await refreshElevenLabsCredit(true);
+    await refreshElevenLabsCredit(
+        true
+    );
+
 
     updateTTSPreview();
 
     updateFixedCTAHTML();
+
 
     setStatus(
         "Ready. Configure your movie IDs and click Generate Podcast."
