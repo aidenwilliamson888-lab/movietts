@@ -40,8 +40,14 @@ export async function onRequestPost(context) {
      * ==========================================
      */
 
-    const apiKey = context.env.REALWAY_API_KEY;
-    const bucket = context.env.PODCAST_BUCKET;
+    const apiKey =
+      context.env.REALWAY_API_KEY;
+
+    const uploadUrl =
+      context.env.R2_UPLOAD_URL;
+
+    const uploadSecret =
+      context.env.R2_UPLOAD_SECRET;
 
     if (!apiKey) {
       return new Response(
@@ -59,12 +65,28 @@ export async function onRequestPost(context) {
       );
     }
 
-    if (!bucket) {
+    if (!uploadUrl) {
       return new Response(
         JSON.stringify({
           success: false,
           error:
-            "PODCAST_BUCKET R2 binding is missing in Cloudflare Pages."
+            "R2_UPLOAD_URL is missing in Cloudflare Variables & Secrets."
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    if (!uploadSecret) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error:
+            "R2_UPLOAD_SECRET is missing in Cloudflare Variables & Secrets."
         }),
         {
           status: 500,
@@ -105,7 +127,11 @@ export async function onRequestPost(context) {
       .replace(/[^a-zA-Z0-9._-]/g, "-")
       .replace(/-+/g, "-");
 
-    if (!fileName.toLowerCase().endsWith(".mp3")) {
+    if (
+      !fileName
+        .toLowerCase()
+        .endsWith(".mp3")
+    ) {
       fileName += ".mp3";
     }
 
@@ -113,20 +139,19 @@ export async function onRequestPost(context) {
      * ==========================================
      * RAILWAY EDGE TTS
      * ==========================================
-     *
-     * Jangan ubah endpoint/payload ini.
-     * Ini adalah konfigurasi yang sudah terbukti
-     * menghasilkan audio.
      */
 
-    const response = await fetch(
+    const ttsResponse = await fetch(
       "https://openai-edge-tts-production-824f.up.railway.app/v1/audio/speech",
       {
         method: "POST",
 
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
+          "Authorization":
+            `Bearer ${apiKey}`,
+
+          "Content-Type":
+            "application/json"
         },
 
         body: JSON.stringify({
@@ -144,22 +169,24 @@ export async function onRequestPost(context) {
      * ==========================================
      */
 
-    if (!response.ok) {
-      const errorText = await response.text();
+    if (!ttsResponse.ok) {
+      const errorText =
+        await ttsResponse.text();
 
       return new Response(
         JSON.stringify({
           success: false,
           error:
-            `Railway TTS HTTP ${response.status}: ${errorText.slice(
+            `Railway TTS HTTP ${ttsResponse.status}: ${errorText.slice(
               0,
               1500
             )}`
         }),
         {
-          status: response.status,
+          status: ttsResponse.status,
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           }
         }
       );
@@ -167,22 +194,25 @@ export async function onRequestPost(context) {
 
     /*
      * ==========================================
-     * GET AUDIO
+     * GET MP3
      * ==========================================
      */
 
-    const audio = await response.arrayBuffer();
+    const audio =
+      await ttsResponse.arrayBuffer();
 
     if (!audio.byteLength) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: "Railway TTS returned an empty audio file."
+          error:
+            "Railway TTS returned an empty audio file."
         }),
         {
           status: 502,
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           }
         }
       );
@@ -190,44 +220,90 @@ export async function onRequestPost(context) {
 
     /*
      * ==========================================
-     * UPLOAD TO CLOUDFLARE R2
+     * R2 UPLOAD WORKER
      * ==========================================
      *
-     * R2 key:
+     * Worker endpoint:
      *
-     * episodes/{fileName}
+     * PUT /upload/{key}
+     *
+     * The Worker handles:
+     *
+     * R2 → movie-podcast
      */
 
-    const audioKey = `episodes/${fileName}`;
+    const audioKey =
+      `episodes/${fileName}`;
 
-    try {
-      await bucket.put(audioKey, audio, {
-        httpMetadata: {
-          contentType: "audio/mpeg",
-          cacheControl: "public, max-age=31536000"
-        },
-        customMetadata: {
-          voice: voice,
-          model: model,
-          outputFormat: outputFormat
+    const normalizedUploadUrl =
+      String(uploadUrl)
+        .replace(/\/+$/, "");
+
+    const uploadEndpoint =
+      `${normalizedUploadUrl}/upload/${encodeURIComponent(
+        audioKey
+      )}`;
+
+    const uploadResponse =
+      await fetch(
+        uploadEndpoint,
+        {
+          method: "PUT",
+
+          headers: {
+            "Authorization":
+              `Bearer ${uploadSecret}`,
+
+            "Content-Type":
+              "audio/mpeg"
+          },
+
+          body: audio
         }
-      });
-    } catch (r2Error) {
+      );
+
+    /*
+     * ==========================================
+     * R2 UPLOAD ERROR
+     * ==========================================
+     */
+
+    if (!uploadResponse.ok) {
+      const errorText =
+        await uploadResponse.text();
+
       return new Response(
         JSON.stringify({
           success: false,
           error:
-            `R2 upload failed: ${
-              r2Error?.message || "Unknown R2 error."
-            }`
+            `R2 Upload Worker HTTP ${uploadResponse.status}: ${errorText.slice(
+              0,
+              1500
+            )}`
         }),
         {
-          status: 502,
+          status: uploadResponse.status,
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           }
         }
       );
+    }
+
+    /*
+     * ==========================================
+     * READ UPLOAD RESULT
+     * ==========================================
+     */
+
+    let uploadResult = null;
+
+    try {
+      uploadResult =
+        await uploadResponse.json();
+    } catch {
+      uploadResult = null;
     }
 
     /*
@@ -237,11 +313,12 @@ export async function onRequestPost(context) {
      */
 
     const audioUrl =
+      uploadResult?.url ||
       `https://audio.onsports.online/${audioKey}`;
 
     /*
      * ==========================================
-     * RESPONSE
+     * FINAL RESPONSE
      * ==========================================
      */
 
@@ -249,37 +326,61 @@ export async function onRequestPost(context) {
       JSON.stringify({
         success: true,
 
-        fileName: fileName,
+        fileName:
 
-        audioKey: audioKey,
+          uploadResult?.key
+            ? uploadResult.key
+                .split("/")
+                .pop()
+            : fileName,
 
-        audioUrl: audioUrl,
+        audioKey:
+          uploadResult?.key ||
+          audioKey,
 
-        size: audio.byteLength,
+        audioUrl:
+          audioUrl,
 
-        voice: voice,
+        size:
+          audio.byteLength,
 
-        model: model,
+        voice:
+          voice,
 
-        outputFormat: outputFormat
+        model:
+          model,
+
+        outputFormat:
+          outputFormat,
+
+        uploaded:
+          true
       }),
       {
         status: 200,
 
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
 
-          "X-Audio-URL": audioUrl,
+          "X-Audio-URL":
+            audioUrl,
 
-          "X-Audio-Key": audioKey,
+          "X-Audio-Key":
+            uploadResult?.key ||
+            audioKey,
 
-          "X-File-Name": fileName,
+          "X-File-Name":
+            fileName,
 
-          "X-Output-Format": outputFormat,
+          "X-Output-Format":
+            outputFormat,
 
-          "X-Model-ID": model,
+          "X-Model-ID":
+            model,
 
-          "Cache-Control": "no-store"
+          "Cache-Control":
+            "no-store"
         }
       }
     );
@@ -288,14 +389,17 @@ export async function onRequestPost(context) {
     return new Response(
       JSON.stringify({
         success: false,
+
         error:
           error?.message ||
-          "Unknown TTS/R2 error."
+          "Unknown TTS/R2 upload error."
       }),
       {
         status: 500,
+
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+            "application/json"
         }
       }
     );
