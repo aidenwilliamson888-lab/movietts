@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Movie Podcast Generator V2.7</title>
+  <title>Movie Podcast Generator V2.8</title>
 
   <meta
     name="description"
@@ -324,6 +324,69 @@
       display: none !important;
     }
 
+    /* =====================================================
+       ELEVENLABS CREDIT PANEL
+    ===================================================== */
+
+    .voice-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .credit-panel {
+      margin-top: 9px;
+      padding: 11px 12px;
+      border: 1px solid #202a42;
+      border-radius: 9px;
+      background: #0c1324;
+    }
+
+    .credit-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .credit-item {
+      padding: 8px;
+      border-radius: 7px;
+      background: #101a30;
+      border: 1px solid #1d2943;
+    }
+
+    .credit-label {
+      display: block;
+      color: #7f8aa3;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    .credit-value {
+      display: block;
+      color: #e8ecf7;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .credit-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .credit-status {
+      font-size: 11px;
+      color: #7f8aa3;
+    }
+
+    .refresh-credit-btn {
+      padding: 8px 11px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
     @media (max-width: 850px) {
       .grid,
       .grid-3 {
@@ -347,6 +410,21 @@
         flex-direction: column;
       }
     }
+
+    @media (max-width: 500px) {
+      .credit-row {
+        grid-template-columns: 1fr;
+      }
+
+      .credit-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .refresh-credit-btn {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 
@@ -357,7 +435,7 @@
   <div class="header">
     <h1>
       Movie Podcast Generator
-      <span class="version">V2.7 RSS SNAPSHOT</span>
+      <span class="version">V2.8 RSS SNAPSHOT</span>
     </h1>
 
     <p>
@@ -521,7 +599,8 @@
       </div>
 
 
-      <div>
+      <!-- VOICE ID + CREDIT -->
+      <div class="voice-field">
 
         <label for="voiceId">
           ElevenLabs Voice ID
@@ -532,6 +611,85 @@
           type="text"
           placeholder="Enter ElevenLabs Voice ID"
         >
+
+        <div
+          id="creditPanel"
+          class="credit-panel"
+        >
+
+          <div class="credit-row">
+
+            <div class="credit-item">
+
+              <span class="credit-label">
+                Terpakai
+              </span>
+
+              <span
+                id="creditUsed"
+                class="credit-value"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="credit-item">
+
+              <span class="credit-label">
+                Sisa
+              </span>
+
+              <span
+                id="creditRemaining"
+                class="credit-value"
+              >
+                —
+              </span>
+
+            </div>
+
+
+            <div class="credit-item">
+
+              <span class="credit-label">
+                Limit
+              </span>
+
+              <span
+                id="creditLimit"
+                class="credit-value"
+              >
+                —
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div class="credit-actions">
+
+            <span
+              id="creditStatus"
+              class="credit-status"
+            >
+              Credit belum diperiksa.
+            </span>
+
+            <button
+              id="refreshCreditBtn"
+              type="button"
+              class="secondary refresh-credit-btn"
+              onclick="refreshElevenLabsCredit()"
+            >
+              🔄 Refresh Credit
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 
@@ -680,8 +838,6 @@
 
     <div class="grid">
 
-
-      <!-- CTA 1 -->
       <div>
 
         <h3>
@@ -720,7 +876,6 @@
       </div>
 
 
-      <!-- CTA 2 -->
       <div>
 
         <h3>
@@ -866,9 +1021,7 @@ The main cast includes {CAST}.
 Thanks for listening to our movie podcast.</textarea>
 
     <div class="hint">
-
       The narration template is converted to speech by ElevenLabs.
-
     </div>
 
   </div>
@@ -889,7 +1042,6 @@ Thanks for listening to our movie podcast.</textarea>
     <br>
 
     <div class="grid">
-
 
       <div>
 
@@ -1165,6 +1317,8 @@ Thanks for listening to our movie podcast.</textarea>
 
       Every successful Generate creates a NEW independent RSS snapshot.
 
+      <br><br>
+
       Example:
 
       <br><br>
@@ -1310,12 +1464,12 @@ Thanks for listening to our movie podcast.</textarea>
    GLOBAL CONSTANTS
 ========================================================= */
 
-const APP_VERSION = "2.7";
+const APP_VERSION = "2.8";
 
 const MAX_EPISODES_PER_RSS = 500;
 
 const LOCAL_STORAGE_KEY =
-  "moviePodcastGeneratorV27";
+  "moviePodcastGeneratorV28";
 
 
 /* =========================================================
@@ -1327,6 +1481,14 @@ let generatedEpisodes = [];
 let generatedZip = null;
 
 let generationRunning = false;
+
+let creditLoading = false;
+
+let latestCredit = {
+  used: null,
+  remaining: null,
+  limit: null
+};
 
 let latestRSS = {
   url: "",
@@ -1376,6 +1538,7 @@ function randomItem(array) {
       Math.random() * array.length
     )
   ];
+
 }
 
 
@@ -1399,6 +1562,7 @@ function updateStatus(message) {
 
   status.scrollTop =
     status.scrollHeight;
+
 }
 
 
@@ -1505,6 +1669,271 @@ function escapeXml(value) {
     /'/g,
     "&apos;"
   );
+
+}
+
+
+/* =========================================================
+   FORMAT NUMBER
+========================================================= */
+
+function formatNumber(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+
+    return "—";
+
+  }
+
+  const number =
+    Number(
+      value
+    );
+
+  if (
+    !Number.isFinite(
+      number
+    )
+  ) {
+
+    return "—";
+
+  }
+
+  return number.toLocaleString(
+    "en-US"
+  );
+
+}
+
+
+/* =========================================================
+   ELEVENLABS CREDIT
+========================================================= */
+
+function renderElevenLabsCredit() {
+
+  document.getElementById(
+    "creditUsed"
+  ).textContent =
+    formatNumber(
+      latestCredit.used
+    );
+
+  document.getElementById(
+    "creditRemaining"
+  ).textContent =
+    formatNumber(
+      latestCredit.remaining
+    );
+
+  document.getElementById(
+    "creditLimit"
+  ).textContent =
+    formatNumber(
+      latestCredit.limit
+    );
+
+}
+
+
+async function refreshElevenLabsCredit(
+  silent = false
+) {
+
+  if (creditLoading) {
+    return;
+  }
+
+  const voiceId =
+    document.getElementById(
+      "voiceId"
+    ).value.trim();
+
+  const button =
+    document.getElementById(
+      "refreshCreditBtn"
+    );
+
+  const status =
+    document.getElementById(
+      "creditStatus"
+    );
+
+  creditLoading =
+    true;
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "⏳ Checking...";
+
+  status.textContent =
+    "Checking ElevenLabs credit...";
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/elevenlabs-credits",
+        {
+          method:
+            "GET",
+
+          cache:
+            "no-store"
+        }
+      );
+
+    let data;
+
+    try {
+
+      data =
+        await response.json();
+
+    } catch (_) {
+
+      throw new Error(
+        `Invalid credit response (HTTP ${response.status}).`
+      );
+
+    }
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.error ||
+        "Unable to retrieve ElevenLabs credit."
+      );
+
+    }
+
+
+    /*
+     * Supported response:
+     *
+     * character_count
+     * character_limit
+     *
+     * Optional:
+     *
+     * remaining_characters
+     */
+
+    const used =
+      Number(
+        data.character_count ??
+        data.used ??
+        0
+      );
+
+    const limit =
+      Number(
+        data.character_limit ??
+        data.limit ??
+        0
+      );
+
+    let remaining =
+      data.remaining_characters ??
+      data.remaining ??
+      null;
+
+    if (
+      remaining === null &&
+      Number.isFinite(used) &&
+      Number.isFinite(limit)
+    ) {
+
+      remaining =
+        Math.max(
+          0,
+          limit - used
+        );
+
+    }
+
+
+    latestCredit = {
+
+      used:
+        Number.isFinite(
+          used
+        )
+          ? used
+          : null,
+
+      remaining:
+        Number.isFinite(
+          Number(
+            remaining
+          )
+        )
+          ? Number(
+              remaining
+            )
+          : null,
+
+      limit:
+        Number.isFinite(
+          limit
+        )
+          ? limit
+          : null
+
+    };
+
+
+    renderElevenLabsCredit();
+
+
+    status.textContent =
+      `Updated ${new Date().toLocaleTimeString()}`;
+
+
+    if (!silent) {
+
+      updateStatus(
+        `ElevenLabs credit refreshed. Used: ${formatNumber(latestCredit.used)} | Remaining: ${formatNumber(latestCredit.remaining)} | Limit: ${formatNumber(latestCredit.limit)}`
+      );
+
+    }
+
+
+  } catch (error) {
+
+    status.textContent =
+      `Error: ${error.message}`;
+
+    if (!silent) {
+
+      updateStatus(
+        `ElevenLabs credit error: ${error.message}`
+      );
+
+    }
+
+  } finally {
+
+    creditLoading =
+      false;
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "🔄 Refresh Credit";
+
+  }
 
 }
 
@@ -2058,10 +2487,6 @@ function createCTA(
     movie.originalTitle ||
     "";
 
-  /*
-   * URL
-   */
-
   let url =
     config.url ||
     "";
@@ -2072,35 +2497,23 @@ function createCTA(
       movie.id
     );
 
+  let text =
+    config.text ||
+    "";
+
   /*
-   * CTA TEXT
-   *
    * Supports:
    *
    * (title)
    *
-   * Example:
-   *
-   * Watch (title) now
-   *
-   * becomes:
-   *
-   * Watch Avengers: Endgame now
+   * Case insensitive.
    */
-
-  let text =
-    config.text ||
-    "";
 
   text =
     text.replace(
       /\(title\)/gi,
       movieTitle
     );
-
-  /*
-   * HTML
-   */
 
   let html =
     config.html ||
@@ -2773,10 +3186,6 @@ async function startGeneration() {
       `Starting batch with ${uniqueIds.length} movie(s).`
     );
 
-    /*
-     * Save current podcast settings.
-     */
-
     updateStatus(
       "Saving podcast settings..."
     );
@@ -2819,10 +3228,6 @@ async function startGeneration() {
 
     }
 
-
-    /*
-     * Generate episodes.
-     */
 
     for (
       let i = 0;
@@ -2877,6 +3282,16 @@ async function startGeneration() {
 
         renderEpisodes();
 
+
+        /*
+         * Refresh credit after
+         * successful TTS generation.
+         */
+
+        await refreshElevenLabsCredit(
+          true
+        );
+
       } catch (
         episodeError
       ) {
@@ -2917,20 +3332,12 @@ async function startGeneration() {
     }
 
 
-    /*
-     * Build ZIP.
-     */
-
     updateStatus(
       "Building ZIP package..."
     );
 
     await buildZip();
 
-
-    /*
-     * Create independent RSS snapshot.
-     */
 
     updateStatus(
       "Creating independent RSS snapshot..."
@@ -3012,6 +3419,14 @@ async function startGeneration() {
 
     syncBtn.disabled =
       false;
+
+    /*
+     * Final credit refresh.
+     */
+
+    refreshElevenLabsCredit(
+      true
+    );
 
   }
 
@@ -3166,14 +3581,6 @@ async function syncRSS(
     }
 
 
-    /*
-     * Save current settings.
-     *
-     * This does NOT define the old RSS feeds.
-     * The server snapshots these settings
-     * when creating the new XML.
-     */
-
     const configResponse =
       await fetch(
         "/api/podcast-config",
@@ -3213,12 +3620,6 @@ async function syncRSS(
     }
 
 
-    /*
-     * NEW RSS SNAPSHOT PAYLOAD
-     *
-     * One Create = one independent feed.
-     */
-
     const payload = {
 
       version:
@@ -3235,16 +3636,6 @@ async function syncRSS(
 
     };
 
-
-    /*
-     * IMPORTANT:
-     *
-     * This endpoint must CREATE a new
-     * immutable XML file.
-     *
-     * It must NOT merge into a master
-     * manifest and overwrite /api/rss.
-     */
 
     const response =
       await fetch(
@@ -3299,19 +3690,6 @@ async function syncRSS(
     }
 
 
-    /*
-     * Expected backend response:
-     *
-     * {
-     *   success: true,
-     *   filename: "001-26-09-26.xml",
-     *   url: "https://domain.com/api/rss/001-26-09-26.xml",
-     *   sequence: 1,
-     *   date: "26-09-26",
-     *   episode_count: 10
-     * }
-     */
-
     latestRSS = {
 
       url:
@@ -3364,6 +3742,15 @@ async function syncRSS(
 
 
     showRSSInfo();
+
+
+    /*
+     * Rebuild ZIP after RSS creation
+     * so podcast-data.json contains
+     * the new RSS snapshot.
+     */
+
+    await buildZip();
 
 
     if (showAlert) {
@@ -3654,10 +4041,6 @@ async function buildZip() {
     getPodcastSettings();
 
 
-  /*
-   * MP3 files + metadata.
-   */
-
   for (
     const episode of generatedEpisodes
   ) {
@@ -3772,10 +4155,6 @@ async function buildZip() {
   }
 
 
-  /*
-   * podcast-data.json
-   */
-
   const podcastData = {
 
     version:
@@ -3809,10 +4188,6 @@ async function buildZip() {
   );
 
 
-  /*
-   * rss-episodes.json
-   */
-
   zip.file(
     "rss-episodes.json",
     JSON.stringify(
@@ -3822,10 +4197,6 @@ async function buildZip() {
     )
   );
 
-
-  /*
-   * README
-   */
 
   const rssUrl =
     latestRSS.url ||
@@ -3838,7 +4209,7 @@ async function buildZip() {
 
   const readme = `
 
-MOVIE PODCAST GENERATOR V2.7
+MOVIE PODCAST GENERATOR V2.8
 ============================
 
 Generated:
@@ -3893,10 +4264,6 @@ ${JSON.stringify(
     readme
   );
 
-
-  /*
-   * Generate ZIP.
-   */
 
   generatedZip =
     await zip.generateAsync({
@@ -4543,6 +4910,32 @@ document.getElementById(
 
 
 /* =========================================================
+   VOICE ID CHANGE
+========================================================= */
+
+document.getElementById(
+  "voiceId"
+).addEventListener(
+  "change",
+  () => {
+
+    /*
+     * Credit belongs to the ElevenLabs
+     * API account configured on the server.
+     *
+     * Refreshing here allows the user
+     * to manually verify the current account.
+     */
+
+    refreshElevenLabsCredit(
+      true
+    );
+
+  }
+);
+
+
+/* =========================================================
    INITIALIZATION
 ========================================================= */
 
@@ -4558,6 +4951,8 @@ loadPodcastSettings();
 
 showRSSInfo();
 
+renderElevenLabsCredit();
+
 updateStatus(
   `Movie Podcast Generator V${APP_VERSION} ready.`
 );
@@ -4572,6 +4967,15 @@ updateStatus(
 
 updateStatus(
   "RSS snapshots are created through /api/rss/create"
+);
+
+
+/*
+ * Initial ElevenLabs credit check.
+ */
+
+refreshElevenLabsCredit(
+  true
 );
 
 </script>
