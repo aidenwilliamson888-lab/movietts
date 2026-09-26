@@ -1751,15 +1751,8 @@ function buildCTAUrl(
 /*
  * Create final CTA HTML for an actual movie.
  */
-function createCTA(
-    text,
-    urlTemplate,
-    movie
-){
-
-    const movieId =
-        movie?.id ??
-        "";
+function createCTA(text, urlTemplate, movie){
+    const movieId = movie?.id ?? "";
 
     const title =
         movie?.title ||
@@ -1768,57 +1761,25 @@ function createCTA(
         movie?.original_name ||
         "";
 
-    const year =
-        getMovieYear(
-            movie
-        );
+    const date =
+        movie?.release_date ||
+        movie?.first_air_date ||
+        "";
 
-    let url =
-        String(
-            urlTemplate || ""
-        ).trim();
+    const year = date ? String(date).slice(0, 4) : "";
 
-    url =
-        url.replace(
-            /\{ID\}/gi,
-            encodeURIComponent(
-                movieId
-            )
-        );
+    let url = String(urlTemplate || "").trim();
+    url = url.replace(/\{ID\}/gi, encodeURIComponent(movieId));
 
-    let ctaText =
-        String(
-            text || ""
-        );
+    let ctaText = String(text || "");
 
-    ctaText =
-        ctaText.replace(
-            /\{TITLE\}/gi,
-            title
-        );
+    ctaText = ctaText.replace(/\{TITLE\}/gi, title);
+    ctaText = ctaText.replace(/\{YEAR\}/gi, year);
 
-    ctaText =
-        ctaText.replace(
-            /\{YEAR\}/gi,
-            year
-        );
+    let html = FIXED_CTA_HTML;
 
-    let html =
-        FIXED_CTA_HTML;
-
-    html =
-        html.replace(
-            /\{URL\}/gi,
-            url
-        );
-
-    html =
-        html.replace(
-            /\{TEXT\}/gi,
-            normalizeText(
-                ctaText
-            )
-        );
+    html = html.replace(/\{URL\}/gi, url);
+    html = html.replace(/\{TEXT\}/gi, normalizeText(ctaText));
 
     return html;
 }
