@@ -2742,22 +2742,22 @@ function buildRSSXML(){
         $("ownerEmail")?.value.trim() || "";
 
     const items = generatedEpisodes
-        .map(episode => {
+    .map(episode => {
 
-            const description =
-                String(episode.description || "")
-                    .replace(/\s+/g, " ")
-                    .trim();
+        const description =
+            buildRSSDescription(
+                episode.description || ""
+            );
 
-            const pubDate =
-                new Date(
-                    episode.generated_at
-                ).toUTCString();
+        const pubDate =
+            new Date(
+                episode.generated_at
+            ).toUTCString();
 
-            return `
+        return `
 <item>
 <title>${xmlText(episode.title)}</title>
-<description>${episode.description}</description>
+<description>${description}</description>
 <guid isPermaLink="false">${xmlText(episode.guid)}</guid>
 <pubDate>${xmlText(pubDate)}</pubDate>
 <enclosure url="${escapeXML(episode.audio_url)}" length="${Number(episode.audio_size || 0)}" type="audio/mpeg"/>
@@ -2766,8 +2766,8 @@ function buildRSSXML(){
 <itunes:episode>${xmlText(episode.tmdb_id)}</itunes:episode>
 <itunes:image href="${escapeXML(episode.poster || artwork)}"/>
 </item>`;
-        })
-        .join("\n");
+    })
+    .join("\n");
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
