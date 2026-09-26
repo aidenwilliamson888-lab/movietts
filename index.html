@@ -631,6 +631,209 @@ small{
 
 </section>
 
+
+<!-- ELEVENLABS -->
+<section class="card">
+
+    <h2>2. ElevenLabs</h2>
+
+    <div class="card-description">
+        Configure the ElevenLabs voice and audio output.
+    </div>
+
+    <div class="grid">
+
+        <div class="field">
+
+            <label for="voiceId">
+                ElevenLabs Voice ID
+            </label>
+
+            <input
+                id="voiceId"
+                type="text"
+                placeholder="Enter Voice ID">
+
+            <div class="help">
+                The API key remains server-side in
+                <code>/api/tts</code>.
+            </div>
+
+        </div>
+
+        <div class="field">
+
+            <label>Credit Status</label>
+
+            <div class="credit-box">
+
+                <div class="credit" id="creditRemainingBox">
+                    <div class="name">Terpakai</div>
+                    <div class="value" id="creditUsed">-</div>
+                </div>
+
+                <div class="credit" id="creditUsedBox">
+                    <div class="name">Sisa</div>
+                    <div class="value" id="creditRemaining">-</div>
+                </div>
+
+                <div class="credit" id="creditLimitBox">
+                    <div class="name">Limit</div>
+                    <div class="value" id="creditLimit">-</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="field">
+
+            <label>Credit</label>
+
+            <button
+                type="button"
+                class="btn-small"
+                id="refreshCreditBtn">
+                ↻ Refresh Credit
+            </button>
+
+            <div
+                class="help"
+                id="creditStatus">
+                Click refresh to check current ElevenLabs
+                character usage.
+            </div>
+
+        </div>
+
+        <div class="field">
+
+            <label for="modelId">Model</label>
+
+            <select id="modelId">
+
+                <option value="eleven_multilingual_v2">
+                    Eleven Multilingual v2
+                </option>
+
+                <option value="eleven_turbo_v2_5">
+                    Eleven Turbo v2.5
+                </option>
+
+                <option value="eleven_flash_v2_5">
+                    Eleven Flash v2.5
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="field">
+
+            <label for="outputFormat">
+                Output Format
+            </label>
+
+            <select id="outputFormat">
+                <option value="mp3_22050_32">
+                    MP3 22050 Hz / 32 kbps
+                </option>
+
+                <option value="mp3_44100_64">
+                    MP3 44100 Hz / 64 kbps
+                </option>
+
+                <option value="mp3_44100_96">
+                    MP3 44100 Hz / 96 kbps
+                </option>
+
+                <option value="mp3_44100_128">
+                    MP3 44100 Hz / 128 kbps
+                </option>
+            </select>
+
+        </div>
+
+        <div class="field">
+
+            <label>Title Mode</label>
+
+            <div class="switch-row">
+
+                <div>
+
+                    <strong>
+                        Random title template
+                    </strong>
+
+                    <div class="help">
+                        Randomly selects one title
+                        template per movie.
+                    </div>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="randomTitle">
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- TITLE -->
+<section class="card">
+
+    <h2>3. Episode Title Templates</h2>
+
+    <div class="card-description">
+        Available variables:
+        <code>{TITLE}</code>,
+        <code>{YEAR}</code>,
+        <code>{ID}</code>.
+    </div>
+
+    <div
+        class="template-list"
+        id="titleTemplates">
+    </div>
+
+    <div class="actions">
+
+        <button
+            type="button"
+            id="addTitleTemplate">
+            + Add Template
+        </button>
+
+    </div>
+
+    <div style="margin-top:15px">
+
+        <label>Preview</label>
+
+        <div
+            class="preview"
+            id="titlePreview">
+            Movie title preview will appear here.
+        </div>
+
+    </div>
+
+</section>
+
+
 <!-- CTA -->
 <section class="card">
 
@@ -807,6 +1010,48 @@ small{
             {ID},
             {CTA1},
             {CTA2}
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- TTS -->
+<section class="card">
+
+    <h2>6. TTS Narration</h2>
+
+    <div class="card-description">
+        The generated text is sent to ElevenLabs. Keep narration
+        reasonably short because the API endpoint limits the TTS input.
+    </div>
+
+    <div class="field">
+
+        <label for="ttsTemplate">
+            Narration Template
+        </label>
+
+        <textarea
+            id="ttsTemplate"></textarea>
+
+        <div class="help">
+            Same movie variables are available.
+            Maximum supported text by the current TTS worker:
+            1500 characters.
+        </div>
+
+    </div>
+
+    <div style="margin-top:12px">
+
+        <label>Narration Preview</label>
+
+        <div
+            class="preview"
+            id="ttsPreview">
+            Narration preview will appear here.
         </div>
 
     </div>
@@ -1598,42 +1843,13 @@ function updateFixedCTAHTML(){
    VARIABLE REPLACEMENT
 ========================================================= */
 
-function replaceVariables(
+function (
     template,
     movie
 ){
 
     const safeMovie =
         movie || {};
-
-    /*
-     * YEAR FIX
-     *
-     * Try several possible date/year fields.
-     *
-     * Priority:
-     * release_date
-     * first_air_date
-     * releaseDate
-     * release_year
-     * year
-     */
-    const releaseDate =
-        safeMovie.release_date ||
-        safeMovie.first_air_date ||
-        safeMovie.releaseDate ||
-        safeMovie.release_year ||
-        safeMovie.year ||
-        "";
-
-    const yearMatch =
-        String(releaseDate)
-            .match(/\b(19|20)\d{2}\b/);
-
-    const releaseYear =
-        yearMatch
-            ? yearMatch[0]
-            : "";
 
     const values = {
 
@@ -1651,7 +1867,11 @@ function replaceVariables(
             "",
 
         YEAR:
-            releaseYear,
+            safeMovie.release_date
+                ? String(
+                    safeMovie.release_date
+                ).slice(0,4)
+                : "",
 
         OVERVIEW:
             safeMovie.overview ||
@@ -2592,6 +2812,241 @@ async function loadPodcastSettings(){
     }
 }
 
+
+/* =========================================================
+   ELEVENLABS CREDIT
+========================================================= */
+
+function extractCreditPayload(data){
+
+    let source =
+        data;
+
+
+    if(
+        data &&
+        data.data &&
+        typeof data.data === "object"
+    ){
+
+        source =
+            data.data;
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * Terpakai = character_count
+     * Limit    = character_limit
+     * Sisa     = character_limit - character_count
+     */
+
+    const usedRaw =
+        source?.character_count ??
+        source?.used ??
+        source?.characters_used;
+
+
+    const limitRaw =
+        source?.character_limit ??
+        source?.limit ??
+        source?.characters_limit;
+
+
+    const explicitRemaining =
+        source?.remaining_characters ??
+        source?.remaining ??
+        source?.characters_remaining;
+
+
+    const used =
+        Number(usedRaw);
+
+
+    const limit =
+        Number(limitRaw);
+
+
+    let remaining;
+
+
+    if(
+        explicitRemaining !== undefined &&
+        Number.isFinite(
+            Number(explicitRemaining)
+        )
+    ){
+
+        remaining =
+            Number(
+                explicitRemaining
+            );
+
+    }else if(
+        Number.isFinite(limit) &&
+        Number.isFinite(used)
+    ){
+
+        remaining =
+            Math.max(
+                0,
+                limit - used
+            );
+
+    }else{
+
+        remaining =
+            NaN;
+    }
+
+
+    return {
+
+        used:
+            Number.isFinite(used)
+                ? used
+                : null,
+
+        remaining:
+            Number.isFinite(remaining)
+                ? remaining
+                : null,
+
+        limit:
+            Number.isFinite(limit)
+                ? limit
+                : null
+    };
+}
+
+
+async function refreshElevenLabsCredit(
+    silent=false
+){
+
+    if(creditLoading){
+        return;
+    }
+
+
+    creditLoading =
+        true;
+
+
+    $("creditUsedBox")
+        .classList
+        .add("loading");
+
+    $("creditRemainingBox")
+        .classList
+        .add("loading");
+
+    $("creditLimitBox")
+        .classList
+        .add("loading");
+
+
+    if(!silent){
+
+        $("creditStatus")
+            .textContent =
+            "Refreshing ElevenLabs credit...";
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/elevenlabs-credits?t=" +
+                Date.now(),
+                {
+
+                    method:"GET",
+
+                    cache:"no-store",
+
+                    headers:{
+                        "Cache-Control":
+                            "no-cache"
+                    }
+                }
+            );
+
+
+        const data =
+            await readJSONResponse(
+                response
+            );
+
+
+        if(data.success === false){
+
+            throw new Error(
+                data.error ||
+                "ElevenLabs credit request failed."
+            );
+        }
+
+
+        const credit =
+            extractCreditPayload(
+                data
+            );
+
+
+        latestCredit =
+            credit;
+
+
+        $("creditUsed")
+            .textContent =
+            formatNumber(
+                credit.used
+            );
+
+
+        $("creditRemaining")
+            .textContent =
+            formatNumber(
+                credit.remaining
+            );
+
+
+        $("creditLimit")
+            .textContent =
+            formatNumber(
+                credit.limit
+            );
+
+
+        $("creditStatus")
+            .textContent =
+            "Credit updated successfully.";
+
+
+    }finally{
+
+        creditLoading =
+            false;
+
+
+        $("creditUsedBox")
+            .classList
+            .remove("loading");
+
+        $("creditRemainingBox")
+            .classList
+            .remove("loading");
+
+        $("creditLimitBox")
+            .classList
+            .remove("loading");
+    }
+}
+
+
 /* =========================================================
    TMDB API
 ========================================================= */
@@ -3345,6 +3800,10 @@ function buildRSSXML(
     <lastBuildDate>${escapeXML(
         lastBuildDate
     )}</lastBuildDate>
+
+    <generator>
+      Movie Podcast Generator V${APP_VERSION}
+    </generator>
 
     <itunes:author>${escapeXML(
         podcast.author
