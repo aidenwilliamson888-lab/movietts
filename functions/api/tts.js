@@ -35,99 +35,145 @@ export async function onRequestPost(context) {
     }
 
     /*
-     * Temporary Edge-TTS test
-     *
-     * No ElevenLabs.
-     * No R2.
+     * ==========================================
+     * REALWAY / OPENAI EDGE TTS
+     * ==========================================
      */
+
+    const apiKey = context.env.REALWAY_API_KEY;
+
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "REALWAY_API_KEY is missing in Cloudflare Variables & Secrets."
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
 
     const voice =
       String(body?.voiceId || "").trim() ||
       "en-US-AvaNeural";
 
-    const response =
-      await fetch(
-        "https://tts.travisvn.com/v1/audio/speech",
-        {
-          method: "POST",
+    const model =
+      String(body?.modelId || "").trim() ||
+      "tts-1";
 
-          headers: {
-            "Content-Type":
-              "application/json",
+    const outputFormat =
+      String(body?.outputFormat || "").trim() ||
+      "mp3";
 
-            "Authorization":
-              "Bearer test"
-          },
+    const fileName =
+      String(body?.fileName || "").trim() ||
+      `podcast-${Date.now()}.mp3`;
 
-          body: JSON.stringify({
-            model: "tts-1",
-            input: text,
-            voice: voice,
-            response_format: "mp3"
-          })
-        }
-      );
+    /*
+     * Railway TTS endpoint
+     */
+
+    const response = await fetch(
+      "https://openai-edge-tts-production-824f.up.railway.app/v1/audio/speech",
+      {
+        method: "POST",
+
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          model: model,
+          input: text,
+          voice: voice,
+          response_format: outputFormat
+        })
+      }
+    );
+
+    /*
+     * Handle Railway / TTS errors
+     */
 
     if (!response.ok) {
-      const errorText =
-        await response.text();
+      const errorText = await response.text();
 
       return new Response(
         JSON.stringify({
           success: false,
           error:
-            `Edge-TTS HTTP ${response.status}: ${errorText.slice(0, 1000)}`
+            `Realway TTS HTTP ${response.status}: ${errorText.slice(
+              0,
+              1500
+            )}`
         }),
         {
           status: response.status,
           headers: {
-            "Content-Type":
-              "application/json"
+            "Content-Type": "application/json"
           }
         }
       );
     }
 
-    const audio =
-      await response.arrayBuffer();
+    /*
+     * Get MP3
+     */
+
+    const audio = await response.arrayBuffer();
 
     if (!audio.byteLength) {
       return new Response(
         JSON.stringify({
           success: false,
-          error:
-            "Edge-TTS returned an empty audio file."
+          error: "Realway returned an empty audio file."
         }),
         {
           status: 502,
           headers: {
-            "Content-Type":
-              "application/json"
+            "Content-Type": "application/json"
           }
         }
       );
     }
 
-    return new Response(
-      audio,
-      {
-        status: 200,
+    /*
+     * ==========================================
+     * RETURN AUDIO TO FRONTEND
+     * ==========================================
+     *
+     * Untuk tahap ini kita return MP3 langsung.
+     * R2 bisa kita sambungkan setelah TTS
+     * sudah confirmed bekerja dari frontend.
+     */
 
-        headers: {
-          "Content-Type":
-            "audio/mpeg",
+    return new Response(audio, {
+      status: 200,
 
-          "X-Output-Format":
-            "mp3",
+      headers: {
+        "Content-Type": "audio/mpeg",
 
-          "X-Model-ID":
-            "edge-tts",
+        "Content-Length":
+          String(audio.byteLength),
 
-          "X-File-Name":
-            "test-edge-tts.mp3"
-        }
+        "X-Output-Format":
+          outputFormat,
+
+        "X-Model-ID":
+          model,
+
+        "X-File-Name":
+          fileName,
+
+        "Cache-Control":
+          "no-store"
       }
-    );
+    });
 
   } catch (error) {
 
@@ -136,13 +182,12 @@ export async function onRequestPost(context) {
         success: false,
         error:
           error?.message ||
-          "Unknown Edge-TTS error."
+          "Unknown Realway TTS error."
       }),
       {
         status: 500,
         headers: {
-          "Content-Type":
-            "application/json"
+          "Content-Type": "application/json"
         }
       }
     );
