@@ -3026,21 +3026,6 @@ async function refreshElevenLabsCredit(
             "Credit updated successfully.";
 
 
-    }catch(error){
-
-        console.error(
-            "ElevenLabs credit error:",
-            error
-        );
-
-
-        $("creditStatus")
-            .textContent =
-            silent
-                ? "Credit unavailable."
-                : `Credit error: ${error.message}`;
-
-
     }finally{
 
         creditLoading =
