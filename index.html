@@ -2781,8 +2781,10 @@ function buildRSSXML(){
                     return `
 <item>
 <title>${xmlText(episode.title)}</title>
-<description>${buildRSSDescription(episode.description)}</description>
-<guid isPermaLink="false">${xmlText(episode.guid)}</guid>
+<description>${String(episode.description || "")
+    .replace(/\s+/g, " ")
+    .replace(/>\s+</g, "><")
+    .trim()}</description><guid isPermaLink="false">${xmlText(episode.guid)}</guid>
 <pubDate>${xmlText(pubDate)}</pubDate>
 <enclosure url="${escapeXML(episode.audio_url)}" length="${Number(episode.audio_size || 0)}" type="audio/mpeg"/>
 <itunes:episodeType>full</itunes:episodeType>
