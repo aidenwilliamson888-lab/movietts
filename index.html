@@ -3714,7 +3714,7 @@ function buildRSSXML(
 
 
     const feedUrl =
-        `${location.origin}/api/rss`;
+        `${location.origin}/rss.xml`;
 
 
     const lastBuildDate =
@@ -3788,10 +3788,6 @@ function buildRSSXML(
         podcast.podcast_title
     )}</title>
 
-    <link>${escapeXML(
-        website
-    )}</link>
-
     <description>${escapeXML(
         podcast.podcast_description
     )}</description>
@@ -3808,11 +3804,6 @@ function buildRSSXML(
     <generator>
       Movie Podcast Generator V${APP_VERSION}
     </generator>
-
-    <atom:link
-      href="${escapeXML(feedUrl)}"
-      rel="self"
-      type="application/rss+xml"/>
 
     <itunes:author>${escapeXML(
         podcast.author
@@ -3851,10 +3842,6 @@ function buildRSSXML(
       <title>${escapeXML(
           podcast.podcast_title
       )}</title>
-
-      <link>${escapeXML(
-          website
-      )}</link>
 
     </image>
 
@@ -3916,7 +3903,7 @@ async function generateRSS(){
     latestRSS = {
 
         url:
-            `${location.origin}/api/rss`,
+            `${location.origin}/rss.xml`,
 
         filename:
             "rss.xml",
@@ -4157,7 +4144,7 @@ rss-episodes.json
 LIVE RSS
 ========
 
-${location.origin}/api/rss
+${location.origin}/rss.xml
 
 
 IMPORTANT
@@ -4170,7 +4157,7 @@ and the current manifest.
 
 Use the Live RSS URL in your podcast host:
 
-${location.origin}/api/rss
+${location.origin}/rss.xml
 
 
 CTA
