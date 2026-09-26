@@ -1,12 +1,12 @@
-
-const RSS_VERSION = "2.6.1";
+const RSS_VERSION = "2.9";
 
 const DEFAULT_ARTWORK =
   "https://movietts.pages.dev/default-podcast-artwork.jpg";
 
-/**
- * Escape special XML characters safely.
- */
+/* =========================
+   XML HELPERS
+========================= */
+
 function xmlEscape(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -16,23 +16,41 @@ function xmlEscape(value) {
     .replace(/'/g, "&apos;");
 }
 
-/**
- * Escape XML attribute values.
+/*
+ * Description sengaja TIDAK di-escape.
+ * Tujuannya supaya HTML seperti:
+ *
+ * <p><a href="...">👉🎬 Xem Movie</a></p>
+ *
+ * tetap tampil sebagai HTML di RSS.
  */
+function rssDescription(value) {
+  let text = String(value ?? "");
+
+  /*
+   * Escape hanya "&" yang bukan bagian dari
+   * entity HTML/XML yang sudah valid.
+   */
+  text = text.replace(
+    /&(?!amp;|lt;|gt;|quot;|apos;|nbsp;|#\d+;|#x[0-9a-fA-F]+;)/g,
+    "&amp;"
+  );
+
+  return text;
+}
+
 function xmlAttribute(value) {
   return xmlEscape(value);
 }
 
-/**
- * Ensure URL has no trailing slash.
- */
+/* =========================
+   URL
+========================= */
+
 function cleanBaseUrl(value) {
   return String(value ?? "").replace(/\/+$/, "");
 }
 
-/**
- * Convert a value into a valid absolute URL when possible.
- */
 function normalizeUrl(value, fallback = "") {
   const raw = String(value ?? "").trim();
 
@@ -47,9 +65,10 @@ function normalizeUrl(value, fallback = "") {
   }
 }
 
-/**
- * Return a valid RFC 822 date.
- */
+/* =========================
+   DATE
+========================= */
+
 function formatPubDate(value) {
   if (!value) {
     return new Date().toUTCString();
@@ -64,26 +83,31 @@ function formatPubDate(value) {
   return date.toUTCString();
 }
 
-/**
- * Convert duration values into HH:MM:SS.
- *
- * Supports:
- * - HH:MM:SS
- * - MM:SS
- * - seconds
- * - minutes
- */
+/* =========================
+   DURATION
+========================= */
+
 function formatDuration(value) {
-  if (value === null || value === undefined || value === "") {
-    return "00:00:00";
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "";
   }
 
   const raw = String(value).trim();
 
+  /*
+   * HH:MM:SS
+   */
   if (/^\d{1,2}:\d{2}:\d{2}$/.test(raw)) {
     return raw;
   }
 
+  /*
+   * MM:SS
+   */
   if (/^\d{1,2}:\d{2}$/.test(raw)) {
     return `00:${raw}`;
   }
@@ -91,14 +115,20 @@ function formatDuration(value) {
   const numeric = Number(raw);
 
   if (!Number.isFinite(numeric) || numeric <= 0) {
-    return "00:00:00";
+    return "";
   }
 
-  // Existing manifest duration is stored in minutes.
+  /*
+   * Manifest menyimpan duration dalam menit.
+   */
   const totalSeconds = Math.round(numeric * 60);
 
   const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  const minutes = Math.floor(
+    (totalSeconds % 3600) / 60
+  );
+
   const seconds = totalSeconds % 60;
 
   return [
@@ -108,22 +138,27 @@ function formatDuration(value) {
   ].join(":");
 }
 
-/**
- * Convert byte count into a valid enclosure length.
- */
+/* =========================
+   AUDIO SIZE
+========================= */
+
 function formatAudioLength(value) {
   const numeric = Number(value);
 
-  if (!Number.isFinite(numeric) || numeric < 0) {
+  if (
+    !Number.isFinite(numeric) ||
+    numeric < 0
+  ) {
     return "0";
   }
 
   return String(Math.round(numeric));
 }
 
-/**
- * Fetch JSON from the upload Worker.
- */
+/* =========================
+   WORKER
+========================= */
+
 async function fetchWorkerJson(url, secret) {
   const response = await fetch(url, {
     method: "GET",
@@ -145,31 +180,39 @@ async function fetchWorkerJson(url, secret) {
 
   if (!response.ok) {
     throw new Error(
-      `Worker request failed: ${response.status} ${text.slice(0, 300)}`
+      `Worker request failed: ${response.status} ${text.slice(
+        0,
+        300
+      )}`
     );
   }
 
   return data;
 }
 
-/**
- * Extract a usable object from different Worker response formats.
- */
+/* =========================
+   UNWRAP
+========================= */
+
 function unwrapData(data) {
   if (!data || typeof data !== "object") {
     return {};
   }
 
-  if (data.data && typeof data.data === "object") {
+  if (
+    data.data &&
+    typeof data.data === "object"
+  ) {
     return data.data;
   }
 
   return data;
 }
 
-/**
- * Normalize podcast configuration.
- */
+/* =========================
+   PODCAST CONFIG
+========================= */
+
 function normalizeConfig(raw) {
   const config = unwrapData(raw);
 
@@ -227,7 +270,8 @@ function normalizeConfig(raw) {
 
     explicit:
       config.explicit === true ||
-      String(config.explicit).toLowerCase() === "true"
+      String(config.explicit).toLowerCase() ===
+        "true"
         ? "true"
         : "false",
 
@@ -239,28 +283,37 @@ function normalizeConfig(raw) {
   };
 }
 
-/**
- * Normalize manifest episodes.
- */
+/* =========================
+   EPISODES
+========================= */
+
 function normalizeEpisodes(raw) {
   if (Array.isArray(raw)) {
     return raw;
   }
 
-  if (raw && Array.isArray(raw.episodes)) {
+  if (
+    raw &&
+    Array.isArray(raw.episodes)
+  ) {
     return raw.episodes;
   }
 
-  if (raw && raw.data && Array.isArray(raw.data.episodes)) {
+  if (
+    raw &&
+    raw.data &&
+    Array.isArray(raw.data.episodes)
+  ) {
     return raw.data.episodes;
   }
 
   return [];
 }
 
-/**
- * Get an episode's audio URL.
- */
+/* =========================
+   EPISODE DATA
+========================= */
+
 function getAudioUrl(episode) {
   return String(
     episode.audio_url ||
@@ -272,13 +325,13 @@ function getAudioUrl(episode) {
   ).trim();
 }
 
-/**
- * Get an episode's unique identifier.
- */
-function getEpisodeGuid(episode, audioUrl, index) {
+function getEpisodeGuid(
+  episode,
+  audioUrl,
+  index
+) {
   return String(
     episode.guid ||
-      episode.id ||
       episode.audio_key ||
       episode.audioKey ||
       audioUrl ||
@@ -286,10 +339,10 @@ function getEpisodeGuid(episode, audioUrl, index) {
   ).trim();
 }
 
-/**
- * Get episode title.
- */
-function getEpisodeTitle(episode, index) {
+function getEpisodeTitle(
+  episode,
+  index
+) {
   return String(
     episode.title ||
       episode.name ||
@@ -297,10 +350,13 @@ function getEpisodeTitle(episode, index) {
   ).trim();
 }
 
-/**
- * Get episode description.
- */
 function getEpisodeDescription(episode) {
+  /*
+   * PRIORITAS UTAMA:
+   * description yang sudah dibuat generator.
+   *
+   * Jangan dibuat ulang.
+   */
   return String(
     episode.description ||
       episode.summary ||
@@ -309,10 +365,10 @@ function getEpisodeDescription(episode) {
   ).trim();
 }
 
-/**
- * Get episode artwork.
- */
-function getEpisodeArtwork(episode, fallbackArtwork) {
+function getEpisodeArtwork(
+  episode,
+  fallbackArtwork
+) {
   return String(
     episode.artwork_url ||
       episode.artworkUrl ||
@@ -323,109 +379,182 @@ function getEpisodeArtwork(episode, fallbackArtwork) {
   ).trim();
 }
 
-/**
- * Get episode publication date.
- */
 function getEpisodeDate(episode) {
   return (
     episode.pubDate ||
     episode.pub_date ||
     episode.publishedAt ||
     episode.published_at ||
+    episode.generated_at ||
+    episode.generatedAt ||
     episode.createdAt ||
     episode.created_at ||
     new Date().toISOString()
   );
 }
 
-/**
- * Build one RSS item.
+/*
+ * Ambil TMDB Movie ID.
+ *
+ * Jangan menggunakan episode.id sebagai fallback
+ * karena id tersebut belum tentu TMDB ID.
  */
-function buildEpisodeXml(episode, index, artworkUrl) {
+function getMovieId(episode) {
+  return String(
+    episode.movie_id ||
+      episode.movieId ||
+      episode.tmdb_id ||
+      episode.tmdbId ||
+      episode.tmdbID ||
+      ""
+  ).trim();
+}
+
+/* =========================
+   BUILD ITEM
+========================= */
+
+function buildEpisodeXml(
+  episode,
+  index,
+  artworkUrl
+) {
   const audioUrl = getAudioUrl(episode);
 
   if (!audioUrl) {
     return "";
   }
 
-  const title = getEpisodeTitle(episode, index);
-  const description = getEpisodeDescription(episode);
-  const guid = getEpisodeGuid(episode, audioUrl, index);
-  const pubDate = formatPubDate(getEpisodeDate(episode));
-  const audioLength = formatAudioLength(
-    episode.audio_size ||
-      episode.audioSize ||
-      episode.file_size ||
-      episode.fileSize ||
-      episode.size ||
-      0
-  );
-
-  const duration = formatDuration(
-    episode.duration ||
-      episode.duration_minutes ||
-      episode.durationMinutes ||
-      episode.length_minutes ||
-      episode.lengthMinutes ||
-      0
-  );
-
-  const episodeArtwork = getEpisodeArtwork(
-    episode,
-    artworkUrl
-  );
-
-  const episodeType = String(
-    episode.episode_type ||
-      episode.episodeType ||
-      "full"
-  ).trim();
-
-  const imageXml = episodeArtwork
-    ? `
-      <itunes:image href="${xmlAttribute(episodeArtwork)}" />`
-    : "";
-
-  return `
-    <item>
-      <title>${xmlEscape(title)}</title>
-
-      <description>${xmlEscape(description)}</description>
-
-      <guid isPermaLink="false">${xmlEscape(guid)}</guid>
-
-      <pubDate>${xmlEscape(pubDate)}</pubDate>
-
-      <enclosure
-        url="${xmlAttribute(audioUrl)}"
-        length="${xmlAttribute(audioLength)}"
-        type="audio/mpeg"
-      />
-
-      <itunes:episodeType>${xmlEscape(episodeType)}</itunes:episodeType>
-
-      <itunes:duration>${xmlEscape(duration)}</itunes:duration>
-      ${imageXml}
-
-    </item>`;
-}
-
-/**
- * GET /api/rss
- */
-export async function onRequestGet(context) {
-  try {
-    const env = context.env || {};
-
-    const workerUrl = cleanBaseUrl(
-      env.R2_UPLOAD_URL || ""
+  const title =
+    getEpisodeTitle(
+      episode,
+      index
     );
 
-    const workerSecret = String(
-      env.R2_UPLOAD_SECRET || ""
-    ).trim();
+  const description =
+    getEpisodeDescription(
+      episode
+    );
 
-    if (!workerUrl || !workerSecret) {
+  const guid =
+    getEpisodeGuid(
+      episode,
+      audioUrl,
+      index
+    );
+
+  const pubDate =
+    formatPubDate(
+      getEpisodeDate(episode)
+    );
+
+  const audioLength =
+    formatAudioLength(
+      episode.audio_size ||
+        episode.audioSize ||
+        episode.file_size ||
+        episode.fileSize ||
+        episode.size ||
+        0
+    );
+
+  const duration =
+    formatDuration(
+      episode.duration ||
+        episode.duration_minutes ||
+        episode.durationMinutes ||
+        episode.length_minutes ||
+        episode.lengthMinutes ||
+        ""
+    );
+
+  const episodeArtwork =
+    getEpisodeArtwork(
+      episode,
+      artworkUrl
+    );
+
+  const movieId =
+    getMovieId(episode);
+
+  /*
+   * Duration:
+   *
+   * Kalau kosong:
+   * <itunes:duration/>
+   *
+   * Kalau ada:
+   * <itunes:duration>01:30:00</itunes:duration>
+   */
+  const durationXml =
+    duration
+      ? `<itunes:duration>${xmlEscape(
+          duration
+        )}</itunes:duration>`
+      : `<itunes:duration/>`;
+
+  /*
+   * Episode number / TMDB ID.
+   */
+  const episodeNumberXml =
+    movieId
+      ? `<itunes:episode>${xmlEscape(
+          movieId
+        )}</itunes:episode>`
+      : "";
+
+  /*
+   * Poster TMDB.
+   */
+  const imageXml =
+    episodeArtwork
+      ? `<itunes:image href="${xmlAttribute(
+          episodeArtwork
+        )}"/>`
+      : "";
+
+  /*
+   * PENTING:
+   * Description TIDAK memakai xmlEscape().
+   */
+  return `<item>
+<title>${xmlEscape(title)}</title>
+<description>${rssDescription(description)}</description>
+<guid isPermaLink="false">${xmlEscape(guid)}</guid>
+<pubDate>${xmlEscape(pubDate)}</pubDate>
+<enclosure url="${xmlAttribute(audioUrl)}" length="${xmlAttribute(audioLength)}" type="audio/mpeg"/>
+<itunes:episodeType>full</itunes:episodeType>
+${durationXml}
+${episodeNumberXml}
+${imageXml}
+</item>`;
+}
+
+/* =========================
+   GET /api/rss
+========================= */
+
+export async function onRequestGet(
+  context
+) {
+  try {
+    const env =
+      context.env || {};
+
+    const workerUrl =
+      cleanBaseUrl(
+        env.R2_UPLOAD_URL || ""
+      );
+
+    const workerSecret =
+      String(
+        env.R2_UPLOAD_SECRET || ""
+      ).trim();
+
+    if (
+      !workerUrl ||
+      !workerSecret
+    ) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -435,170 +564,231 @@ export async function onRequestGet(context) {
         {
           status: 500,
           headers: {
-            "Content-Type": "application/json; charset=utf-8",
+            "Content-Type":
+              "application/json; charset=utf-8",
           },
         }
       );
     }
 
-    const [configResponse, manifestResponse] =
-      await Promise.all([
-        fetchWorkerJson(
-          `${workerUrl}/podcast-config`,
-          workerSecret
-        ),
+    /*
+     * Ambil config + manifest
+     * langsung dari Worker.
+     */
+    const [
+      configResponse,
+      manifestResponse,
+    ] = await Promise.all([
+      fetchWorkerJson(
+        `${workerUrl}/podcast-config`,
+        workerSecret
+      ),
 
-        fetchWorkerJson(
-          `${workerUrl}/manifest`,
-          workerSecret
-        ),
-      ]);
+      fetchWorkerJson(
+        `${workerUrl}/manifest`,
+        workerSecret
+      ),
+    ]);
 
-    const config = normalizeConfig(configResponse);
-    const episodes = normalizeEpisodes(manifestResponse);
+    const config =
+      normalizeConfig(
+        configResponse
+      );
 
-    const requestUrl = new URL(context.request.url);
+    const episodes =
+      normalizeEpisodes(
+        manifestResponse
+      );
 
-    const selfUrl = `${requestUrl.origin}/api/rss`;
+    const artworkUrl =
+      normalizeUrl(
+        config.artworkUrl,
+        DEFAULT_ARTWORK
+      );
 
-    const artworkUrl = normalizeUrl(
-      config.artworkUrl,
-      DEFAULT_ARTWORK
-    );
+    const author =
+      config.author;
 
-    const websiteUrl = normalizeUrl(
-      config.websiteUrl,
-      requestUrl.origin
-    );
+    const email =
+      config.email;
 
-    const author = config.author;
-    const email = config.email;
-
-    /**
-     * Important:
-     * Keep email inside itunes:owner.
-     * Do not add a standalone itunes:email at channel level.
+    /*
+     * Owner
      */
     const ownerXml =
       author || email
-        ? `
-    <itunes:owner>
-      <itunes:name>${xmlEscape(author)}</itunes:name>
-      <itunes:email>${xmlEscape(email)}</itunes:email>
-    </itunes:owner>`
+        ? `<itunes:owner>
+<itunes:name>${xmlEscape(author)}</itunes:name>
+<itunes:email>${xmlEscape(email)}</itunes:email>
+</itunes:owner>`
         : "";
 
-    const channelImageXml = artworkUrl
-      ? `
-    <itunes:image href="${xmlAttribute(artworkUrl)}" />`
-      : "";
+    /*
+     * Channel artwork
+     */
+    const channelImageXml =
+      artworkUrl
+        ? `<itunes:image href="${xmlAttribute(
+            artworkUrl
+          )}"/>`
+        : "";
 
-    const standardImageXml = artworkUrl
-      ? `
-    <image>
-      <url>${xmlEscape(artworkUrl)}</url>
-      <title>${xmlEscape(config.title)}</title>
-      <link>${xmlEscape(websiteUrl)}</link>
-    </image>`
-      : "";
+    /*
+     * Standard RSS image.
+     *
+     * Sesuai contoh user:
+     * hanya url + title.
+     */
+    const standardImageXml =
+      artworkUrl
+        ? `<image>
+<url>${xmlEscape(
+            artworkUrl
+          )}</url>
+<title>${xmlEscape(
+            config.title
+          )}</title>
+</image>`
+        : "";
 
-    const categoryXml = config.category
-      ? `
-    <itunes:category text="${xmlAttribute(config.category)}" />`
-      : "";
+    /*
+     * Category
+     */
+    const categoryXml =
+      config.category
+        ? `<itunes:category text="${xmlAttribute(
+            config.category
+          )}"/>`
+        : "";
 
-    const episodeXml = episodes
-      .map((episode, index) =>
-        buildEpisodeXml(
-          episode,
-          index,
-          artworkUrl
+    /*
+     * Episodes
+     */
+    const episodeXml =
+      episodes
+        .map(
+          (
+            episode,
+            index
+          ) =>
+            buildEpisodeXml(
+              episode,
+              index,
+              artworkUrl
+            )
         )
-      )
-      .filter(Boolean)
-      .join("\n");
+        .filter(Boolean)
+        .join("\n");
 
-    const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss
-  version="2.0"
-  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
-  xmlns:content="http://purl.org/rss/1.0/modules/content/"
-  xmlns:atom="http://www.w3.org/2005/Atom"
->
-  <channel>
+    /*
+     * Last build date
+     */
+    const lastBuildDate =
+      episodes.length > 0
+        ? formatPubDate(
+            getEpisodeDate(
+              episodes[0]
+            )
+          )
+        : new Date().toUTCString();
 
-    <title>${xmlEscape(config.title)}</title>
+    /*
+     * REQUEST URL
+     */
+    const requestUrl =
+      new URL(
+        context.request.url
+      );
 
-    <link>${xmlEscape(websiteUrl)}</link>
-
-    <description>${xmlEscape(config.description)}</description>
-
-    <language>${xmlEscape(config.language)}</language>
-
-    <lastBuildDate>${xmlEscape(
-      new Date().toUTCString()
+    /*
+     * RSS FINAL
+     *
+     * Tidak ada:
+     * - XML declaration
+     * - blank line
+     * - indentation
+     * - atom:link
+     * - channel <link>
+     *
+     * Sesuai contoh user.
+     */
+    const rssXml = `<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<channel>
+<title>${xmlEscape(
+      config.title
+    )}</title>
+<description>${xmlEscape(
+      config.description
+    )}</description>
+<language>${xmlEscape(
+      config.language
+    )}</language>
+<lastBuildDate>${xmlEscape(
+      lastBuildDate
     )}</lastBuildDate>
-
-    <generator>Movie Podcast Generator V${RSS_VERSION}</generator>
-
-    <atom:link
-      href="${xmlAttribute(selfUrl)}"
-      rel="self"
-      type="application/rss+xml"
-    />
-
-    <itunes:author>${xmlEscape(author)}</itunes:author>
-
-    <itunes:summary>${xmlEscape(
+<generator> Movie Podcast Generator V${RSS_VERSION} </generator>
+<itunes:author>${xmlEscape(
+      author
+    )}</itunes:author>
+<itunes:summary>${xmlEscape(
       config.description
     )}</itunes:summary>
-
-    <itunes:explicit>${xmlEscape(
+<itunes:explicit>${xmlEscape(
       config.explicit
     )}</itunes:explicit>
-
-    <itunes:type>${xmlEscape(
+<itunes:type>${xmlEscape(
       config.type
     )}</itunes:type>
-
-    ${categoryXml}
-
-    ${channelImageXml}
-
-    ${ownerXml}
-
-    ${standardImageXml}
-
-    ${episodeXml}
-
-  </channel>
+${categoryXml}
+${channelImageXml}
+${standardImageXml}
+${ownerXml}
+${episodeXml}
+</channel>
 </rss>`;
 
-    return new Response(rssXml, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/rss+xml; charset=utf-8",
-        "Cache-Control":
-          "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    return new Response(
+      rssXml,
+      {
+        status: 200,
+        headers: {
+          "Content-Type":
+            "application/rss+xml; charset=utf-8",
+
+          "Cache-Control":
+            "no-cache, no-store, must-revalidate",
+
+          Pragma: "no-cache",
+
+          Expires: "0",
+
+          "Access-Control-Allow-Origin":
+            "*",
+        },
+      }
+    );
   } catch (error) {
-    console.error("RSS generation error:", error);
+    console.error(
+      "RSS generation error:",
+      error
+    );
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: "Failed to generate RSS feed.",
-        message: error.message,
+        error:
+          "Failed to generate RSS feed.",
+        message:
+          error.message,
       }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json; charset=utf-8",
-          "Access-Control-Allow-Origin": "*",
+          "Content-Type":
+            "application/json; charset=utf-8",
+
+          "Access-Control-Allow-Origin":
+            "*",
         },
       }
     );
