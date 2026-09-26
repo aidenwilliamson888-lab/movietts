@@ -2714,127 +2714,130 @@ function buildRSSDescription(description){
 
 function buildRSSXML(){
 
-    const podcastTitle =
-        $("podcastTitle")
-            .value
-            .trim();
+    const settings = getSettings();
 
+    const podcastTitle =
+        String(settings.podcastTitle || "Movie Podcast").trim();
 
     const podcastAuthor =
-        $("podcastAuthor")
-            .value
-            .trim();
-
-
-    const podcastLanguage =
-        $("podcastLanguage")
-            .value
-            .trim();
-
+        String(settings.podcastAuthor || podcastTitle).trim();
 
     const podcastDescription =
-        $("podcastDescription")
-            .value
+        String(settings.podcastDescription || "Movie podcast")
+            .replace(/\s+/g, " ")
             .trim();
-
-
-    const ownerName =
-        $("ownerName")
-            .value
-            .trim();
-
-
-    const ownerEmail =
-        $("ownerEmail")
-            .value
-            .trim();
-
-
-    const category =
-        $("podcastCategory")
-            .value
-            .trim();
-
-
-    const podcastType =
-        $("podcastType")
-            .value;
-
-
-    const explicit =
-        $("explicit")
-            .value;
-
 
     const artwork =
-        $("artworkUrl")
-            .value
-            .trim() ||
-        DEFAULT_ARTWORK;
+        String(settings.artwork || DEFAULT_ARTWORK).trim();
 
+    const website =
+        String(settings.website || "").trim();
 
-    const now =
-        new Date();
+    const language =
+        String(settings.language || "en-us").trim();
 
+    const explicit =
+        String(settings.explicit || "true").trim();
 
-    const lastBuildDate =
-        now.toUTCString();
+    const category =
+        String(settings.category || "TV & Film").trim();
 
+    const ownerName =
+        String(settings.ownerName || podcastAuthor).trim();
 
-    const items =
-        generatedEpisodes
-            .map(
-                episode => {
+    const ownerEmail =
+        String(settings.ownerEmail || "").trim();
 
-                    const pubDate =
-                        new Date(
-                            episode.generated_at
-                        )
-                        .toUTCString();
+    const channelDescription =
+        podcastDescription
+            .replace(/\s+/g, " ")
+            .trim();
 
+    const items = generatedEpisodes.map(episode => {
 
-                    return `
-<item>
-<title>${xmlText(episode.title)}</title>
-<description>${episode.description}</description>
-<guid isPermaLink="false">${xmlText(episode.guid)}</guid>
-<pubDate>${xmlText(pubDate)}</pubDate>
-<enclosure url="${escapeXML(episode.audio_url)}" length="${Number(episode.audio_size || 0)}" type="audio/mpeg"/>
-<itunes:episodeType>full</itunes:episodeType>
-<itunes:duration>${xmlText(episode.duration || "")}</itunes:duration>
-<itunes:episode>${xmlText(episode.tmdb_id)}</itunes:episode>
-<itunes:image href="${escapeXML(episode.poster || artwork)}"/>
-</item>`;
-                }
-            )
-            .join("\n");
+        const title =
+            String(episode.title || "")
+                .replace(/\s+/g, " ")
+                .trim();
 
+        const description =
+            String(episode.description || "")
+                .replace(/\s+/g, " ")
+                .trim();
 
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
-<channel>
-<title>${xmlText(podcastTitle)}</title>
-<description>${xmlText(podcastDescription)}</description>
-<language>${xmlText(podcastLanguage)}</language>
-<lastBuildDate>${xmlText(lastBuildDate)}</lastBuildDate>
-<generator> Movie Podcast Generator V3.0 </generator>
-<itunes:author>${xmlText(podcastAuthor)}</itunes:author>
-<itunes:summary>${xmlText(podcastDescription)}</itunes:summary>
-<itunes:explicit>${xmlText(explicit)}</itunes:explicit>
-<itunes:type>${xmlText(podcastType)}</itunes:type>
-<itunes:category text="${escapeXML(category)}"/>
-<itunes:image href="${escapeXML(artwork)}"/>
-<image>
-<url>${escapeXML(artwork)}</url>
-<title>${xmlText(podcastTitle)}</title>
-</image>
-<itunes:owner>
-<itunes:name>${xmlText(ownerName)}</itunes:name>
-<itunes:email>${xmlText(ownerEmail)}</itunes:email>
-</itunes:owner>
-${items}
-</channel>
-</rss>`;
+        const guid =
+            String(episode.guid || "")
+                .replace(/\s+/g, " ")
+                .trim();
+
+        const pubDate =
+            new Date(
+                episode.generated_at || Date.now()
+            ).toUTCString();
+
+        const audioUrl =
+            String(episode.audio_url || "").trim();
+
+        const audioSize =
+            Number(episode.audio_size || 0);
+
+        const duration =
+            String(episode.duration || "").trim();
+
+        const tmdbId =
+            String(episode.tmdb_id || episode.id || "").trim();
+
+        const poster =
+            String(
+                episode.poster ||
+                artwork
+            ).trim();
+
+        return [
+            "<item>",
+            `<title>${xmlText(title)}</title>`,
+            `<description>${xmlText(description, true)}</description>`,
+            `<guid isPermaLink="false">${xmlText(guid)}</guid>`,
+            `<pubDate>${xmlText(pubDate)}</pubDate>`,
+            `<enclosure url="${escapeXML(audioUrl)}" length="${audioSize}" type="audio/mpeg"/>`,
+            "<itunes:episodeType>full</itunes:episodeType>",
+            duration
+                ? `<itunes:duration>${xmlText(duration)}</itunes:duration>`
+                : "<itunes:duration/>",
+            `<itunes:episode>${xmlText(tmdbId)}</itunes:episode>`,
+            `<itunes:image href="${escapeXML(poster)}"/>`,
+            "</item>"
+        ].join("\n");
+
+    }).join("\n");
+
+    return [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">',
+        "<channel>",
+        `<title>${xmlText(podcastTitle)}</title>`,
+        `<description>${xmlText(channelDescription)}</description>`,
+        `<language>${xmlText(language)}</language>`,
+        `<lastBuildDate>${xmlText(new Date().toUTCString())}</lastBuildDate>`,
+        "<generator>Movie Podcast Generator V3.0</generator>",
+        `<itunes:author>${xmlText(podcastAuthor)}</itunes:author>`,
+        `<itunes:summary>${xmlText(channelDescription)}</itunes:summary>`,
+        `<itunes:explicit>${xmlText(explicit)}</itunes:explicit>`,
+        `<itunes:type>episodic</itunes:type>`,
+        `<itunes:category text="${escapeXML(category)}"/>`,
+        `<itunes:image href="${escapeXML(artwork)}"/>`,
+        "<image>",
+        `<url>${escapeXML(artwork)}</url>`,
+        `<title>${xmlText(podcastTitle)}</title>`,
+        "</image>",
+        "<itunes:owner>",
+        `<itunes:name>${xmlText(ownerName)}</itunes:name>`,
+        `<itunes:email>${xmlText(ownerEmail)}</itunes:email>`,
+        "</itunes:owner>",
+        items,
+        "</channel>",
+        "</rss>"
+    ].join("\n");
 }
 
 
