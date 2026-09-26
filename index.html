@@ -1751,8 +1751,15 @@ function buildCTAUrl(
 /*
  * Create final CTA HTML for an actual movie.
  */
-function createCTA(text, urlTemplate, movie){
-    const movieId = movie?.id ?? "";
+function createCTA(
+    text,
+    urlTemplate,
+    movie
+){
+
+    const movieId =
+        movie?.id ??
+        "";
 
     const title =
         movie?.title ||
@@ -1761,25 +1768,57 @@ function createCTA(text, urlTemplate, movie){
         movie?.original_name ||
         "";
 
-    const date =
-        movie?.release_date ||
-        movie?.first_air_date ||
-        "";
+    const year =
+        getMovieYear(
+            movie
+        );
 
-    const year = date ? String(date).slice(0, 4) : "";
+    let url =
+        String(
+            urlTemplate || ""
+        ).trim();
 
-    let url = String(urlTemplate || "").trim();
-    url = url.replace(/\{ID\}/gi, encodeURIComponent(movieId));
+    url =
+        url.replace(
+            /\{ID\}/gi,
+            encodeURIComponent(
+                movieId
+            )
+        );
 
-    let ctaText = String(text || "");
+    let ctaText =
+        String(
+            text || ""
+        );
 
-    ctaText = ctaText.replace(/\{TITLE\}/gi, title);
-    ctaText = ctaText.replace(/\{YEAR\}/gi, year);
+    ctaText =
+        ctaText.replace(
+            /\{TITLE\}/gi,
+            title
+        );
 
-    let html = FIXED_CTA_HTML;
+    ctaText =
+        ctaText.replace(
+            /\{YEAR\}/gi,
+            year
+        );
 
-    html = html.replace(/\{URL\}/gi, url);
-    html = html.replace(/\{TEXT\}/gi, normalizeText(ctaText));
+    let html =
+        FIXED_CTA_HTML;
+
+    html =
+        html.replace(
+            /\{URL\}/gi,
+            url
+        );
+
+    html =
+        html.replace(
+            /\{TEXT\}/gi,
+            normalizeText(
+                ctaText
+            )
+        );
 
     return html;
 }
@@ -1843,7 +1882,7 @@ function updateFixedCTAHTML(){
    VARIABLE REPLACEMENT
 ========================================================= */
 
-function replaceVariables(
+function (
     template,
     movie
 ){
