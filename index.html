@@ -2692,6 +2692,19 @@ function buildRSSDescription(description){
         .replace(/\s{2,}/g, " ")
         .trim();
 }
+    function debugRSSDescription(description){
+
+    const result = String(description ?? "")
+        .replace(/\s+/g, " ")
+        .replace(/>\s+</g, "><")
+        .trim();
+
+    console.log("=== RSS DESCRIPTION DEBUG ===");
+    console.log("BEFORE:", JSON.stringify(description));
+    console.log("AFTER :", JSON.stringify(result));
+
+    return result;
+}
 
 /* =========================================================
    RSS XML
@@ -2781,7 +2794,7 @@ function buildRSSXML(){
                     return `
 <item>
 <title>${xmlText(episode.title)}</title>
-<description>${buildRSSDescription(episode.description)}</description>
+<description>${debugRSSDescription(episode.description)}</description>
 <guid isPermaLink="false">${xmlText(episode.guid)}</guid>
 <pubDate>${xmlText(pubDate)}</pubDate>
 <enclosure url="${escapeXML(episode.audio_url)}" length="${Number(episode.audio_size || 0)}" type="audio/mpeg"/>
