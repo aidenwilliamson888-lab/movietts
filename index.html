@@ -2757,7 +2757,7 @@ function buildRSSXML(){
             return `
 <item>
 <title>${xmlText(episode.title)}</title>
-<description>${description}</description>
+<description>${episode.description}</description>
 <guid isPermaLink="false">${xmlText(episode.guid)}</guid>
 <pubDate>${xmlText(pubDate)}</pubDate>
 <enclosure url="${escapeXML(episode.audio_url)}" length="${Number(episode.audio_size || 0)}" type="audio/mpeg"/>
