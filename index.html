@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Movie Podcast Generator V2.6</title>
+  <title>Movie Podcast Generator V2.7</title>
 
   <meta
     name="description"
-    content="TMDB Movie Podcast Generator with ElevenLabs TTS, Cloudflare R2 storage and persistent RSS."
+    content="TMDB Movie Podcast Generator with ElevenLabs TTS, Cloudflare R2 storage and independent RSS snapshots."
   >
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -342,6 +342,10 @@
       .header h1 {
         font-size: 24px;
       }
+
+      .url-box {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -353,11 +357,11 @@
   <div class="header">
     <h1>
       Movie Podcast Generator
-      <span class="version">V2.6 RSS ENGINE</span>
+      <span class="version">V2.7 RSS SNAPSHOT</span>
     </h1>
 
     <p>
-      TMDB → ElevenLabs → Cloudflare R2 → Persistent RSS
+      TMDB → ElevenLabs → Cloudflare R2 → Independent RSS Snapshots
     </p>
   </div>
 
@@ -370,9 +374,16 @@
     <div class="grid">
 
       <div class="full">
+
         <label for="tmdbIds">
           TMDB Movie IDs
-          <span class="count" id="idCount">0 / 100</span>
+
+          <span
+            class="count"
+            id="idCount"
+          >
+            0 / 500
+          </span>
         </label>
 
         <textarea
@@ -386,51 +397,142 @@
         ></textarea>
 
         <div class="hint">
-          One TMDB ID per line. Maximum 100 IDs per generation batch.
+          One TMDB ID per line. Maximum 500 IDs per generation batch.
+          Each generation creates a separate RSS snapshot.
         </div>
+
       </div>
 
+
       <div>
-        <label for="language">TMDB Language</label>
+
+        <label for="language">
+          TMDB Language
+        </label>
 
         <select id="language">
-          <option value="en-US">English (US)</option>
-          <option value="en-GB">English (UK)</option>
-          <option value="es-ES">Spanish (Spain)</option>
-          <option value="es-MX">Spanish (Mexico)</option>
-          <option value="fr-FR">French</option>
-          <option value="de-DE">German</option>
-          <option value="it-IT">Italian</option>
-          <option value="pt-PT">Portuguese (Portugal)</option>
-          <option value="pt-BR">Portuguese (Brazil)</option>
-          <option value="nl-NL">Dutch</option>
-          <option value="sv-SE">Swedish</option>
-          <option value="da-DK">Danish</option>
-          <option value="no-NO">Norwegian</option>
-          <option value="fi-FI">Finnish</option>
-          <option value="pl-PL">Polish</option>
-          <option value="cs-CZ">Czech</option>
-          <option value="hu-HU">Hungarian</option>
-          <option value="ro-RO">Romanian</option>
-          <option value="bg-BG">Bulgarian</option>
-          <option value="tr-TR">Turkish</option>
-          <option value="el-GR">Greek</option>
-          <option value="ko-KR">Korean</option>
-          <option value="ja-JP">Japanese</option>
-          <option value="zh-CN">Chinese</option>
-          <option value="th-TH">Thai</option>
-          <option value="vi-VN">Vietnamese</option>
+
+          <option value="en-US">
+            English (US)
+          </option>
+
+          <option value="en-GB">
+            English (UK)
+          </option>
+
+          <option value="es-ES">
+            Spanish (Spain)
+          </option>
+
+          <option value="es-MX">
+            Spanish (Mexico)
+          </option>
+
+          <option value="fr-FR">
+            French
+          </option>
+
+          <option value="de-DE">
+            German
+          </option>
+
+          <option value="it-IT">
+            Italian
+          </option>
+
+          <option value="pt-PT">
+            Portuguese (Portugal)
+          </option>
+
+          <option value="pt-BR">
+            Portuguese (Brazil)
+          </option>
+
+          <option value="nl-NL">
+            Dutch
+          </option>
+
+          <option value="sv-SE">
+            Swedish
+          </option>
+
+          <option value="da-DK">
+            Danish
+          </option>
+
+          <option value="no-NO">
+            Norwegian
+          </option>
+
+          <option value="fi-FI">
+            Finnish
+          </option>
+
+          <option value="pl-PL">
+            Polish
+          </option>
+
+          <option value="cs-CZ">
+            Czech
+          </option>
+
+          <option value="hu-HU">
+            Hungarian
+          </option>
+
+          <option value="ro-RO">
+            Romanian
+          </option>
+
+          <option value="bg-BG">
+            Bulgarian
+          </option>
+
+          <option value="tr-TR">
+            Turkish
+          </option>
+
+          <option value="el-GR">
+            Greek
+          </option>
+
+          <option value="ko-KR">
+            Korean
+          </option>
+
+          <option value="ja-JP">
+            Japanese
+          </option>
+
+          <option value="zh-CN">
+            Chinese
+          </option>
+
+          <option value="th-TH">
+            Thai
+          </option>
+
+          <option value="vi-VN">
+            Vietnamese
+          </option>
+
         </select>
+
       </div>
 
+
       <div>
-        <label for="voiceId">ElevenLabs Voice ID</label>
+
+        <label for="voiceId">
+          ElevenLabs Voice ID
+        </label>
 
         <input
           id="voiceId"
           type="text"
           placeholder="Enter ElevenLabs Voice ID"
         >
+
       </div>
 
     </div>
@@ -446,9 +548,13 @@
     <div class="grid-3">
 
       <div>
-        <label for="modelId">Model</label>
+
+        <label for="modelId">
+          Model
+        </label>
 
         <select id="modelId">
+
           <option value="eleven_multilingual_v2">
             eleven_multilingual_v2
           </option>
@@ -460,24 +566,47 @@
           <option value="eleven_flash_v2_5">
             eleven_flash_v2_5
           </option>
+
         </select>
+
       </div>
 
+
       <div>
-        <label for="outputFormat">MP3 Format</label>
+
+        <label for="outputFormat">
+          MP3 Format
+        </label>
 
         <select id="outputFormat">
-          <option value="mp3_22050_32">MP3 22050 Hz / 32 kbps</option>
-          <option value="mp3_44100_64">MP3 44100 Hz / 64 kbps</option>
-          <option value="mp3_44100_96">MP3 44100 Hz / 96 kbps</option>
-          <option value="mp3_44100_128">MP3 44100 Hz / 128 kbps</option>
+
+          <option value="mp3_22050_32">
+            MP3 22050 Hz / 32 kbps
+          </option>
+
+          <option value="mp3_44100_64">
+            MP3 44100 Hz / 64 kbps
+          </option>
+
+          <option value="mp3_44100_96">
+            MP3 44100 Hz / 96 kbps
+          </option>
+
+          <option value="mp3_44100_128">
+            MP3 44100 Hz / 128 kbps
+          </option>
+
         </select>
+
       </div>
 
+
       <div>
+
         <label>&nbsp;</label>
 
         <label class="checkbox">
+
           <input
             id="randomTitleEnabled"
             type="checkbox"
@@ -485,7 +614,9 @@
           >
 
           Random Title Template
+
         </label>
+
       </div>
 
     </div>
@@ -501,6 +632,7 @@
     <div id="titleTemplates"></div>
 
     <div class="actions">
+
       <button
         type="button"
         class="secondary"
@@ -516,11 +648,19 @@
       >
         🎲 Random Preview
       </button>
+
     </div>
 
     <div class="hint">
+
       Available variables:
-      {TITLE}, {YEAR}, {ID}, {DIRECTOR}, {RATING}
+
+      {TITLE},
+      {YEAR},
+      {ID},
+      {DIRECTOR},
+      {RATING}
+
     </div>
 
     <div
@@ -540,18 +680,27 @@
 
     <div class="grid">
 
-      <div>
-        <h3>CTA 1</h3>
 
-        <label for="cta1Text">Text</label>
+      <!-- CTA 1 -->
+      <div>
+
+        <h3>
+          CTA 1
+        </h3>
+
+        <label for="cta1Text">
+          Text
+        </label>
 
         <input
           id="cta1Text"
           type="text"
-          value="Watch the movie now"
+          value="Watch (title) now"
         >
 
-        <label for="cta1Url">URL</label>
+        <label for="cta1Url">
+          URL
+        </label>
 
         <input
           id="cta1Url"
@@ -559,7 +708,9 @@
           placeholder="https://example.com/movie/{ID}"
         >
 
-        <label for="cta1Html">HTML</label>
+        <label for="cta1Html">
+          HTML
+        </label>
 
         <textarea
           id="cta1Html"
@@ -569,18 +720,26 @@
       </div>
 
 
+      <!-- CTA 2 -->
       <div>
-        <h3>CTA 2</h3>
 
-        <label for="cta2Text">Text</label>
+        <h3>
+          CTA 2
+        </h3>
+
+        <label for="cta2Text">
+          Text
+        </label>
 
         <input
           id="cta2Text"
           type="text"
-          value="Learn more about this movie"
+          value="Learn more about (title)"
         >
 
-        <label for="cta2Url">URL</label>
+        <label for="cta2Url">
+          URL
+        </label>
 
         <input
           id="cta2Url"
@@ -588,7 +747,9 @@
           placeholder="https://example.com/movie/{ID}"
         >
 
-        <label for="cta2Html">HTML</label>
+        <label for="cta2Html">
+          HTML
+        </label>
 
         <textarea
           id="cta2Html"
@@ -600,8 +761,39 @@
     </div>
 
     <div class="hint">
-      Use {CTA1} and {CTA2} inside the Description Template.
-      The generator will replace them with the configured HTML.
+
+      CTA text supports:
+
+      <strong>(title)</strong>
+
+      Example:
+
+      <strong>Watch (title) now</strong>
+
+      becomes:
+
+      <strong>Watch Avengers: Endgame now</strong>
+
+      <br><br>
+
+      HTML variables:
+
+      {URL}
+
+      and
+
+      {TEXT}
+
+      <br>
+
+      Description Template supports:
+
+      {CTA1}
+
+      and
+
+      {CTA2}
+
     </div>
 
   </div>
@@ -630,7 +822,9 @@ Cast: {CAST}
 {CTA2}</textarea>
 
     <div class="hint">
+
       Available variables:
+
       {TITLE},
       {YEAR},
       {OVERVIEW},
@@ -643,6 +837,7 @@ Cast: {CAST}
       {ORIGINAL_LANGUAGE},
       {CTA1},
       {CTA2}
+
     </div>
 
   </div>
@@ -671,7 +866,9 @@ The main cast includes {CAST}.
 Thanks for listening to our movie podcast.</textarea>
 
     <div class="hint">
+
       The narration template is converted to speech by ElevenLabs.
+
     </div>
 
   </div>
@@ -683,35 +880,49 @@ Thanks for listening to our movie podcast.</textarea>
     <h2>🎧 Podcast Settings</h2>
 
     <div class="notice">
-      These settings are stored persistently through the RSS backend.
-      The email entered here becomes part of the public RSS feed.
+
+      These settings are captured as a snapshot when a new RSS feed is created.
+      Changing the settings later will not modify previously generated RSS feeds.
+
     </div>
 
     <br>
 
     <div class="grid">
 
+
       <div>
-        <label for="podcastTitle">Podcast Title</label>
+
+        <label for="podcastTitle">
+          Podcast Title
+        </label>
 
         <input
           id="podcastTitle"
           type="text"
           placeholder="My Movie Podcast"
         >
+
       </div>
 
+
       <div>
-        <label for="podcastAuthor">Author</label>
+
+        <label for="podcastAuthor">
+          Author
+        </label>
 
         <input
           id="podcastAuthor"
           type="text"
           placeholder="Podcast Author"
         >
+
       </div>
 
+
       <div class="full">
+
         <label for="podcastDescription">
           Podcast Description
         </label>
@@ -721,9 +932,12 @@ Thanks for listening to our movie podcast.</textarea>
           class="small-textarea"
           placeholder="Describe your podcast..."
         ></textarea>
+
       </div>
 
+
       <div>
+
         <label for="podcastEmail">
           Owner Email
         </label>
@@ -737,9 +951,12 @@ Thanks for listening to our movie podcast.</textarea>
         <div class="hint">
           This email is published in the RSS feed.
         </div>
+
       </div>
 
+
       <div>
+
         <label for="podcastArtwork">
           Artwork URL
         </label>
@@ -749,9 +966,12 @@ Thanks for listening to our movie podcast.</textarea>
           type="url"
           placeholder="https://example.com/artwork.jpg"
         >
+
       </div>
 
+
       <div>
+
         <label for="podcastWebsite">
           Website URL
         </label>
@@ -761,67 +981,148 @@ Thanks for listening to our movie podcast.</textarea>
           type="url"
           placeholder="https://example.com"
         >
+
       </div>
 
+
       <div>
+
         <label for="podcastCategory">
           Category
         </label>
 
         <select id="podcastCategory">
-          <option value="TV & Film">TV & Film</option>
-          <option value="Film Reviews">Film Reviews</option>
-          <option value="Entertainment News">Entertainment News</option>
-          <option value="Film Interviews">Film Interviews</option>
-          <option value="Comedy">Comedy</option>
-          <option value="Arts">Arts</option>
-          <option value="Leisure">Leisure</option>
+
+          <option value="TV & Film">
+            TV & Film
+          </option>
+
+          <option value="Film Reviews">
+            Film Reviews
+          </option>
+
+          <option value="Entertainment News">
+            Entertainment News
+          </option>
+
+          <option value="Film Interviews">
+            Film Interviews
+          </option>
+
+          <option value="Comedy">
+            Comedy
+          </option>
+
+          <option value="Arts">
+            Arts
+          </option>
+
+          <option value="Leisure">
+            Leisure
+          </option>
+
         </select>
+
       </div>
 
+
       <div>
+
         <label for="podcastLanguage">
           Podcast Language
         </label>
 
         <select id="podcastLanguage">
-          <option value="en-us">English (US)</option>
-          <option value="en-gb">English (UK)</option>
-          <option value="es-es">Spanish</option>
-          <option value="fr-fr">French</option>
-          <option value="de-de">German</option>
-          <option value="it-it">Italian</option>
-          <option value="pt-pt">Portuguese</option>
-          <option value="ko-kr">Korean</option>
-          <option value="ja-jp">Japanese</option>
-          <option value="th-th">Thai</option>
-          <option value="vi-vn">Vietnamese</option>
-          <option value="id-id">Indonesian</option>
+
+          <option value="en-us">
+            English (US)
+          </option>
+
+          <option value="en-gb">
+            English (UK)
+          </option>
+
+          <option value="es-es">
+            Spanish
+          </option>
+
+          <option value="fr-fr">
+            French
+          </option>
+
+          <option value="de-de">
+            German
+          </option>
+
+          <option value="it-it">
+            Italian
+          </option>
+
+          <option value="pt-pt">
+            Portuguese
+          </option>
+
+          <option value="ko-kr">
+            Korean
+          </option>
+
+          <option value="ja-jp">
+            Japanese
+          </option>
+
+          <option value="th-th">
+            Thai
+          </option>
+
+          <option value="vi-vn">
+            Vietnamese
+          </option>
+
+          <option value="id-id">
+            Indonesian
+          </option>
+
         </select>
+
       </div>
 
+
       <div>
+
         <label for="podcastType">
           Podcast Type
         </label>
 
         <select id="podcastType">
-          <option value="episodic">Episodic</option>
-          <option value="serial">Serial</option>
+
+          <option value="episodic">
+            Episodic
+          </option>
+
+          <option value="serial">
+            Serial
+          </option>
+
         </select>
+
       </div>
 
+
       <div>
+
         <label>&nbsp;</label>
 
         <label class="checkbox">
+
           <input
             id="podcastExplicit"
             type="checkbox"
           >
 
           Explicit Content
+
         </label>
+
       </div>
 
     </div>
@@ -854,7 +1155,33 @@ Thanks for listening to our movie podcast.</textarea>
   <!-- Generate -->
   <div class="card">
 
-    <h2>🚀 Generate Podcast</h2>
+    <h2>
+      🚀 Generate Podcast
+    </h2>
+
+    <div class="notice">
+
+      <strong>Important:</strong>
+
+      Every successful Generate creates a NEW independent RSS snapshot.
+
+      Example:
+
+      <br><br>
+
+      001-26-09-26.xml
+      <br>
+      002-26-09-26.xml
+      <br>
+      003-26-09-26.xml
+
+      <br><br>
+
+      Previously created RSS feeds remain unchanged.
+
+    </div>
+
+    <br>
 
     <div class="actions">
 
@@ -866,14 +1193,16 @@ Thanks for listening to our movie podcast.</textarea>
         🎙️ Generate Podcast
       </button>
 
+
       <button
         id="syncBtn"
         type="button"
         class="success"
         onclick="syncRSS()"
       >
-        🔄 Sync RSS
+        🆕 Create New RSS Snapshot
       </button>
+
 
       <button
         id="downloadBtn"
@@ -887,14 +1216,18 @@ Thanks for listening to our movie podcast.</textarea>
 
     </div>
 
+
     <div class="progress-wrap">
 
       <div class="progress-bar">
+
         <div
           id="progress"
           class="progress"
         ></div>
+
       </div>
+
 
       <div
         id="progressText"
@@ -911,7 +1244,9 @@ Thanks for listening to our movie podcast.</textarea>
   <!-- RSS result -->
   <div class="card">
 
-    <h2>📡 RSS Engine</h2>
+    <h2>
+      📡 RSS Engine
+    </h2>
 
     <div
       id="rssResult"
@@ -942,13 +1277,16 @@ Thanks for listening to our movie podcast.</textarea>
   <div class="card">
 
     <h2>
+
       🎧 Generated Episodes
+
       <span
         id="episodeCount"
         class="count"
       >
         0
       </span>
+
     </h2>
 
     <div
@@ -969,12 +1307,34 @@ Thanks for listening to our movie podcast.</textarea>
 
 
 /* =========================================================
+   GLOBAL CONSTANTS
+========================================================= */
+
+const APP_VERSION = "2.7";
+
+const MAX_EPISODES_PER_RSS = 500;
+
+const LOCAL_STORAGE_KEY =
+  "moviePodcastGeneratorV27";
+
+
+/* =========================================================
    GLOBAL STATE
 ========================================================= */
 
 let generatedEpisodes = [];
+
 let generatedZip = null;
+
 let generationRunning = false;
+
+let latestRSS = {
+  url: "",
+  filename: "",
+  sequence: null,
+  date: "",
+  episodeCount: 0
+};
 
 
 /* =========================================================
@@ -982,45 +1342,17 @@ let generationRunning = false;
 ========================================================= */
 
 const DEFAULT_TITLE_TEMPLATES = [
+
   "WATCH {TITLE} ({YEAR}) FULL MOVIE REVIEW",
+
   "{TITLE} ({YEAR}) MOVIE REVIEW - STORY, CAST & RATING",
+
   "{TITLE} {YEAR} FULL MOVIE REVIEW | EVERYTHING YOU NEED TO KNOW",
+
   "MOVIE REVIEW: {TITLE} ({YEAR}) - STORY, CAST & DETAILS",
+
   "{TITLE} ({YEAR}) - FULL MOVIE REVIEW & BREAKDOWN"
-];
 
-
-/* =========================================================
-   LANGUAGE HELPERS
-========================================================= */
-
-const TMDB_LANGUAGES = [
-  "en-US",
-  "en-GB",
-  "es-ES",
-  "es-MX",
-  "fr-FR",
-  "de-DE",
-  "it-IT",
-  "pt-PT",
-  "pt-BR",
-  "nl-NL",
-  "sv-SE",
-  "da-DK",
-  "no-NO",
-  "fi-FI",
-  "pl-PL",
-  "cs-CZ",
-  "hu-HU",
-  "ro-RO",
-  "bg-BG",
-  "tr-TR",
-  "el-GR",
-  "ko-KR",
-  "ja-JP",
-  "zh-CN",
-  "th-TH",
-  "vi-VN"
 ];
 
 
@@ -1030,12 +1362,19 @@ const TMDB_LANGUAGES = [
 
 function randomItem(array) {
 
-  if (!Array.isArray(array) || !array.length) {
+  if (
+    !Array.isArray(array) ||
+    !array.length
+  ) {
+
     return "";
+
   }
 
   return array[
-    Math.floor(Math.random() * array.length)
+    Math.floor(
+      Math.random() * array.length
+    )
   ];
 }
 
@@ -1046,10 +1385,14 @@ function randomItem(array) {
 
 function updateStatus(message) {
 
-  const status = document.getElementById("status");
+  const status =
+    document.getElementById(
+      "status"
+    );
 
-  const time = new Date()
-    .toLocaleTimeString();
+  const time =
+    new Date()
+      .toLocaleTimeString();
 
   status.textContent +=
     `[${time}] ${message}\n`;
@@ -1061,8 +1404,10 @@ function updateStatus(message) {
 
 function clearStatus() {
 
-  document.getElementById("status")
-    .textContent = "";
+  document.getElementById(
+    "status"
+  ).textContent = "";
+
 }
 
 
@@ -1070,17 +1415,31 @@ function clearStatus() {
    PROGRESS
 ========================================================= */
 
-function setProgress(percent, text) {
+function setProgress(
+  percent,
+  text
+) {
 
   const safePercent =
-    Math.max(0, Math.min(100, percent));
+    Math.max(
+      0,
+      Math.min(
+        100,
+        percent
+      )
+    );
 
-  document.getElementById("progress")
-    .style.width = `${safePercent}%`;
+  document.getElementById(
+    "progress"
+  ).style.width =
+    `${safePercent}%`;
 
-  document.getElementById("progressText")
-    .textContent =
-      text || `${safePercent}%`;
+  document.getElementById(
+    "progressText"
+  ).textContent =
+    text ||
+    `${safePercent}%`;
+
 }
 
 
@@ -1090,12 +1449,30 @@ function setProgress(percent, text) {
 
 function escapeHtml(value) {
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return String(
+    value ?? ""
+  )
+  .replace(
+    /&/g,
+    "&amp;"
+  )
+  .replace(
+    /</g,
+    "&lt;"
+  )
+  .replace(
+    />/g,
+    "&gt;"
+  )
+  .replace(
+    /"/g,
+    "&quot;"
+  )
+  .replace(
+    /'/g,
+    "&#039;"
+  );
+
 }
 
 
@@ -1105,12 +1482,30 @@ function escapeHtml(value) {
 
 function escapeXml(value) {
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
+  return String(
+    value ?? ""
+  )
+  .replace(
+    /&/g,
+    "&amp;"
+  )
+  .replace(
+    /</g,
+    "&lt;"
+  )
+  .replace(
+    />/g,
+    "&gt;"
+  )
+  .replace(
+    /"/g,
+    "&quot;"
+  )
+  .replace(
+    /'/g,
+    "&apos;"
+  );
+
 }
 
 
@@ -1121,30 +1516,46 @@ function escapeXml(value) {
 function initTitleTemplates() {
 
   const container =
-    document.getElementById("titleTemplates");
+    document.getElementById(
+      "titleTemplates"
+    );
 
   container.innerHTML = "";
 
   DEFAULT_TITLE_TEMPLATES.forEach(
-    template => addTitleTemplate(template)
+    template =>
+      addTitleTemplate(
+        template
+      )
   );
+
 }
 
 
-function addTitleTemplate(value = "") {
+function addTitleTemplate(
+  value = ""
+) {
 
   const container =
-    document.getElementById("titleTemplates");
+    document.getElementById(
+      "titleTemplates"
+    );
 
   const row =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
-  row.className = "template-row";
+  row.className =
+    "template-row";
 
   const input =
-    document.createElement("input");
+    document.createElement(
+      "input"
+    );
 
-  input.type = "text";
+  input.type =
+    "text";
 
   input.value =
     value ||
@@ -1154,35 +1565,52 @@ function addTitleTemplate(value = "") {
     "title-template";
 
   const remove =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
 
-  remove.type = "button";
-  remove.className = "danger";
-  remove.textContent = "×";
+  remove.type =
+    "button";
 
-  remove.onclick = () => {
+  remove.className =
+    "danger";
 
-    if (
-      document.querySelectorAll(
-        ".title-template"
-      ).length <= 1
-    ) {
+  remove.textContent =
+    "×";
 
-      alert(
-        "At least one title template is required."
-      );
+  remove.onclick =
+    () => {
 
-      return;
-    }
+      if (
+        document.querySelectorAll(
+          ".title-template"
+        ).length <= 1
+      ) {
 
-    row.remove();
+        alert(
+          "At least one title template is required."
+        );
 
-  };
+        return;
 
-  row.appendChild(input);
-  row.appendChild(remove);
+      }
 
-  container.appendChild(row);
+      row.remove();
+
+    };
+
+  row.appendChild(
+    input
+  );
+
+  row.appendChild(
+    remove
+  );
+
+  container.appendChild(
+    row
+  );
+
 }
 
 
@@ -1193,8 +1621,12 @@ function getTitleTemplates() {
       ".title-template"
     )
   )
-  .map(input => input.value.trim())
+  .map(
+    input =>
+      input.value.trim()
+  )
   .filter(Boolean);
+
 }
 
 
@@ -1208,28 +1640,41 @@ function randomizeTitlePreview() {
   }
 
   const template =
-    randomItem(templates);
+    randomItem(
+      templates
+    );
 
   const preview =
     replaceVariables(
       template,
       {
-        TITLE: "Example Movie",
-        YEAR: "2026",
-        ID: "123456",
-        DIRECTOR: "Example Director",
-        RATING: "8.2"
+        TITLE:
+          "Example Movie",
+
+        YEAR:
+          "2026",
+
+        ID:
+          "123456",
+
+        DIRECTOR:
+          "Example Director",
+
+        RATING:
+          "8.2"
       }
     );
 
-  document.getElementById("titlePreview")
-    .textContent =
-      preview;
+  document.getElementById(
+    "titlePreview"
+  ).textContent =
+    preview;
+
 }
 
 
 /* =========================================================
-   SETTINGS
+   GENERAL SETTINGS
 ========================================================= */
 
 function getSettings() {
@@ -1237,54 +1682,69 @@ function getSettings() {
   return {
 
     tmdbLanguage:
-      document.getElementById("language")
-        .value,
+      document.getElementById(
+        "language"
+      ).value,
 
     voiceId:
-      document.getElementById("voiceId")
-        .value.trim(),
+      document.getElementById(
+        "voiceId"
+      ).value.trim(),
 
     modelId:
-      document.getElementById("modelId")
-        .value,
+      document.getElementById(
+        "modelId"
+      ).value,
 
     outputFormat:
-      document.getElementById("outputFormat")
-        .value,
+      document.getElementById(
+        "outputFormat"
+      ).value,
 
     randomTitleEnabled:
-      document.getElementById("randomTitleEnabled")
-        .checked,
+      document.getElementById(
+        "randomTitleEnabled"
+      ).checked,
 
     titleTemplates:
       getTitleTemplates(),
 
     cta1: {
+
       text:
-        document.getElementById("cta1Text")
-          .value,
+        document.getElementById(
+          "cta1Text"
+        ).value,
 
       url:
-        document.getElementById("cta1Url")
-          .value,
+        document.getElementById(
+          "cta1Url"
+        ).value,
 
       html:
-        document.getElementById("cta1Html")
-          .value
+        document.getElementById(
+          "cta1Html"
+        ).value
+
     },
 
     cta2: {
+
       text:
-        document.getElementById("cta2Text")
-          .value,
+        document.getElementById(
+          "cta2Text"
+        ).value,
 
       url:
-        document.getElementById("cta2Url")
-          .value,
+        document.getElementById(
+          "cta2Url"
+        ).value,
 
       html:
-        document.getElementById("cta2Html")
-          .value
+        document.getElementById(
+          "cta2Html"
+        ).value
+
     },
 
     descriptionTemplate:
@@ -1296,7 +1756,9 @@ function getSettings() {
       document.getElementById(
         "ttsTemplate"
       ).value
+
   };
+
 }
 
 
@@ -1357,11 +1819,15 @@ function getPodcastSettings() {
       document.getElementById(
         "podcastType"
       ).value
+
   };
+
 }
 
 
-function setPodcastSettings(config) {
+function setPodcastSettings(
+  config
+) {
 
   if (!config) {
     return;
@@ -1400,22 +1866,28 @@ function setPodcastSettings(config) {
   document.getElementById(
     "podcastCategory"
   ).value =
-    config.category || "TV & Film";
+    config.category ||
+    "TV & Film";
 
   document.getElementById(
     "podcastLanguage"
   ).value =
-    config.language || "en-us";
+    config.language ||
+    "en-us";
 
   document.getElementById(
     "podcastExplicit"
   ).checked =
-    Boolean(config.explicit);
+    Boolean(
+      config.explicit
+    );
 
   document.getElementById(
     "podcastType"
   ).value =
-    config.podcast_type || "episodic";
+    config.podcast_type ||
+    "episodic";
+
 }
 
 
@@ -1430,13 +1902,16 @@ async function savePodcastSettings() {
     const config =
       getPodcastSettings();
 
-    if (!config.podcast_title) {
+    if (
+      !config.podcast_title
+    ) {
 
       alert(
         "Please enter a Podcast Title."
       );
 
       return;
+
     }
 
     updateStatus(
@@ -1447,34 +1922,43 @@ async function savePodcastSettings() {
       await fetch(
         "/api/podcast-config",
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
           body:
-            JSON.stringify(config)
+            JSON.stringify(
+              config
+            )
+
         }
       );
 
     const data =
       await response.json();
 
-    if (!response.ok || !data.success) {
+    if (
+      !response.ok ||
+      !data.success
+    ) {
 
       throw new Error(
         data.error ||
         "Failed to save podcast settings."
       );
+
     }
 
     updateStatus(
       "Podcast settings saved successfully."
     );
-
-    showRSSInfo();
 
   } catch (error) {
 
@@ -1482,8 +1966,12 @@ async function savePodcastSettings() {
       `Podcast settings error: ${error.message}`
     );
 
-    alert(error.message);
+    alert(
+      error.message
+    );
+
   }
+
 }
 
 
@@ -1503,19 +1991,24 @@ async function loadPodcastSettings() {
       await fetch(
         "/api/podcast-config",
         {
-          cache: "no-store"
+          cache:
+            "no-store"
         }
       );
 
     const data =
       await response.json();
 
-    if (!response.ok || !data.success) {
+    if (
+      !response.ok ||
+      !data.success
+    ) {
 
       throw new Error(
         data.error ||
         "Failed to load podcast settings."
       );
+
     }
 
     if (data.config) {
@@ -1533,6 +2026,7 @@ async function loadPodcastSettings() {
       updateStatus(
         "No saved podcast settings yet."
       );
+
     }
 
   } catch (error) {
@@ -1559,8 +2053,18 @@ function createCTA(
     return "";
   }
 
+  const movieTitle =
+    movie.title ||
+    movie.originalTitle ||
+    "";
+
+  /*
+   * URL
+   */
+
   let url =
-    config.url || "";
+    config.url ||
+    "";
 
   url =
     url.replace(
@@ -1568,8 +2072,39 @@ function createCTA(
       movie.id
     );
 
+  /*
+   * CTA TEXT
+   *
+   * Supports:
+   *
+   * (title)
+   *
+   * Example:
+   *
+   * Watch (title) now
+   *
+   * becomes:
+   *
+   * Watch Avengers: Endgame now
+   */
+
+  let text =
+    config.text ||
+    "";
+
+  text =
+    text.replace(
+      /\(title\)/gi,
+      movieTitle
+    );
+
+  /*
+   * HTML
+   */
+
   let html =
-    config.html || "";
+    config.html ||
+    "";
 
   html =
     html.replace(
@@ -1580,10 +2115,11 @@ function createCTA(
   html =
     html.replace(
       /\{TEXT\}/g,
-      config.text || ""
+      text
     );
 
   return html;
+
 }
 
 
@@ -1598,11 +2134,17 @@ function replaceVariables(
 ) {
 
   let output =
-    String(template || "");
+    String(
+      template || ""
+    );
 
   const cast =
-    Array.isArray(movie.cast)
-      ? movie.cast.join(", ")
+    Array.isArray(
+      movie.cast
+    )
+      ? movie.cast.join(
+          ", "
+        )
       : "";
 
   const values = {
@@ -1642,10 +2184,14 @@ function replaceVariables(
 
     CTA2:
       extra.CTA2 || ""
+
   };
 
-  Object.entries(values)
-    .forEach(([key, value]) => {
+  Object.entries(
+    values
+  )
+  .forEach(
+    ([key, value]) => {
 
       output =
         output.replace(
@@ -1653,12 +2199,16 @@ function replaceVariables(
             `\\{${key}\\}`,
             "g"
           ),
-          String(value ?? "")
+          String(
+            value ?? ""
+          )
         );
 
-    });
+    }
+  );
 
   return output.trim();
+
 }
 
 
@@ -1666,24 +2216,34 @@ function replaceVariables(
    SLUG
 ========================================================= */
 
-function slugify(value) {
+function slugify(
+  value
+) {
 
-  return String(value || "")
-    .normalize("NFKD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      ""
-    )
-    .replace(
-      /[^a-zA-Z0-9]+/g,
-      "-"
-    )
-    .replace(
-      /^-+|-+$/g,
-      ""
-    )
-    .toLowerCase()
-    .substring(0, 80);
+  return String(
+    value || ""
+  )
+  .normalize(
+    "NFKD"
+  )
+  .replace(
+    /[\u0300-\u036f]/g,
+    ""
+  )
+  .replace(
+    /[^a-zA-Z0-9]+/g,
+    "-"
+  )
+  .replace(
+    /^-+|-+$/g,
+    ""
+  )
+  .toLowerCase()
+  .substring(
+    0,
+    80
+  );
+
 }
 
 
@@ -1697,17 +2257,25 @@ function createAudioFilename(
 ) {
 
   const number =
-    String(index)
-      .padStart(3, "0");
+    String(
+      index
+    ).padStart(
+      3,
+      "0"
+    );
 
   const slug =
-    slugify(movie.title) ||
+    slugify(
+      movie.title
+    ) ||
     "movie";
 
   const id =
-    movie.id || "unknown";
+    movie.id ||
+    "unknown";
 
   return `${number}-${slug}-${id}.mp3`;
+
 }
 
 
@@ -1724,7 +2292,8 @@ async function fetchMovie(
     await fetch(
       `/api/movie?id=${encodeURIComponent(id)}&language=${encodeURIComponent(language)}`,
       {
-        cache: "no-store"
+        cache:
+          "no-store"
       }
     );
 
@@ -1737,9 +2306,11 @@ async function fetchMovie(
       data.error ||
       `TMDB request failed for ID ${id}.`
     );
+
   }
 
   return data;
+
 }
 
 
@@ -1757,11 +2328,15 @@ async function generateTTS(
     await fetch(
       "/api/tts",
       {
-        method: "POST",
+
+        method:
+          "POST",
 
         headers: {
+
           "Content-Type":
             "application/json"
+
         },
 
         body:
@@ -1781,8 +2356,9 @@ async function generateTTS(
             fileName
 
           })
-        }
-      );
+
+      }
+    );
 
   if (!response.ok) {
 
@@ -1803,6 +2379,7 @@ async function generateTTS(
     throw new Error(
       errorMessage
     );
+
   }
 
   const audio =
@@ -1828,7 +2405,8 @@ async function generateTTS(
     fileName:
       response.headers.get(
         "X-File-Name"
-      ) || fileName,
+      ) ||
+      fileName,
 
     outputFormat:
       response.headers.get(
@@ -1841,7 +2419,9 @@ async function generateTTS(
         "X-Model-ID"
       ) ||
       settings.modelId
+
   };
+
 }
 
 
@@ -1863,7 +2443,9 @@ async function generateEpisode(
 
   const selectedTemplate =
     settings.randomTitleEnabled
-      ? randomItem(titleTemplates)
+      ? randomItem(
+          titleTemplates
+        )
       : titleTemplates[0];
 
   const cta1 =
@@ -1883,8 +2465,11 @@ async function generateEpisode(
       selectedTemplate,
       movie,
       {
-        CTA1: cta1,
-        CTA2: cta2
+        CTA1:
+          cta1,
+
+        CTA2:
+          cta2
       }
     );
 
@@ -1893,8 +2478,11 @@ async function generateEpisode(
       settings.descriptionTemplate,
       movie,
       {
-        CTA1: cta1,
-        CTA2: cta2
+        CTA1:
+          cta1,
+
+        CTA2:
+          cta2
       }
     );
 
@@ -1903,16 +2491,13 @@ async function generateEpisode(
       settings.ttsTemplate,
       movie,
       {
-        CTA1: cta1,
-        CTA2: cta2
+        CTA1:
+          cta1,
+
+        CTA2:
+          cta2
       }
     );
-
-  /*
-   * IMPORTANT:
-   * filename is created BEFORE TTS.
-   * This prevents every episode becoming episode.mp3.
-   */
 
   const fileName =
     createAudioFilename(
@@ -1963,36 +2548,47 @@ async function generateEpisode(
       movie.title,
 
     original_title:
-      movie.originalTitle || "",
+      movie.originalTitle ||
+      "",
 
     original_language:
-      movie.originalLanguage || "",
+      movie.originalLanguage ||
+      "",
 
     year:
-      movie.year || "",
+      movie.year ||
+      "",
 
     rating:
-      movie.rating ?? "",
+      movie.rating ??
+      "",
 
     director:
-      movie.director || "",
+      movie.director ||
+      "",
 
     runtime:
-      movie.runtime || null,
+      movie.runtime ||
+      null,
 
     cast:
-      Array.isArray(movie.cast)
+      Array.isArray(
+        movie.cast
+      )
         ? movie.cast
         : [],
 
     poster:
-      movie.poster || "",
+      movie.poster ||
+      "",
 
     backdrop:
-      movie.backdrop || "",
+      movie.backdrop ||
+      "",
 
     language:
-      movie.language || settings.tmdbLanguage,
+      movie.language ||
+      settings.tmdbLanguage,
 
     audio_filename:
       tts.fileName,
@@ -2013,14 +2609,17 @@ async function generateEpisode(
       tts.modelId,
 
     duration:
-      movie.runtime || null,
+      movie.runtime ||
+      null,
 
     generated_at:
       generatedAt,
 
     audio:
       tts.audio
+
   };
+
 }
 
 
@@ -2041,12 +2640,21 @@ async function startGeneration() {
 
   const ids =
     raw
-      .split(/[\s,]+/)
-      .map(id => id.trim())
+      .split(
+        /[\s,]+/
+      )
+      .map(
+        id =>
+          id.trim()
+      )
       .filter(Boolean);
 
   const uniqueIds =
-    [...new Set(ids)];
+    [
+      ...new Set(
+        ids
+      )
+    ];
 
   if (!uniqueIds.length) {
 
@@ -2055,15 +2663,20 @@ async function startGeneration() {
     );
 
     return;
+
   }
 
-  if (uniqueIds.length > 100) {
+  if (
+    uniqueIds.length >
+    MAX_EPISODES_PER_RSS
+  ) {
 
     alert(
-      "Maximum 100 TMDB IDs per batch."
+      `Maximum ${MAX_EPISODES_PER_RSS} TMDB IDs per batch.`
     );
 
     return;
+
   }
 
   const settings =
@@ -2076,6 +2689,7 @@ async function startGeneration() {
     );
 
     return;
+
   }
 
   if (!settings.titleTemplates.length) {
@@ -2085,21 +2699,26 @@ async function startGeneration() {
     );
 
     return;
+
   }
 
   const podcastSettings =
     getPodcastSettings();
 
-  if (!podcastSettings.podcast_title) {
+  if (
+    !podcastSettings.podcast_title
+  ) {
 
     alert(
       "Please enter Podcast Title in Podcast Settings."
     );
 
     return;
+
   }
 
-  generationRunning = true;
+  generationRunning =
+    true;
 
   const generateBtn =
     document.getElementById(
@@ -2111,19 +2730,37 @@ async function startGeneration() {
       "syncBtn"
     );
 
-  generateBtn.disabled = true;
-  syncBtn.disabled = true;
+  generateBtn.disabled =
+    true;
+
+  syncBtn.disabled =
+    true;
 
   clearStatus();
 
-  generatedEpisodes = [];
-  generatedZip = null;
+  generatedEpisodes =
+    [];
+
+  generatedZip =
+    null;
+
+  latestRSS =
+    {
+      url: "",
+      filename: "",
+      sequence: null,
+      date: "",
+      episodeCount: 0
+    };
 
   document.getElementById(
     "downloadBtn"
-  ).disabled = true;
+  ).disabled =
+    true;
 
   renderEpisodes();
+
+  showRSSInfo();
 
   setProgress(
     0,
@@ -2137,7 +2774,7 @@ async function startGeneration() {
     );
 
     /*
-     * Save podcast config first.
+     * Save current podcast settings.
      */
 
     updateStatus(
@@ -2148,17 +2785,22 @@ async function startGeneration() {
       await fetch(
         "/api/podcast-config",
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
           body:
             JSON.stringify(
               podcastSettings
             )
+
         }
       );
 
@@ -2174,7 +2816,9 @@ async function startGeneration() {
         configData.error ||
         "Failed to save podcast settings."
       );
+
     }
+
 
     /*
      * Generate episodes.
@@ -2191,7 +2835,11 @@ async function startGeneration() {
 
       const percentBefore =
         Math.round(
-          (i / uniqueIds.length) * 100
+          (
+            i /
+            uniqueIds.length
+          ) *
+          100
         );
 
       setProgress(
@@ -2229,34 +2877,45 @@ async function startGeneration() {
 
         renderEpisodes();
 
-      } catch (episodeError) {
+      } catch (
+        episodeError
+      ) {
 
         updateStatus(
           `[${i + 1}/${uniqueIds.length}] ERROR: ${episodeError.message}`
         );
 
-        /*
-         * Continue with the next movie.
-         */
       }
 
       const percentAfter =
         Math.round(
-          ((i + 1) / uniqueIds.length) * 100
+          (
+            (
+              i + 1
+            ) /
+            uniqueIds.length
+          ) *
+          100
         );
 
       setProgress(
         percentAfter,
         `Completed ${i + 1} / ${uniqueIds.length}`
       );
+
     }
 
-    if (!generatedEpisodes.length) {
+
+    if (
+      !generatedEpisodes.length
+    ) {
 
       throw new Error(
         "No episodes were generated successfully."
       );
+
     }
+
 
     /*
      * Build ZIP.
@@ -2268,12 +2927,13 @@ async function startGeneration() {
 
     await buildZip();
 
+
     /*
-     * Sync persistent RSS manifest.
+     * Create independent RSS snapshot.
      */
 
     updateStatus(
-      "Syncing persistent RSS manifest..."
+      "Creating independent RSS snapshot..."
     );
 
     const syncResult =
@@ -2284,14 +2944,17 @@ async function startGeneration() {
     if (!syncResult) {
 
       throw new Error(
-        "RSS manifest synchronization failed."
+        "RSS snapshot creation failed."
       );
+
     }
+
 
     setProgress(
       100,
       `Finished: ${generatedEpisodes.length} episode(s)`
     );
+
 
     updateStatus(
       "================================"
@@ -2309,15 +2972,20 @@ async function startGeneration() {
       "MP3 files uploaded to R2."
     );
 
-    updateStatus(
-      "RSS manifest synchronized."
-    );
+    if (
+      latestRSS.filename
+    ) {
+
+      updateStatus(
+        `RSS snapshot: ${latestRSS.filename}`
+      );
+
+    }
 
     updateStatus(
       "ZIP package ready for download."
     );
 
-    showRSSInfo();
 
   } catch (error) {
 
@@ -2336,12 +3004,17 @@ async function startGeneration() {
 
   } finally {
 
-    generationRunning = false;
+    generationRunning =
+      false;
 
-    generateBtn.disabled = false;
-    syncBtn.disabled = false;
+    generateBtn.disabled =
+      false;
+
+    syncBtn.disabled =
+      false;
 
   }
+
 }
 
 
@@ -2353,12 +3026,6 @@ function getManifestEpisodes() {
 
   return generatedEpisodes.map(
     episode => {
-
-      /*
-       * IMPORTANT:
-       * Do NOT send the ArrayBuffer audio
-       * to the manifest.
-       */
 
       return {
 
@@ -2433,14 +3100,17 @@ function getManifestEpisodes() {
 
         generated_at:
           episode.generated_at
+
       };
+
     }
   );
+
 }
 
 
 /* =========================================================
-   SYNC RSS
+   CREATE RSS SNAPSHOT
 ========================================================= */
 
 async function syncRSS(
@@ -2449,10 +3119,12 @@ async function syncRSS(
 
   try {
 
-    if (!generatedEpisodes.length) {
+    if (
+      !generatedEpisodes.length
+    ) {
 
       updateStatus(
-        "No newly generated episodes to sync."
+        "No newly generated episodes to create RSS."
       );
 
       if (showAlert) {
@@ -2460,40 +3132,68 @@ async function syncRSS(
         alert(
           "Generate at least one episode first."
         );
+
       }
 
       return false;
+
     }
+
+
+    if (
+      generatedEpisodes.length >
+      MAX_EPISODES_PER_RSS
+    ) {
+
+      throw new Error(
+        `RSS snapshot cannot contain more than ${MAX_EPISODES_PER_RSS} episodes.`
+      );
+
+    }
+
 
     const podcastSettings =
       getPodcastSettings();
 
-    if (!podcastSettings.podcast_title) {
+    if (
+      !podcastSettings.podcast_title
+    ) {
 
       throw new Error(
         "Podcast Title is required."
       );
+
     }
 
+
     /*
-     * Save podcast configuration.
+     * Save current settings.
+     *
+     * This does NOT define the old RSS feeds.
+     * The server snapshots these settings
+     * when creating the new XML.
      */
 
     const configResponse =
       await fetch(
         "/api/podcast-config",
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
           body:
             JSON.stringify(
               podcastSettings
             )
+
         }
       );
 
@@ -2509,16 +3209,20 @@ async function syncRSS(
         configData.error ||
         "Failed to save podcast config."
       );
+
     }
 
+
     /*
-     * Build manifest payload.
+     * NEW RSS SNAPSHOT PAYLOAD
+     *
+     * One Create = one independent feed.
      */
 
     const payload = {
 
       version:
-        "2.6",
+        APP_VERSION,
 
       podcast:
         podcastSettings,
@@ -2526,44 +3230,61 @@ async function syncRSS(
       episodes:
         getManifestEpisodes(),
 
-      updated_at:
+      created_at:
         new Date().toISOString()
+
     };
 
+
     /*
-     * POST to Pages Function.
+     * IMPORTANT:
      *
-     * The server-side Function then:
+     * This endpoint must CREATE a new
+     * immutable XML file.
      *
-     * existing manifest
-     *       +
-     * new episodes
-     *       ↓
-     * merge + dedupe
-     *       ↓
-     * Worker
-     *       ↓
-     * R2
+     * It must NOT merge into a master
+     * manifest and overwrite /api/rss.
      */
 
     const response =
       await fetch(
-        "/api/manifest",
+        "/api/rss/create",
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
           body:
-            JSON.stringify(payload)
+            JSON.stringify(
+              payload
+            )
+
         }
       );
 
-    const data =
-      await response.json();
+
+    let data;
+
+    try {
+
+      data =
+        await response.json();
+
+    } catch (_) {
+
+      throw new Error(
+        `RSS server returned invalid JSON (HTTP ${response.status}).`
+      );
+
+    }
+
 
     if (
       !response.ok ||
@@ -2572,31 +3293,97 @@ async function syncRSS(
 
       throw new Error(
         data.error ||
-        "Manifest sync failed."
+        "RSS snapshot creation failed."
       );
+
     }
 
+
+    /*
+     * Expected backend response:
+     *
+     * {
+     *   success: true,
+     *   filename: "001-26-09-26.xml",
+     *   url: "https://domain.com/api/rss/001-26-09-26.xml",
+     *   sequence: 1,
+     *   date: "26-09-26",
+     *   episode_count: 10
+     * }
+     */
+
+    latestRSS = {
+
+      url:
+        data.url ||
+        "",
+
+      filename:
+        data.filename ||
+        "",
+
+      sequence:
+        data.sequence ??
+        null,
+
+      date:
+        data.date ||
+        "",
+
+      episodeCount:
+        Number(
+          data.episode_count ??
+          generatedEpisodes.length
+        )
+
+    };
+
+
+    if (
+      !latestRSS.url
+    ) {
+
+      throw new Error(
+        "RSS server did not return a feed URL."
+      );
+
+    }
+
+
     updateStatus(
-      `RSS manifest synced. Persistent episode count: ${data.episode_count}`
+      `RSS snapshot created: ${latestRSS.filename || latestRSS.url}`
     );
 
-    showRSSInfo(
-      data.episode_count
+    updateStatus(
+      `RSS episodes: ${latestRSS.episodeCount}`
     );
+
+    updateStatus(
+      `RSS URL: ${latestRSS.url}`
+    );
+
+
+    showRSSInfo();
+
 
     if (showAlert) {
 
       alert(
-        `RSS synchronized successfully.\n\nPersistent episodes: ${data.episode_count}`
+        `RSS snapshot created successfully.\n\n` +
+        `File: ${latestRSS.filename}\n` +
+        `Episodes: ${latestRSS.episodeCount}\n\n` +
+        `${latestRSS.url}`
       );
+
     }
+
 
     return true;
 
   } catch (error) {
 
     updateStatus(
-      `RSS sync error: ${error.message}`
+      `RSS snapshot error: ${error.message}`
     );
 
     if (showAlert) {
@@ -2604,10 +3391,13 @@ async function syncRSS(
       alert(
         error.message
       );
+
     }
 
     return false;
+
   }
+
 }
 
 
@@ -2615,26 +3405,77 @@ async function syncRSS(
    SHOW RSS INFO
 ========================================================= */
 
-function showRSSInfo(
-  episodeCount = null
-) {
+function showRSSInfo() {
 
-  const base =
-    window.location.origin;
+  const result =
+    document.getElementById(
+      "rssResult"
+    );
 
-  const rssUrl =
-    `${base}/api/rss`;
 
-  const countText =
-    episodeCount !== null
-      ? `<br><strong>Persistent Episodes:</strong> ${episodeCount}`
-      : "";
+  if (
+    !latestRSS.url
+  ) {
 
-  document.getElementById(
-    "rssResult"
-  ).innerHTML = `
+    result.innerHTML = `
 
-    <strong>RSS Feed:</strong>
+      <strong>
+        RSS Feed:
+      </strong>
+
+      <div class="hint">
+
+        No RSS snapshot has been created yet.
+
+        <br><br>
+
+        Generate a batch and the system will create
+        a new independent RSS XML file.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const filename =
+    escapeHtml(
+      latestRSS.filename ||
+      "-"
+    );
+
+  const sequence =
+    latestRSS.sequence !== null
+      ? escapeHtml(
+          latestRSS.sequence
+        )
+      : "-";
+
+  const date =
+    escapeHtml(
+      latestRSS.date ||
+      "-"
+    );
+
+  const count =
+    escapeHtml(
+      latestRSS.episodeCount
+    );
+
+  const url =
+    escapeHtml(
+      latestRSS.url
+    );
+
+
+  result.innerHTML = `
+
+    <strong>
+      Latest RSS Snapshot
+    </strong>
 
     <div class="url-box">
 
@@ -2642,7 +3483,7 @@ function showRSSInfo(
         id="rssUrlInput"
         type="text"
         readonly
-        value="${escapeHtml(rssUrl)}"
+        value="${url}"
       >
 
       <button
@@ -2662,11 +3503,48 @@ function showRSSInfo(
 
     </div>
 
+
     <div class="hint">
-      Use this RSS URL when connecting the podcast feed to your podcast platform.
-      ${countText}
+
+      <strong>
+        Filename:
+      </strong>
+
+      ${filename}
+
+      <br>
+
+      <strong>
+        Sequence:
+      </strong>
+
+      ${sequence}
+
+      <br>
+
+      <strong>
+        Date:
+      </strong>
+
+      ${date}
+
+      <br>
+
+      <strong>
+        Episodes:
+      </strong>
+
+      ${count}
+
+      <br><br>
+
+      This RSS feed is an independent snapshot.
+      Future podcast setting changes will not modify this feed.
+
     </div>
+
   `;
+
 }
 
 
@@ -2676,13 +3554,23 @@ function showRSSInfo(
 
 async function copyRSSUrl() {
 
-  const url =
-    `${window.location.origin}/api/rss`;
+  if (
+    !latestRSS.url
+  ) {
+
+    alert(
+      "No RSS snapshot has been created yet."
+    );
+
+    return;
+
+  }
+
 
   try {
 
     await navigator.clipboard.writeText(
-      url
+      latestRSS.url
     );
 
     updateStatus(
@@ -2696,16 +3584,22 @@ async function copyRSSUrl() {
         "rssUrlInput"
       );
 
-    input.select();
+    if (input) {
 
-    document.execCommand(
-      "copy"
-    );
+      input.select();
 
-    updateStatus(
-      "RSS URL copied."
-    );
+      document.execCommand(
+        "copy"
+      );
+
+      updateStatus(
+        "RSS URL copied."
+      );
+
+    }
+
   }
+
 }
 
 
@@ -2715,11 +3609,24 @@ async function copyRSSUrl() {
 
 function openRSS() {
 
+  if (
+    !latestRSS.url
+  ) {
+
+    alert(
+      "No RSS snapshot has been created yet."
+    );
+
+    return;
+
+  }
+
   window.open(
-    `${window.location.origin}/api/rss`,
+    latestRSS.url,
     "_blank",
     "noopener"
   );
+
 }
 
 
@@ -2742,15 +3649,13 @@ async function buildZip() {
       "metadata"
     );
 
-  /*
-   * Podcast settings.
-   */
 
   const podcastSettings =
     getPodcastSettings();
 
+
   /*
-   * Add MP3 files.
+   * MP3 files + metadata.
    */
 
   for (
@@ -2758,7 +3663,8 @@ async function buildZip() {
   ) {
 
     if (
-      episode.audio instanceof ArrayBuffer
+      episode.audio instanceof
+      ArrayBuffer
     ) {
 
       episodesFolder.file(
@@ -2768,9 +3674,6 @@ async function buildZip() {
 
     }
 
-    /*
-     * Metadata JSON.
-     */
 
     const metadata = {
 
@@ -2845,7 +3748,9 @@ async function buildZip() {
 
       generated_at:
         episode.generated_at
+
     };
+
 
     const metadataFilename =
       episode.audio_filename
@@ -2853,6 +3758,7 @@ async function buildZip() {
           /\.mp3$/i,
           ".json"
         );
+
 
     metadataFolder.file(
       metadataFilename,
@@ -2862,6 +3768,7 @@ async function buildZip() {
         2
       )
     );
+
   }
 
 
@@ -2872,7 +3779,7 @@ async function buildZip() {
   const podcastData = {
 
     version:
-      "2.6",
+      APP_VERSION,
 
     generated_at:
       new Date().toISOString(),
@@ -2883,9 +3790,14 @@ async function buildZip() {
     episode_count:
       generatedEpisodes.length,
 
+    rss_snapshot:
+      latestRSS,
+
     episodes:
       getManifestEpisodes()
+
   };
+
 
   zip.file(
     "podcast-data.json",
@@ -2916,10 +3828,17 @@ async function buildZip() {
    */
 
   const rssUrl =
-    `${window.location.origin}/api/rss`;
+    latestRSS.url ||
+    "RSS snapshot will be created after generation.";
+
+  const rssFilename =
+    latestRSS.filename ||
+    "Pending";
+
 
   const readme = `
-MOVIE PODCAST GENERATOR V2.6
+
+MOVIE PODCAST GENERATOR V2.7
 ============================
 
 Generated:
@@ -2927,6 +3846,9 @@ ${new Date().toISOString()}
 
 Episodes:
 ${generatedEpisodes.length}
+
+RSS SNAPSHOT:
+${rssFilename}
 
 RSS FEED:
 ${rssUrl}
@@ -2941,13 +3863,20 @@ FILES:
 - rss-episodes.json
 - README.txt
 
-IMPORTANT:
+RSS MODEL:
+Each generation creates an independent RSS snapshot.
+
+Example:
+001-26-09-26.xml
+002-26-09-26.xml
+003-26-09-26.xml
+
+Previously generated RSS snapshots are not modified
+when a new podcast configuration is saved.
+
 The MP3 files have already been uploaded to the
 configured Cloudflare R2 storage through the server-side
 TTS endpoint.
-
-The persistent RSS manifest is stored separately and
-is available through the RSS endpoint above.
 
 Podcast settings:
 ${JSON.stringify(
@@ -2955,6 +3884,7 @@ ${JSON.stringify(
   null,
   2
 )}
+
 `.trim();
 
 
@@ -2970,21 +3900,33 @@ ${JSON.stringify(
 
   generatedZip =
     await zip.generateAsync({
-      type: "blob",
-      compression: "DEFLATE",
+
+      type:
+        "blob",
+
+      compression:
+        "DEFLATE",
+
       compressionOptions: {
-        level: 6
+
+        level:
+          6
+
       }
+
     });
 
 
   document.getElementById(
     "downloadBtn"
-  ).disabled = false;
+  ).disabled =
+    false;
+
 
   updateStatus(
     `ZIP ready. Size: ${formatBytes(generatedZip.size)}`
   );
+
 }
 
 
@@ -3001,22 +3943,27 @@ function downloadZip() {
     );
 
     return;
+
   }
+
 
   const url =
     URL.createObjectURL(
       generatedZip
     );
 
+
   const link =
     document.createElement(
       "a"
     );
 
-  link.href = url;
+  link.href =
+    url;
 
   link.download =
-    `movie-podcast-v2.6-${Date.now()}.zip`;
+    `movie-podcast-v${APP_VERSION}-${Date.now()}.zip`;
+
 
   document.body.appendChild(
     link
@@ -3026,14 +3973,20 @@ function downloadZip() {
 
   link.remove();
 
+
   setTimeout(
-    () => URL.revokeObjectURL(url),
+    () =>
+      URL.revokeObjectURL(
+        url
+      ),
     1000
   );
+
 
   updateStatus(
     "ZIP download started."
   );
+
 }
 
 
@@ -3041,11 +3994,21 @@ function downloadZip() {
    FORMAT BYTES
 ========================================================= */
 
-function formatBytes(bytes) {
+function formatBytes(
+  bytes
+) {
 
-  if (!Number.isFinite(bytes) || bytes <= 0) {
+  if (
+    !Number.isFinite(
+      bytes
+    ) ||
+    bytes <= 0
+  ) {
+
     return "0 B";
+
   }
+
 
   const units = [
     "B",
@@ -3054,11 +4017,17 @@ function formatBytes(bytes) {
     "GB"
   ];
 
+
   const index =
     Math.floor(
-      Math.log(bytes) /
-      Math.log(1024)
+      Math.log(
+        bytes
+      ) /
+      Math.log(
+        1024
+      )
     );
+
 
   const safeIndex =
     Math.min(
@@ -3066,17 +4035,29 @@ function formatBytes(bytes) {
       units.length - 1
     );
 
+
   return (
+
     bytes /
     Math.pow(
       1024,
       safeIndex
     )
+
   ).toFixed(
-    safeIndex === 0 ? 0 : 2
-  ) +
-    " " +
-    units[safeIndex];
+    safeIndex === 0
+      ? 0
+      : 2
+  )
+
+  +
+
+  " " +
+
+  units[
+    safeIndex
+  ];
+
 }
 
 
@@ -3089,15 +4070,18 @@ function renderEpisodes() {
   const count =
     generatedEpisodes.length;
 
+
   document.getElementById(
     "episodeCount"
   ).textContent =
     count;
 
+
   const container =
     document.getElementById(
       "episodeList"
     );
+
 
   if (!count) {
 
@@ -3105,55 +4089,76 @@ function renderEpisodes() {
       "No episodes generated yet.";
 
     return;
+
   }
+
 
   container.innerHTML =
     generatedEpisodes
       .map(
-        (episode, index) => `
+        (
+          episode,
+          index
+        ) => `
 
           <div class="episode">
 
             <div class="episode-title">
+
               ${index + 1}.
+
               ${escapeHtml(
                 episode.title
               )}
+
             </div>
 
+
             <div class="episode-meta">
+
               TMDB ID:
+
               ${escapeHtml(
                 episode.id
               )}
+
               <br>
 
               File:
+
               ${escapeHtml(
                 episode.audio_filename
               )}
+
               <br>
 
               R2:
+
               ${escapeHtml(
                 episode.audio_url ||
                 episode.audio_key ||
                 "-"
               )}
+
               <br>
 
               Size:
+
               ${formatBytes(
                 Number(
-                  episode.audio_size || 0
+                  episode.audio_size ||
+                  0
                 )
               )}
+
             </div>
 
           </div>
+
         `
       )
       .join("");
+
 }
 
 
@@ -3168,27 +4173,45 @@ function updateIdCount() {
       "tmdbIds"
     ).value;
 
+
   const ids =
     raw
-      .split(/[\s,]+/)
-      .map(id => id.trim())
+      .split(
+        /[\s,]+/
+      )
+      .map(
+        id =>
+          id.trim()
+      )
       .filter(Boolean);
 
+
   const unique =
-    [...new Set(ids)];
+    [
+      ...new Set(
+        ids
+      )
+    ];
+
 
   const count =
     unique.length;
+
 
   const element =
     document.getElementById(
       "idCount"
     );
 
-  element.textContent =
-    `${count} / 100`;
 
-  if (count > 100) {
+  element.textContent =
+    `${count} / ${MAX_EPISODES_PER_RSS}`;
+
+
+  if (
+    count >
+    MAX_EPISODES_PER_RSS
+  ) {
 
     element.style.color =
       "#ff7b8a";
@@ -3197,7 +4220,9 @@ function updateIdCount() {
 
     element.style.color =
       "#8fb4ff";
+
   }
+
 }
 
 
@@ -3234,41 +4259,43 @@ function saveLocalSettings() {
       titleTemplates:
         getTitleTemplates(),
 
-      cta1:
-        {
-          text:
-            document.getElementById(
-              "cta1Text"
-            ).value,
+      cta1: {
 
-          url:
-            document.getElementById(
-              "cta1Url"
-            ).value,
+        text:
+          document.getElementById(
+            "cta1Text"
+          ).value,
 
-          html:
-            document.getElementById(
-              "cta1Html"
-            ).value
-        },
+        url:
+          document.getElementById(
+            "cta1Url"
+          ).value,
 
-      cta2:
-        {
-          text:
-            document.getElementById(
-              "cta2Text"
-            ).value,
+        html:
+          document.getElementById(
+            "cta1Html"
+          ).value
 
-          url:
-            document.getElementById(
-              "cta2Url"
-            ).value,
+      },
 
-          html:
-            document.getElementById(
-              "cta2Html"
-            ).value
-        },
+      cta2: {
+
+        text:
+          document.getElementById(
+            "cta2Text"
+          ).value,
+
+        url:
+          document.getElementById(
+            "cta2Url"
+          ).value,
+
+        html:
+          document.getElementById(
+            "cta2Html"
+          ).value
+
+      },
 
       descriptionTemplate:
         document.getElementById(
@@ -3279,16 +4306,25 @@ function saveLocalSettings() {
         document.getElementById(
           "ttsTemplate"
         ).value
+
     };
 
+
     localStorage.setItem(
-      "moviePodcastGeneratorV26",
-      JSON.stringify(data)
+      LOCAL_STORAGE_KEY,
+      JSON.stringify(
+        data
+      )
     );
 
   } catch (_) {}
+
 }
 
+
+/* =========================================================
+   LOAD LOCAL SETTINGS
+========================================================= */
 
 function loadLocalSettings() {
 
@@ -3296,49 +4332,74 @@ function loadLocalSettings() {
 
     const raw =
       localStorage.getItem(
-        "moviePodcastGeneratorV26"
+        LOCAL_STORAGE_KEY
       );
 
+
     if (!raw) {
+
       return;
+
     }
 
-    const data =
-      JSON.parse(raw);
 
-    if (data.voiceId !== undefined) {
+    const data =
+      JSON.parse(
+        raw
+      );
+
+
+    if (
+      data.voiceId !==
+      undefined
+    ) {
 
       document.getElementById(
         "voiceId"
       ).value =
         data.voiceId;
+
     }
 
-    if (data.modelId !== undefined) {
+
+    if (
+      data.modelId !==
+      undefined
+    ) {
 
       document.getElementById(
         "modelId"
       ).value =
         data.modelId;
+
     }
 
-    if (data.outputFormat !== undefined) {
+
+    if (
+      data.outputFormat !==
+      undefined
+    ) {
 
       document.getElementById(
         "outputFormat"
       ).value =
         data.outputFormat;
+
     }
 
+
     if (
-      data.randomTitleEnabled !== undefined
+      data.randomTitleEnabled !==
+      undefined
     ) {
 
       document.getElementById(
         "randomTitleEnabled"
       ).checked =
         data.randomTitleEnabled;
+
     }
+
 
     if (
       Array.isArray(
@@ -3352,7 +4413,8 @@ function loadLocalSettings() {
           "titleTemplates"
         );
 
-      container.innerHTML = "";
+      container.innerHTML =
+        "";
 
       data.titleTemplates.forEach(
         template =>
@@ -3360,65 +4422,87 @@ function loadLocalSettings() {
             template
           )
       );
+
     }
 
-    if (data.cta1) {
+
+    if (
+      data.cta1
+    ) {
 
       document.getElementById(
         "cta1Text"
       ).value =
-        data.cta1.text || "";
+        data.cta1.text ||
+        "";
 
       document.getElementById(
         "cta1Url"
       ).value =
-        data.cta1.url || "";
+        data.cta1.url ||
+        "";
 
       document.getElementById(
         "cta1Html"
       ).value =
-        data.cta1.html || "";
+        data.cta1.html ||
+        "";
+
     }
 
-    if (data.cta2) {
+
+    if (
+      data.cta2
+    ) {
 
       document.getElementById(
         "cta2Text"
       ).value =
-        data.cta2.text || "";
+        data.cta2.text ||
+        "";
 
       document.getElementById(
         "cta2Url"
       ).value =
-        data.cta2.url || "";
+        data.cta2.url ||
+        "";
 
       document.getElementById(
         "cta2Html"
       ).value =
-        data.cta2.html || "";
+        data.cta2.html ||
+        "";
+
     }
 
+
     if (
-      data.descriptionTemplate !== undefined
+      data.descriptionTemplate !==
+      undefined
     ) {
 
       document.getElementById(
         "descriptionTemplate"
       ).value =
         data.descriptionTemplate;
+
     }
 
+
     if (
-      data.ttsTemplate !== undefined
+      data.ttsTemplate !==
+      undefined
     ) {
 
       document.getElementById(
         "ttsTemplate"
       ).value =
         data.ttsTemplate;
+
     }
 
   } catch (_) {}
+
 }
 
 
@@ -3434,6 +4518,7 @@ document.addEventListener(
 
   }
 );
+
 
 document.addEventListener(
   "change",
@@ -3474,15 +4559,19 @@ loadPodcastSettings();
 showRSSInfo();
 
 updateStatus(
-  "Movie Podcast Generator V2.6 ready."
+  `Movie Podcast Generator V${APP_VERSION} ready.`
 );
 
 updateStatus(
-  "RSS Engine enabled."
+  "Independent RSS Snapshot Engine enabled."
 );
 
 updateStatus(
-  `RSS URL: ${window.location.origin}/api/rss`
+  `Maximum episodes per RSS: ${MAX_EPISODES_PER_RSS}`
+);
+
+updateStatus(
+  "RSS snapshots are created through /api/rss/create"
 );
 
 </script>
