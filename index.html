@@ -1843,13 +1843,42 @@ function updateFixedCTAHTML(){
    VARIABLE REPLACEMENT
 ========================================================= */
 
-function (
+function replaceVariables(
     template,
     movie
 ){
 
     const safeMovie =
         movie || {};
+
+    /*
+     * YEAR FIX
+     *
+     * Try several possible date/year fields.
+     *
+     * Priority:
+     * release_date
+     * first_air_date
+     * releaseDate
+     * release_year
+     * year
+     */
+    const releaseDate =
+        safeMovie.release_date ||
+        safeMovie.first_air_date ||
+        safeMovie.releaseDate ||
+        safeMovie.release_year ||
+        safeMovie.year ||
+        "";
+
+    const yearMatch =
+        String(releaseDate)
+            .match(/\b(19|20)\d{2}\b/);
+
+    const releaseYear =
+        yearMatch
+            ? yearMatch[0]
+            : "";
 
     const values = {
 
@@ -1867,11 +1896,7 @@ function (
             "",
 
         YEAR:
-            safeMovie.release_date
-                ? String(
-                    safeMovie.release_date
-                ).slice(0,4)
-                : "",
+            releaseYear,
 
         OVERVIEW:
             safeMovie.overview ||
