@@ -2,1458 +2,457 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>Movie Podcast Generator V2.9</title>
+<title>Movie Podcast Generator V3.0</title>
 
 <meta name="description"
-content="TMDB Movie Podcast Generator with ElevenLabs TTS, Cloudflare R2 storage and independent RSS generation.">
+content="TMDB Movie Podcast Generator with Edge TTS, Cloudflare R2 storage and independent RSS generation.">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
 :root{
-    --bg:#07111f;
-    --panel:#0d1a2b;
-    --panel2:#101f33;
-    --border:#20354d;
-    --text:#eef6ff;
-    --muted:#8fa7bd;
-    --accent:#4da3ff;
-    --accent2:#7c5cff;
-    --success:#28d17c;
-    --danger:#ff5d73;
-    --warning:#ffc857;
-    --input:#081522;
-    --shadow:0 15px 45px rgba(0,0,0,.28);
+--bg:#07111f;--panel:#0d1a2b;--panel2:#101f33;--border:#20354d;
+--text:#eef6ff;--muted:#8fa7bd;--accent:#4da3ff;--accent2:#7c5cff;
+--success:#28d17c;--danger:#ff5d73;--warning:#ffc857;--input:#081522;
+--shadow:0 15px 45px rgba(0,0,0,.28)
 }
-
-*{
-    box-sizing:border-box;
-}
-
+*{box-sizing:border-box}
 body{
-    margin:0;
-    background:
-        radial-gradient(circle at top right,rgba(77,163,255,.10),transparent 30%),
-        radial-gradient(circle at bottom left,rgba(124,92,255,.08),transparent 30%),
-        var(--bg);
-    color:var(--text);
-    font-family:Inter,Arial,Helvetica,sans-serif;
-    min-height:100vh;
-}
-
-.container{
-    width:min(1180px,calc(100% - 28px));
-    margin:0 auto;
-    padding:30px 0 60px;
-}
-
-.header{
-    margin-bottom:25px;
-}
-
-.header h1{
-    margin:0 0 8px;
-    font-size:32px;
-    letter-spacing:-.7px;
-}
-
-.header p{
-    margin:0;
-    color:var(--muted);
-    line-height:1.6;
-}
-
-.version{
-    display:inline-block;
-    margin-left:7px;
-    padding:4px 9px;
-    border:1px solid var(--border);
-    border-radius:999px;
-    color:#9ecfff;
-    font-size:12px;
-    vertical-align:middle;
-}
-
-.card{
-    background:linear-gradient(180deg,rgba(16,31,51,.98),rgba(10,23,38,.98));
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:20px;
-    margin-bottom:18px;
-    box-shadow:var(--shadow);
-}
-
-.card h2{
-    margin:0 0 5px;
-    font-size:19px;
-}
-
-.card-description{
-    color:var(--muted);
-    font-size:13px;
-    margin-bottom:18px;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:15px;
-}
-
-.grid-3{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:15px;
-}
-
-.full{
-    grid-column:1/-1;
-}
-
-.field{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-}
-
-label{
-    font-size:13px;
-    font-weight:700;
-    color:#c9d8e8;
-}
-
-input,
-textarea,
-select{
-    width:100%;
-    border:1px solid var(--border);
-    background:var(--input);
-    color:var(--text);
-    border-radius:10px;
-    padding:11px 12px;
-    outline:none;
-    font:inherit;
-    font-size:14px;
-    transition:.15s;
-}
-
-textarea{
-    min-height:110px;
-    resize:vertical;
-    line-height:1.5;
-}
-
-input:focus,
-textarea:focus,
-select:focus{
-    border-color:var(--accent);
-    box-shadow:0 0 0 3px rgba(77,163,255,.10);
-}
-
-.help{
-    color:#718aa0;
-    font-size:11px;
-    line-height:1.5;
-}
-
-.counter{
-    text-align:right;
-    color:#718aa0;
-    font-size:11px;
-    margin-top:-3px;
-}
-
-.actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-top:18px;
-}
-
-button{
-    border:0;
-    border-radius:10px;
-    padding:11px 16px;
-    color:white;
-    background:#17304a;
-    cursor:pointer;
-    font-weight:700;
-    font-size:13px;
-    transition:.15s;
-}
-
-button:hover{
-    transform:translateY(-1px);
-    filter:brightness(1.08);
-}
-
-button:disabled{
-    opacity:.45;
-    cursor:not-allowed;
-    transform:none;
-}
-
-.btn-primary{
-    background:linear-gradient(135deg,var(--accent),#357be5);
-}
-
-.btn-purple{
-    background:linear-gradient(135deg,var(--accent2),#6044d8);
-}
-
-.btn-success{
-    background:linear-gradient(135deg,#19b969,#168e55);
-}
-
-.btn-danger{
-    background:#572333;
-}
-
-.btn-small{
-    padding:8px 11px;
-    font-size:12px;
-}
-
-.status{
-    border-radius:12px;
-    border:1px solid var(--border);
-    background:#081522;
-    padding:13px 15px;
-    font-size:13px;
-    line-height:1.6;
-}
-
-.status.success{
-    border-color:rgba(40,209,124,.35);
-    background:rgba(40,209,124,.06);
-}
-
-.status.error{
-    border-color:rgba(255,93,115,.35);
-    background:rgba(255,93,115,.06);
-}
-
-.status.warning{
-    border-color:rgba(255,200,87,.35);
-    background:rgba(255,200,87,.06);
-}
-
-.status-title{
-    font-weight:800;
-    margin-bottom:3px;
-}
-
-.credit-box{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    margin-top:12px;
-}
-
-.credit{
-    background:#081522;
-    border:1px solid var(--border);
-    border-radius:11px;
-    padding:12px;
-}
-
-.credit .value{
-    font-size:21px;
-    font-weight:800;
-    margin-top:4px;
-}
-
-.credit .name{
-    color:var(--muted);
-    font-size:11px;
-}
-
-.credit.loading .value{
-    opacity:.5;
-}
-
-.badge{
-    display:inline-block;
-    border-radius:999px;
-    padding:4px 8px;
-    font-size:10px;
-    font-weight:800;
-    background:#17304a;
-    color:#a9d5ff;
-}
-
-.switch-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:15px;
-    padding:11px 12px;
-    background:#081522;
-    border:1px solid var(--border);
-    border-radius:10px;
-}
-
-.switch{
-    position:relative;
-    width:43px;
-    height:23px;
-    flex:none;
-}
-
-.switch input{
-    display:none;
-}
-
-.slider{
-    position:absolute;
-    inset:0;
-    background:#26384b;
-    border-radius:30px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.slider:before{
-    content:"";
-    position:absolute;
-    width:17px;
-    height:17px;
-    left:3px;
-    top:3px;
-    background:white;
-    border-radius:50%;
-    transition:.2s;
-}
-
-.switch input:checked + .slider{
-    background:var(--accent);
-}
-
-.switch input:checked + .slider:before{
-    transform:translateX(20px);
-}
-
-.template-list{
-    display:flex;
-    flex-direction:column;
-    gap:9px;
-}
-
-.template-row{
-    display:flex;
-    gap:8px;
-}
-
-.template-row input{
-    flex:1;
-}
-
-.template-row button{
-    width:40px;
-    padding:0;
-}
-
-.cta-fixed{
-    border:1px solid rgba(77,163,255,.18);
-    background:rgba(77,163,255,.04);
-    border-radius:12px;
-    padding:13px;
-}
-
-.fixed-label{
-    color:#6faee5;
-    font-size:11px;
-    font-weight:800;
-    margin-bottom:5px;
-}
-
-.readonly{
-    opacity:.75;
-}
-
-.preview{
-    background:#081522;
-    border:1px dashed var(--border);
-    border-radius:10px;
-    padding:12px;
-    color:#b9cbe0;
-    font-size:13px;
-    line-height:1.55;
-    white-space:pre-wrap;
-}
-
-.rss-info{
-    display:none;
-}
-
-.rss-info.visible{
-    display:block;
-}
-
-.rss-url{
-    word-break:break-all;
-    color:#79bcff;
-    font-size:13px;
-    background:#081522;
-    border:1px solid var(--border);
-    padding:10px;
-    border-radius:9px;
-}
-
-.episode-list{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-.episode{
-    display:grid;
-    grid-template-columns:60px 1fr auto;
-    gap:13px;
-    align-items:center;
-    padding:12px;
-    border:1px solid var(--border);
-    background:#081522;
-    border-radius:12px;
-}
-
-.episode-number{
-    width:52px;
-    height:52px;
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#142a42;
-    color:#8fc8ff;
-    font-weight:800;
-}
-
-.episode-title{
-    font-size:14px;
-    font-weight:800;
-    margin-bottom:5px;
-}
-
-.episode-meta{
-    color:var(--muted);
-    font-size:11px;
-    line-height:1.5;
-    word-break:break-word;
-}
-
-.progress-wrap{
-    margin-top:15px;
-    display:none;
-}
-
-.progress-wrap.show{
-    display:block;
-}
-
-.progress-top{
-    display:flex;
-    justify-content:space-between;
-    color:var(--muted);
-    font-size:11px;
-    margin-bottom:6px;
-}
-
-.progress{
-    height:8px;
-    background:#081522;
-    border-radius:20px;
-    overflow:hidden;
-    border:1px solid var(--border);
-}
-
-.progress-bar{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    transition:width:.25s;
-}
-
-hr{
-    border:0;
-    border-top:1px solid var(--border);
-    margin:20px 0;
-}
-
-small{
-    color:var(--muted);
-}
-
-.footer{
-    text-align:center;
-    color:#61798f;
-    font-size:11px;
-    margin-top:25px;
-}
-
+margin:0;background:
+radial-gradient(circle at top right,rgba(77,163,255,.10),transparent 30%),
+radial-gradient(circle at bottom left,rgba(124,92,255,.08),transparent 30%),
+var(--bg);color:var(--text);font-family:Inter,Arial,Helvetica,sans-serif;min-height:100vh
+}
+.container{width:min(1180px,calc(100% - 28px));margin:auto;padding:30px 0 60px}
+.header{margin-bottom:25px}
+.header h1{margin:0 0 8px;font-size:32px;letter-spacing:-.7px}
+.header p{margin:0;color:var(--muted);line-height:1.6}
+.version{display:inline-block;margin-left:7px;padding:4px 9px;border:1px solid var(--border);border-radius:999px;color:#9ecfff;font-size:12px;vertical-align:middle}
+.card{background:linear-gradient(180deg,rgba(16,31,51,.98),rgba(10,23,38,.98));border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow)}
+.card h2{margin:0 0 5px;font-size:19px}
+.card-description{color:var(--muted);font-size:13px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:7px}
+label{font-size:13px;font-weight:700;color:#c9d8e8}
+input,textarea,select{width:100%;border:1px solid var(--border);background:var(--input);color:var(--text);border-radius:10px;padding:11px 12px;outline:none;font:inherit;font-size:14px;transition:.15s}
+textarea{min-height:110px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(77,163,255,.10)}
+.help{color:#718aa0;font-size:11px;line-height:1.5}
+.counter{text-align:right;color:#718aa0;font-size:11px;margin-top:-3px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+button{border:0;border-radius:10px;padding:11px 16px;color:white;background:#17304a;cursor:pointer;font-weight:700;font-size:13px;transition:.15s}
+button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#357be5)}
+.btn-purple{background:linear-gradient(135deg,var(--accent2),#6044d8)}
+.btn-success{background:linear-gradient(135deg,#19b969,#168e55)}
+.btn-danger{background:#572333}
+.btn-small{padding:8px 11px;font-size:12px}
+.status{border-radius:12px;border:1px solid var(--border);background:#081522;padding:13px 15px;font-size:13px;line-height:1.6}
+.status.success{border-color:rgba(40,209,124,.35);background:rgba(40,209,124,.06)}
+.status.error{border-color:rgba(255,93,115,.35);background:rgba(255,93,115,.06)}
+.status.warning{border-color:rgba(255,200,87,.35);background:rgba(255,200,87,.06)}
+.status-title{font-weight:800;margin-bottom:3px}
+.badge{display:inline-block;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:800;background:#17304a;color:#a9d5ff}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:11px 12px;background:#081522;border:1px solid var(--border);border-radius:10px}
+.switch{position:relative;width:43px;height:23px;flex:none}
+.switch input{display:none}
+.slider{position:absolute;inset:0;background:#26384b;border-radius:30px;cursor:pointer;transition:.2s}
+.slider:before{content:"";position:absolute;width:17px;height:17px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s}
+.switch input:checked+.slider{background:var(--accent)}
+.switch input:checked+.slider:before{transform:translateX(20px)}
+.template-list{display:flex;flex-direction:column;gap:9px}
+.template-row{display:flex;gap:8px}
+.template-row input{flex:1}
+.template-row button{width:40px;padding:0}
+.cta-fixed{border:1px solid rgba(77,163,255,.18);background:rgba(77,163,255,.04);border-radius:12px;padding:13px}
+.fixed-label{color:#6faee5;font-size:11px;font-weight:800;margin-bottom:5px}
+.readonly{opacity:.75}
+.preview{background:#081522;border:1px dashed var(--border);border-radius:10px;padding:12px;color:#b9cbe0;font-size:13px;line-height:1.55;white-space:pre-wrap}
+.rss-info{display:none}.rss-info.visible{display:block}
+.rss-url{word-break:break-all;color:#79bcff;font-size:13px;background:#081522;border:1px solid var(--border);padding:10px;border-radius:9px}
+.episode-list{display:flex;flex-direction:column;gap:10px}
+.episode{display:grid;grid-template-columns:60px 1fr auto;gap:13px;align-items:center;padding:12px;border:1px solid var(--border);background:#081522;border-radius:12px}
+.episode-number{width:52px;height:52px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#142a42;color:#8fc8ff;font-weight:800}
+.episode-title{font-size:14px;font-weight:800;margin-bottom:5px}
+.episode-meta{color:var(--muted);font-size:11px;line-height:1.5;word-break:break-word}
+.progress-wrap{margin-top:15px;display:none}
+.progress-wrap.show{display:block}
+.progress-top{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:6px}
+.progress{height:8px;background:#081522;border-radius:20px;overflow:hidden;border:1px solid var(--border)}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width:.25s}
+small{color:var(--muted)}
+.footer{text-align:center;color:#61798f;font-size:11px;margin-top:25px}
 @media(max-width:800px){
-    .grid,
-    .grid-3{
-        grid-template-columns:1fr;
-    }
-
-    .header h1{
-        font-size:25px;
-    }
-
-    .credit-box{
-        grid-template-columns:1fr 1fr 1fr;
-    }
-
-    .episode{
-        grid-template-columns:48px 1fr;
-    }
-
-    .episode > div:last-child{
-        grid-column:2;
-    }
+.grid{grid-template-columns:1fr}.header h1{font-size:25px}
+.episode{grid-template-columns:48px 1fr}.episode>div:last-child{grid-column:2}
 }
-
 @media(max-width:520px){
-    .container{
-        width:min(100% - 18px,1180px);
-        padding-top:18px;
-    }
-
-    .card{
-        padding:15px;
-    }
-
-    .credit-box{
-        grid-template-columns:1fr;
-    }
-
-    .actions button{
-        width:100%;
-    }
+.container{width:min(100% - 18px,1180px);padding-top:18px}
+.card{padding:15px}.actions button{width:100%}
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
 <header class="header">
-    <h1>
-        Movie Podcast Generator
-        <span class="version">V2.9</span>
-    </h1>
-    <p>
-        TMDB → ElevenLabs TTS → Cloudflare R2 → Live RSS.
-        Generate movie podcast episodes and download everything as a ZIP.
-    </p>
+<h1>Movie Podcast Generator <span class="version">V3.0</span></h1>
+<p>TMDB → Edge TTS → Cloudflare R2 → Live RSS. Generate movie podcast episodes and download everything as a ZIP.</p>
 </header>
 
-
-<!-- MOVIE SOURCE -->
+<!-- 1 MOVIE SOURCE -->
 <section class="card">
+<h2>1. Movie Source</h2>
+<div class="card-description">Enter TMDB movie IDs. Maximum 500 unique IDs per generation.</div>
 
-    <h2>1. Movie Source</h2>
-
-    <div class="card-description">
-        Enter TMDB movie IDs. Maximum 500 unique IDs per generation.
-    </div>
-
-    <div class="grid">
-
-        <div class="field full">
-
-            <label for="tmdbIds">TMDB Movie IDs</label>
-
-            <textarea
-                id="tmdbIds"
-                placeholder="Example:
+<div class="grid">
+<div class="field full">
+<label for="tmdbIds">TMDB Movie IDs</label>
+<textarea id="tmdbIds" placeholder="Example:
 550
 603
 680
 157
 27205"></textarea>
+<div class="counter" id="idCounter">0 / 500 IDs</div>
+<div class="help">You can paste IDs separated by spaces, commas or new lines. Duplicate IDs are automatically removed.</div>
+</div>
 
-            <div class="counter" id="idCounter">
-                0 / 500 IDs
-            </div>
-
-            <div class="help">
-                You can paste IDs separated by spaces, commas or new lines.
-                Duplicate IDs are automatically removed.
-            </div>
-
-        </div>
-
-        <div class="field">
-
-            <label for="tmdbLanguage">
-                TMDB Language
-            </label>
-
-            <select id="tmdbLanguage">
-
-                <option value="en-US">English (US)</option>
-                <option value="en-GB">English (UK)</option>
-                <option value="es-ES">Spanish (Spain)</option>
-                <option value="es-MX">Spanish (Mexico)</option>
-                <option value="fr-FR">French</option>
-                <option value="de-DE">German</option>
-                <option value="it-IT">Italian</option>
-                <option value="pt-PT">Portuguese (Portugal)</option>
-                <option value="pt-BR">Portuguese (Brazil)</option>
-                <option value="nl-NL">Dutch</option>
-                <option value="sv-SE">Swedish</option>
-                <option value="da-DK">Danish</option>
-                <option value="no-NO">Norwegian</option>
-                <option value="fi-FI">Finnish</option>
-                <option value="pl-PL">Polish</option>
-                <option value="cs-CZ">Czech</option>
-                <option value="hu-HU">Hungarian</option>
-                <option value="ro-RO">Romanian</option>
-                <option value="bg-BG">Bulgarian</option>
-                <option value="tr-TR">Turkish</option>
-                <option value="el-GR">Greek</option>
-                <option value="ko-KR">Korean</option>
-                <option value="ja-JP">Japanese</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="th-TH">Thai</option>
-                <option value="vi-VN">Vietnamese</option>
-
-            </select>
-
-        </div>
-
-    </div>
-
+<div class="field">
+<label for="tmdbLanguage">TMDB Language</label>
+<select id="tmdbLanguage">
+<option value="en-US">English (US)</option>
+<option value="en-GB">English (UK)</option>
+<option value="es-ES">Spanish (Spain)</option>
+<option value="es-MX">Spanish (Mexico)</option>
+<option value="fr-FR">French</option>
+<option value="de-DE">German</option>
+<option value="it-IT">Italian</option>
+<option value="pt-PT">Portuguese (Portugal)</option>
+<option value="pt-BR">Portuguese (Brazil)</option>
+<option value="nl-NL">Dutch</option>
+<option value="sv-SE">Swedish</option>
+<option value="da-DK">Danish</option>
+<option value="no-NO">Norwegian</option>
+<option value="fi-FI">Finnish</option>
+<option value="pl-PL">Polish</option>
+<option value="cs-CZ">Czech</option>
+<option value="hu-HU">Hungarian</option>
+<option value="ro-RO">Romanian</option>
+<option value="bg-BG">Bulgarian</option>
+<option value="tr-TR">Turkish</option>
+<option value="el-GR">Greek</option>
+<option value="ko-KR">Korean</option>
+<option value="ja-JP">Japanese</option>
+<option value="zh-CN">Chinese</option>
+<option value="th-TH">Thai</option>
+<option value="vi-VN">Vietnamese</option>
+</select>
+</div>
+</div>
 </section>
 
-
-<!-- ELEVENLABS -->
+<!-- 2 EDGE TTS -->
 <section class="card">
+<h2>2. Edge TTS</h2>
+<div class="card-description">Configure the Microsoft Edge TTS voice used to generate the movie podcast narration.</div>
 
-    <h2>2. ElevenLabs</h2>
+<div class="grid">
+<div class="field">
+<label for="voiceId">Edge TTS Voice</label>
+<input id="voiceId" type="text" value="vi-VN-HoaiMyNeural" placeholder="Example: vi-VN-HoaiMyNeural">
+<div class="help">Example voices: vi-VN-HoaiMyNeural, en-US-JennyNeural, en-US-GuyNeural.</div>
+</div>
 
-    <div class="card-description">
-        Configure the ElevenLabs voice and audio output.
-    </div>
+<div class="field">
+<label>TTS Engine</label>
+<div class="status">
+<div class="status-title">Edge TTS</div>
+<div>No ElevenLabs API key or credit system is required.</div>
+</div>
+</div>
 
-    <div class="grid">
-
-        <div class="field">
-
-            <label for="voiceId">
-                ElevenLabs Voice ID
-            </label>
-
-            <input
-                id="voiceId"
-                type="text"
-                placeholder="Enter Voice ID">
-
-            <div class="help">
-                The API key remains server-side in
-                <code>/api/tts</code>.
-            </div>
-
-        </div>
-
-        <div class="field">
-
-            <label>Credit Status</label>
-
-            <div class="credit-box">
-
-                <div class="credit" id="creditRemainingBox">
-                    <div class="name">Terpakai</div>
-                    <div class="value" id="creditUsed">-</div>
-                </div>
-
-                <div class="credit" id="creditUsedBox">
-                    <div class="name">Sisa</div>
-                    <div class="value" id="creditRemaining">-</div>
-                </div>
-
-                <div class="credit" id="creditLimitBox">
-                    <div class="name">Limit</div>
-                    <div class="value" id="creditLimit">-</div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="field">
-
-            <label>Credit</label>
-
-            <button
-                type="button"
-                class="btn-small"
-                id="refreshCreditBtn">
-                ↻ Refresh Credit
-            </button>
-
-            <div
-                class="help"
-                id="creditStatus">
-                Click refresh to check current ElevenLabs
-                character usage.
-            </div>
-
-        </div>
-
-        <div class="field">
-
-            <label for="modelId">Model</label>
-
-            <select id="modelId">
-
-                <option value="eleven_multilingual_v2">
-                    Eleven Multilingual v2
-                </option>
-
-                <option value="eleven_turbo_v2_5">
-                    Eleven Turbo v2.5
-                </option>
-
-                <option value="eleven_flash_v2_5">
-                    Eleven Flash v2.5
-                </option>
-
-            </select>
-
-        </div>
-
-        <div class="field">
-
-            <label for="outputFormat">
-                Output Format
-            </label>
-
-            <select id="outputFormat">
-                <option value="mp3_22050_32">
-                    MP3 22050 Hz / 32 kbps
-                </option>
-
-                <option value="mp3_44100_64">
-                    MP3 44100 Hz / 64 kbps
-                </option>
-
-                <option value="mp3_44100_96">
-                    MP3 44100 Hz / 96 kbps
-                </option>
-
-                <option value="mp3_44100_128">
-                    MP3 44100 Hz / 128 kbps
-                </option>
-            </select>
-
-        </div>
-
-        <div class="field">
-
-            <label>Title Mode</label>
-
-            <div class="switch-row">
-
-                <div>
-
-                    <strong>
-                        Random title template
-                    </strong>
-
-                    <div class="help">
-                        Randomly selects one title
-                        template per movie.
-                    </div>
-
-                </div>
-
-                <label class="switch">
-
-                    <input
-                        type="checkbox"
-                        id="randomTitle">
-
-                    <span class="slider"></span>
-
-                </label>
-
-            </div>
-
-        </div>
-
-    </div>
-
+<div class="field full">
+<label>Title Mode</label>
+<div class="switch-row">
+<div>
+<strong>Random title template</strong>
+<div class="help">Randomly selects one title template per movie.</div>
+</div>
+<label class="switch">
+<input type="checkbox" id="randomTitle">
+<span class="slider"></span>
+</label>
+</div>
+</div>
+</div>
 </section>
 
-
-<!-- TITLE -->
+<!-- 3 TITLE -->
 <section class="card">
-
-    <h2>3. Episode Title Templates</h2>
-
-    <div class="card-description">
-        Available variables:
-        <code>{TITLE}</code>,
-        <code>{YEAR}</code>,
-        <code>{ID}</code>.
-    </div>
-
-    <div
-        class="template-list"
-        id="titleTemplates">
-    </div>
-
-    <div class="actions">
-
-        <button
-            type="button"
-            id="addTitleTemplate">
-            + Add Template
-        </button>
-
-    </div>
-
-    <div style="margin-top:15px">
-
-        <label>Preview</label>
-
-        <div
-            class="preview"
-            id="titlePreview">
-            Movie title preview will appear here.
-        </div>
-
-    </div>
-
+<h2>3. Episode Title Templates</h2>
+<div class="card-description">Available variables: <code>{TITLE}</code>, <code>{YEAR}</code>, <code>{ID}</code>.</div>
+<div class="template-list" id="titleTemplates"></div>
+<div class="actions">
+<button type="button" id="addTitleTemplate">+ Add Template</button>
+</div>
+<div style="margin-top:15px">
+<label>Preview</label>
+<div class="preview" id="titlePreview">Movie title preview will appear here.</div>
+</div>
 </section>
 
-
-<!-- CTA -->
+<!-- 4 CTA -->
 <section class="card">
+<h2>4. CTA</h2>
+<div class="card-description">Enter your CTA URL template. Use <code>{ID}</code> where the TMDB movie ID should be inserted.</div>
 
-    <h2>4. CTA</h2>
+<div class="grid">
 
-    <div class="card-description">
-        Enter your CTA URL template. Use
-        <code>{ID}</code> where the TMDB movie ID should be inserted.
-        The URL is automatically converted for every movie.
-    </div>
+<div class="cta-fixed">
+<div class="fixed-label">CTA 1</div>
+<div class="field">
+<label for="cta1Text">CTA Text</label>
+<input id="cta1Text" value="Watch Full Movie">
+</div>
+<div style="height:10px"></div>
+<div class="field">
+<label for="cta1Url">CTA URL Template</label>
+<input id="cta1Url" type="url" value="https://onpreps.live/vi/movie/{ID}">
+<div class="help">Example: <strong>https://onpreps.live/vi/movie/{ID}</strong></div>
+</div>
+<div style="height:10px"></div>
+<div class="field">
+<label>CTA HTML</label>
+<textarea id="cta1Html" readonly class="readonly"></textarea>
+</div>
+</div>
 
-    <div class="grid">
+<div class="cta-fixed">
+<div class="fixed-label">CTA 2</div>
+<div class="field">
+<label for="cta2Text">CTA Text</label>
+<input id="cta2Text" value="Watch Now">
+</div>
+<div style="height:10px"></div>
+<div class="field">
+<label for="cta2Url">CTA URL Template</label>
+<input id="cta2Url" type="url" value="https://onpreps.live/vi/movie/{ID}">
+<div class="help">Example: <strong>https://onpreps.live/vi/movie/{ID}</strong></div>
+</div>
+<div style="height:10px"></div>
+<div class="field">
+<label>CTA HTML</label>
+<textarea id="cta2Html" readonly class="readonly"></textarea>
+</div>
+</div>
 
-
-        <!-- CTA 1 -->
-        <div class="cta-fixed">
-
-            <div class="fixed-label">
-                CTA 1
-            </div>
-
-            <div class="field">
-
-                <label for="cta1Text">
-                    CTA Text
-                </label>
-
-                <input
-                    id="cta1Text"
-                    value="Watch Full Movie">
-
-            </div>
-
-            <div style="height:10px"></div>
-
-            <div class="field">
-
-                <label for="cta1Url">
-                    CTA URL Template
-                </label>
-
-                <input
-                    id="cta1Url"
-                    type="url"
-                    value="https://onpreps.live/movie/{ID}"
-                    placeholder="https://example.com/movie/{ID}">
-
-                <div class="help">
-                    Example:
-                    <strong>
-                        https://onpreps.live/movie/{ID}
-                    </strong>
-                    <br>
-                    TMDB 550 →
-                    https://onpreps.live/movie/550
-                </div>
-
-            </div>
-
-            <div style="height:10px"></div>
-
-            <div class="field">
-
-                <label>
-                    CTA HTML
-                </label>
-
-                <textarea
-                    id="cta1Html"
-                    readonly
-                    class="readonly"></textarea>
-
-            </div>
-
-        </div>
-
-
-        <!-- CTA 2 -->
-        <div class="cta-fixed">
-
-            <div class="fixed-label">
-                CTA 2
-            </div>
-
-            <div class="field">
-
-                <label for="cta2Text">
-                    CTA Text
-                </label>
-
-                <input
-                    id="cta2Text"
-                    value="Watch Now">
-
-            </div>
-
-            <div style="height:10px"></div>
-
-            <div class="field">
-
-                <label for="cta2Url">
-                    CTA URL Template
-                </label>
-
-                <input
-                    id="cta2Url"
-                    type="url"
-                    value="https://onpreps.live/movie/{ID}"
-                    placeholder="https://example.com/movie/{ID}">
-
-                <div class="help">
-                    Example:
-                    <strong>
-                        https://onpreps.live/movie/{ID}
-                    </strong>
-                    <br>
-                    TMDB 603 →
-                    https://onpreps.live/movie/603
-                </div>
-
-            </div>
-
-            <div style="height:10px"></div>
-
-            <div class="field">
-
-                <label>
-                    CTA HTML
-                </label>
-
-                <textarea
-                    id="cta2Html"
-                    readonly
-                    class="readonly"></textarea>
-
-            </div>
-
-        </div>
-
-    </div>
-
+</div>
 </section>
 
-
-<!-- DESCRIPTION -->
+<!-- 5 DESCRIPTION -->
 <section class="card">
-
-    <h2>5. Episode Description</h2>
-
-    <div class="card-description">
-        Build the RSS episode description using movie information and CTA.
-    </div>
-
-    <div class="field">
-
-        <label for="descriptionTemplate">
-            Description Template
-        </label>
-
-        <textarea
-            id="descriptionTemplate"></textarea>
-
-        <div class="help">
-            Variables:
-            {TITLE},
-            {ORIGINAL_TITLE},
-            {ORIGINAL_LANGUAGE},
-            {YEAR},
-            {OVERVIEW},
-            {RATING},
-            {DIRECTOR},
-            {RUNTIME},
-            {CAST},
-            {ID},
-            {CTA1},
-            {CTA2}
-        </div>
-
-    </div>
-
+<h2>5. Episode Description</h2>
+<div class="card-description">Build the RSS episode description using movie information and CTA.</div>
+<div class="field">
+<label for="descriptionTemplate">Description Template</label>
+<textarea id="descriptionTemplate"></textarea>
+<div class="help">
+Variables:
+{TITLE}, {ORIGINAL_TITLE}, {ORIGINAL_LANGUAGE}, {YEAR}, {OVERVIEW},
+{RATING}, {DIRECTOR}, {RUNTIME}, {CAST}, {ID}, {CTA1}, {CTA2}
+</div>
+</div>
 </section>
 
-
-<!-- TTS -->
+<!-- 6 TTS -->
 <section class="card">
-
-    <h2>6. TTS Narration</h2>
-
-    <div class="card-description">
-        The generated text is sent to ElevenLabs. Keep narration
-        reasonably short because the API endpoint limits the TTS input.
-    </div>
-
-    <div class="field">
-
-        <label for="ttsTemplate">
-            Narration Template
-        </label>
-
-        <textarea
-            id="ttsTemplate"></textarea>
-
-        <div class="help">
-            Same movie variables are available.
-            Maximum supported text by the current TTS worker:
-            1500 characters.
-        </div>
-
-    </div>
-
-    <div style="margin-top:12px">
-
-        <label>Narration Preview</label>
-
-        <div
-            class="preview"
-            id="ttsPreview">
-            Narration preview will appear here.
-        </div>
-
-    </div>
-
+<h2>6. TTS Narration</h2>
+<div class="card-description">The generated narration is sent to the Edge TTS worker through <code>/api/tts</code>. Maximum narration length is 1500 characters.</div>
+<div class="field">
+<label for="ttsTemplate">Narration Template</label>
+<textarea id="ttsTemplate"></textarea>
+<div class="help">Same movie variables are available. Maximum supported text: 1500 characters.</div>
+</div>
+<div style="margin-top:12px">
+<label>Narration Preview</label>
+<div class="preview" id="ttsPreview">Narration preview will appear here.</div>
+</div>
 </section>
 
-
-<!-- PODCAST -->
+<!-- 7 PODCAST -->
 <section class="card">
-
-    <h2>7. Podcast Settings</h2>
-
-    <div class="card-description">
-        These values are stored through
-        <code>/api/podcast-config</code>
-        and are used by the live RSS feed.
-    </div>
-
-    <div class="grid">
-
-        <div class="field">
-
-            <label for="podcastTitle">
-                Podcast Title
-            </label>
-
-            <input id="podcastTitle">
-
-        </div>
-
-        <div class="field">
-
-            <label for="podcastAuthor">
-                Author
-            </label>
-
-            <input id="podcastAuthor">
-
-        </div>
-
-        <div class="field full">
-
-            <label for="podcastDescription">
-                Podcast Description
-            </label>
-
-            <textarea
-                id="podcastDescription"></textarea>
-
-        </div>
-
-        <div class="field">
-
-            <label for="podcastEmail">
-                Owner Email
-            </label>
-
-            <input
-                id="podcastEmail"
-                type="email">
-
-        </div>
-
-        <div class="field">
-
-            <label for="podcastArtwork">
-                Artwork URL
-            </label>
-
-            <input
-                id="podcastArtwork"
-                type="url">
-
-        </div>
-
-        <div class="field">
-
-            <label for="podcastWebsite">
-                Website URL
-            </label>
-
-            <input
-                id="podcastWebsite"
-                type="url">
-
-        </div>
-
-        <div class="field">
-
-            <label for="podcastCategory">
-                Category
-            </label>
-
-            <input id="podcastCategory">
-
-        </div>
-
-        <div class="field">
-
-            <label for="podcastLanguage">
-                Podcast Language
-            </label>
-
-            <input
-                id="podcastLanguage"
-                value="en-us"
-                placeholder="en-us">
-
-        </div>
-
-        <div class="field">
-
-            <label for="podcastType">
-                Podcast Type
-            </label>
-
-            <select id="podcastType">
-
-                <option value="episodic">
-                    Episodic
-                </option>
-
-                <option value="serial">
-                    Serial
-                </option>
-
-            </select>
-
-        </div>
-
-        <div class="field">
-
-            <label for="podcastExplicit">
-                Explicit
-            </label>
-
-            <select id="podcastExplicit">
-
-                <option value="false">
-                    No
-                </option>
-
-                <option value="true">
-                    Yes
-                </option>
-
-            </select>
-
-        </div>
-
-    </div>
-
-    <div class="actions">
-
-        <button
-            type="button"
-            id="savePodcastBtn">
-            Save Podcast Settings
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- GENERATE -->
-<section class="card">
-
-    <h2>8. Generate Podcast</h2>
-
-    <div class="card-description">
-        Episodes are generated sequentially to avoid unnecessary API pressure.
-    </div>
-
-    <div class="actions">
-
-        <button
-            type="button"
-            class="btn-primary"
-            id="generateBtn">
-            🎙 Generate Podcast
-        </button>
-
-        <button
-            type="button"
-            class="btn-purple"
-            id="rssBtn"
-            disabled>
-            Generate rss.xml
-        </button>
-
-        <button
-            type="button"
-            class="btn-success"
-            id="downloadZipBtn"
-            disabled>
-            Download ZIP
-        </button>
-
-    </div>
-
-    <div
-        class="progress-wrap"
-        id="progressWrap">
-
-        <div class="progress-top">
-
-            <span id="progressText">
-                Preparing...
-            </span>
-
-            <span id="progressPercent">
-                0%
-            </span>
-
-        </div>
-
-        <div class="progress">
-
-            <div
-                class="progress-bar"
-                id="progressBar">
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- RSS -->
-<section class="card">
-
-    <h2>9. RSS Engine</h2>
-
-    <div class="card-description">
-        RSS is not saved as a server snapshot. The live feed is generated
-        from podcast configuration + manifest.
-    </div>
-
-    <div
-        class="status"
-        id="rssStatus">
-        No RSS generated yet.
-    </div>
-
-    <div
-        class="rss-info"
-        id="rssInfo"
-        style="margin-top:15px">
-
-        <div class="field">
-
-            <label>
-                Live RSS Feed URL
-            </label>
-
-            <div
-                class="rss-url"
-                id="liveRSSUrl">
-            </div>
-
-            <div class="help">
-                Use this URL in your podcast host. It points to
-                <code>/api/rss</code> and does not require an RSS snapshot.
-            </div>
-
-        </div>
-
-        <div style="height:12px"></div>
-
-        <div class="actions">
-
-            <button
-                type="button"
-                class="btn-small"
-                id="copyRSSBtn">
-                Copy RSS URL
-            </button>
-
-            <button
-                type="button"
-                class="btn-small"
-                id="openRSSBtn">
-                Open Live RSS
-            </button>
-
-            <button
-                type="button"
-                class="btn-small"
-                id="downloadRSSBtn">
-                Download rss.xml
-            </button>
-
-        </div>
-
-        <div style="height:12px"></div>
-
-        <small id="rssMeta"></small>
-
-    </div>
-
-</section>
-
-
-<!-- STATUS -->
-<section class="card">
-
-    <h2>10. Status</h2>
-
-    <div
-        class="status"
-        id="mainStatus">
-
-        <div class="status-title">
-            Ready
-        </div>
-
-        <div>
-            Configure your movie IDs and settings,
-            then click Generate Podcast.
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- EPISODES -->
-<section class="card">
-
-    <h2>11. Generated Episodes</h2>
-
-    <div class="card-description">
-        Generated audio files and metadata from the current browser session.
-    </div>
-
-    <div
-        class="episode-list"
-        id="episodeList">
-
-        <div class="status">
-            No episodes generated yet.
-        </div>
-
-    </div>
-
-</section>
-
-
-<div class="footer">
-    Movie Podcast Generator V2.9
+<h2>7. Podcast Settings</h2>
+<div class="card-description">These values are stored through <code>/api/podcast-config</code> and are used by the live RSS feed.</div>
+
+<div class="grid">
+
+<div class="field">
+<label for="podcastTitle">Podcast Title</label>
+<input id="podcastTitle">
+</div>
+
+<div class="field">
+<label for="podcastAuthor">Author</label>
+<input id="podcastAuthor">
+</div>
+
+<div class="field full">
+<label for="podcastDescription">Podcast Description</label>
+<textarea id="podcastDescription"></textarea>
+</div>
+
+<div class="field">
+<label for="podcastEmail">Owner Email</label>
+<input id="podcastEmail" type="email">
+</div>
+
+<div class="field">
+<label for="podcastArtwork">Artwork URL</label>
+<input id="podcastArtwork" type="url">
+</div>
+
+<div class="field">
+<label for="podcastWebsite">Website URL</label>
+<input id="podcastWebsite" type="url">
+</div>
+
+<div class="field">
+<label for="podcastCategory">Category</label>
+<input id="podcastCategory">
+</div>
+
+<div class="field">
+<label for="podcastLanguage">Podcast Language</label>
+<input id="podcastLanguage" value="en-us" placeholder="en-us">
+</div>
+
+<div class="field">
+<label for="podcastType">Podcast Type</label>
+<select id="podcastType">
+<option value="episodic">Episodic</option>
+<option value="serial">Serial</option>
+</select>
+</div>
+
+<div class="field">
+<label for="podcastExplicit">Explicit</label>
+<select id="podcastExplicit">
+<option value="false">No</option>
+<option value="true">Yes</option>
+</select>
 </div>
 
 </div>
 
+<div class="actions">
+<button type="button" id="savePodcastBtn">Save Podcast Settings</button>
+</div>
+</section>
+
+<!-- 8 GENERATE -->
+<section class="card">
+<h2>8. Generate Podcast</h2>
+<div class="card-description">Episodes are generated sequentially to avoid unnecessary API pressure.</div>
+
+<div class="actions">
+<button type="button" class="btn-primary" id="generateBtn">🎙 Generate Podcast</button>
+<button type="button" class="btn-purple" id="rssBtn" disabled>Generate rss.xml</button>
+<button type="button" class="btn-success" id="downloadZipBtn" disabled>Download ZIP</button>
+</div>
+
+<div class="progress-wrap" id="progressWrap">
+<div class="progress-top">
+<span id="progressText">Preparing...</span>
+<span id="progressPercent">0%</span>
+</div>
+<div class="progress">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+</div>
+</section>
+
+<!-- 9 RSS -->
+<section class="card">
+<h2>9. RSS Engine</h2>
+<div class="card-description">RSS is not saved as a server snapshot. The live feed is generated from podcast configuration + manifest.</div>
+
+<div class="status" id="rssStatus">No RSS generated yet.</div>
+
+<div class="rss-info" id="rssInfo" style="margin-top:15px">
+
+<div class="field">
+<label>Live RSS Feed URL</label>
+<div class="rss-url" id="liveRSSUrl"></div>
+<div class="help">Use this URL in your podcast host. It points to <code>/api/rss</code> and does not require an RSS snapshot.</div>
+</div>
+
+<div style="height:12px"></div>
+
+<div class="actions">
+<button type="button" class="btn-small" id="copyRSSBtn">Copy RSS URL</button>
+<button type="button" class="btn-small" id="openRSSBtn">Open Live RSS</button>
+<button type="button" class="btn-small" id="downloadRSSBtn">Download rss.xml</button>
+</div>
+
+<div style="height:12px"></div>
+<small id="rssMeta"></small>
+</div>
+</section>
+
+<!-- 10 STATUS -->
+<section class="card">
+<h2>10. Status</h2>
+<div class="status" id="mainStatus">
+<div class="status-title">Ready</div>
+<div>Configure your movie IDs and settings, then click Generate Podcast.</div>
+</div>
+</section>
+
+<!-- 11 EPISODES -->
+<section class="card">
+<h2>11. Generated Episodes</h2>
+<div class="card-description">Generated audio files and metadata from the current browser session.</div>
+<div class="episode-list" id="episodeList">
+<div class="status">No episodes generated yet.</div>
+</div>
+</section>
+
+<div class="footer">Movie Podcast Generator V3.0</div>
+</div>
 
 <script>
 "use strict";
-
 
 /* =========================================================
    CONSTANTS
 ========================================================= */
 
-const APP_VERSION = "2.9";
-
+const APP_VERSION = "3.0";
 const MAX_EPISODES_PER_RSS = 500;
-
 const MAX_TTS_TEXT = 1500;
 
 const LOCAL_STORAGE_KEY =
-    "moviePodcastGeneratorV28";
+    "moviePodcastGeneratorV30";
 
 const DEFAULT_ARTWORK =
     "https://movietts.pages.dev/default-podcast-artwork.jpg";
 
-
-/*
- * CTA HTML IS FIXED.
- *
- * Only URL and TEXT are replaced.
- */
 const FIXED_CTA_HTML =
     '<p><a href="{URL}" target="_blank" rel="noopener noreferrer">{TEXT}</a></p>';
 
-
 const DEFAULT_TITLE_TEMPLATES = [
-
     "WATCH {TITLE} ({YEAR}) FULL MOVIE REVIEW",
-
     "{TITLE} ({YEAR}) MOVIE REVIEW - STORY, CAST & RATING",
-
     "{TITLE} {YEAR} FULL MOVIE REVIEW | EVERYTHING YOU NEED TO KNOW",
-
     "MOVIE REVIEW: {TITLE} ({YEAR}) - STORY, CAST & DETAILS",
-
     "{TITLE} ({YEAR}) - FULL MOVIE REVIEW & BREAKDOWN"
-
 ];
-
 
 const DEFAULT_DESCRIPTION_TEMPLATE =
 `{TITLE} ({YEAR}) movie review.
@@ -1469,7 +468,6 @@ Watch the full movie:
 {CTA1}
 
 {CTA2}`;
-
 
 const DEFAULT_TTS_TEMPLATE =
 `Welcome to our movie review podcast.
@@ -1488,24 +486,13 @@ To watch the full movie, check the link in the description.
 
 {CTA1}`;
 
-
 /* =========================================================
    STATE
 ========================================================= */
 
 let generatedEpisodes = [];
-
 let generatedZip = null;
-
 let generationRunning = false;
-
-let creditLoading = false;
-
-let latestCredit = {
-    used:null,
-    remaining:null,
-    limit:null
-};
 
 let latestRSS = {
     url:"",
@@ -1516,36 +503,23 @@ let latestRSS = {
 
 let latestRSSXML = "";
 
-
 /* =========================================================
    DOM
 ========================================================= */
 
-const $ = id =>
-    document.getElementById(id);
-
+const $ = id => document.getElementById(id);
 
 /* =========================================================
    UTILITY
 ========================================================= */
 
 function formatNumber(value){
-
-    const number =
-        Number(value);
-
-    if(!Number.isFinite(number)){
-        return "-";
-    }
-
-    return new Intl.NumberFormat(
-        "en-US"
-    ).format(number);
+    const number = Number(value);
+    if(!Number.isFinite(number)) return "-";
+    return new Intl.NumberFormat("en-US").format(number);
 }
 
-
 function escapeHtml(value){
-
     return String(value ?? "")
         .replace(/&/g,"&amp;")
         .replace(/</g,"&lt;")
@@ -1554,9 +528,7 @@ function escapeHtml(value){
         .replace(/'/g,"&#039;");
 }
 
-
 function escapeXML(value){
-
     return String(value ?? "")
         .replace(/&/g,"&amp;")
         .replace(/</g,"&lt;")
@@ -1565,144 +537,73 @@ function escapeXML(value){
         .replace(/'/g,"&apos;");
 }
 
-
 function normalizeText(value){
-
     return String(value ?? "")
         .replace(/\r/g,"")
         .trim();
 }
 
-
-function sleep(ms){
-
-    return new Promise(
-        resolve => setTimeout(resolve,ms)
-    );
-}
-
-
-function setStatus(
-    message,
-    type=""
-){
-
-    const box =
-        $("mainStatus");
-
-    box.className =
-        "status";
-
-    if(type){
-        box.classList.add(type);
-    }
+function setStatus(message,type=""){
+    const box = $("mainStatus");
+    box.className = "status";
+    if(type) box.classList.add(type);
 
     box.innerHTML =
         `<div class="status-title">${escapeHtml(
-            type === "error"
-                ? "Error"
-                : type === "success"
-                    ? "Success"
-                    : type === "warning"
-                        ? "Warning"
-                        : "Status"
+            type==="error" ? "Error" :
+            type==="success" ? "Success" :
+            type==="warning" ? "Warning" : "Status"
         )}</div>
         <div>${escapeHtml(message)}</div>`;
 }
 
-
-function setRSSStatus(
-    message,
-    type=""
-){
-
-    const box =
-        $("rssStatus");
-
-    box.className =
-        "status";
-
-    if(type){
-        box.classList.add(type);
-    }
-
-    box.textContent =
-        message;
+function setRSSStatus(message,type=""){
+    const box = $("rssStatus");
+    box.className = "status";
+    if(type) box.classList.add(type);
+    box.textContent = message;
 }
 
-
-function downloadBlob(
-    blob,
-    filename
-){
-
-    const url =
-        URL.createObjectURL(blob);
-
-    const a =
-        document.createElement("a");
-
-    a.href =
-        url;
-
-    a.download =
-        filename;
-
+function downloadBlob(blob,filename){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
     document.body.appendChild(a);
-
     a.click();
-
     a.remove();
 
     setTimeout(
-        () => URL.revokeObjectURL(url),
+        ()=>URL.revokeObjectURL(url),
         1000
     );
 }
-
 
 function downloadText(
     text,
     filename,
     mime="text/plain;charset=utf-8"
 ){
-
-    const blob =
-        new Blob(
-            [text],
-            {type:mime}
-        );
-
     downloadBlob(
-        blob,
+        new Blob([text],{type:mime}),
         filename
     );
 }
 
-
-async function readJSONResponse(
-    response
-){
-
-    const text =
-        await response.text();
+async function readJSONResponse(response){
+    const text = await response.text();
 
     let data = null;
 
     try{
-
-        data =
-            JSON.parse(text);
-
+        data = JSON.parse(text);
     }catch{
-
         throw new Error(
             `Invalid JSON response (${response.status}): ${text.slice(0,500)}`
         );
     }
 
     if(!response.ok){
-
         const message =
             data?.error ||
             data?.message ||
@@ -1715,31 +616,13 @@ async function readJSONResponse(
     return data;
 }
 
-
 /* =========================================================
    CTA
 ========================================================= */
 
-/*
- * Convert:
- *
- * https://example.com/movie/{ID}
- *
- * into:
- *
- * https://example.com/movie/550
- */
-function buildCTAUrl(
-    urlTemplate,
-    movieId
-){
-
-    let url =
-        String(urlTemplate || "")
-            .trim();
-
-    const id =
-        String(movieId ?? "");
+function buildCTAUrl(urlTemplate,movieId){
+    let url = String(urlTemplate || "").trim();
+    const id = String(movieId ?? "");
 
     return url.replace(
         /\{ID\}/gi,
@@ -1747,11 +630,8 @@ function buildCTAUrl(
     );
 }
 
+function createCTA(text,urlTemplate,movie){
 
-/*
- * Create final CTA HTML for an actual movie.
- */
-function createCTA(text, urlTemplate, movie){
     const movieId = movie?.id ?? "";
 
     const title =
@@ -1766,33 +646,54 @@ function createCTA(text, urlTemplate, movie){
         movie?.first_air_date ||
         "";
 
-    const year = date ? String(date).slice(0, 4) : "";
+    const year =
+        date
+            ? String(date).slice(0,4)
+            : "";
 
-    let url = String(urlTemplate || "").trim();
-    url = url.replace(/\{ID\}/gi, encodeURIComponent(movieId));
+    let url =
+        String(urlTemplate || "").trim();
 
-    let ctaText = String(text || "");
+    url =
+        url.replace(
+            /\{ID\}/gi,
+            encodeURIComponent(movieId)
+        );
 
-    ctaText = ctaText.replace(/\{TITLE\}/gi, title);
-    ctaText = ctaText.replace(/\{YEAR\}/gi, year);
+    let ctaText =
+        String(text || "");
 
-    let html = FIXED_CTA_HTML;
+    ctaText =
+        ctaText.replace(
+            /\{TITLE\}/gi,
+            title
+        );
 
-    html = html.replace(/\{URL\}/gi, url);
-    html = html.replace(/\{TEXT\}/gi, normalizeText(ctaText));
+    ctaText =
+        ctaText.replace(
+            /\{YEAR\}/gi,
+            year
+        );
+
+    let html =
+        FIXED_CTA_HTML;
+
+    html =
+        html.replace(
+            /\{URL\}/gi,
+            url
+        );
+
+    html =
+        html.replace(
+            /\{TEXT\}/gi,
+            normalizeText(ctaText)
+        );
 
     return html;
 }
 
-/*
- * Preview CTA.
- *
- * Keep {ID} visible in the preview.
- */
-function previewCTA(
-    text,
-    urlTemplate
-){
+function previewCTA(text,urlTemplate){
 
     let url =
         String(urlTemplate || "")
@@ -1822,7 +723,6 @@ function previewCTA(
     return html;
 }
 
-
 function updateFixedCTAHTML(){
 
     $("cta1Html").value =
@@ -1838,18 +738,46 @@ function updateFixedCTAHTML(){
         );
 }
 
-
 /* =========================================================
    VARIABLE REPLACEMENT
 ========================================================= */
 
-function (
+function replaceVariables(
     template,
     movie
 ){
 
     const safeMovie =
         movie || {};
+
+    /*
+     * YEAR FIX
+     *
+     * Try several possible date/year fields.
+     *
+     * Priority:
+     * release_date
+     * first_air_date
+     * releaseDate
+     * release_year
+     * year
+     */
+    const releaseDate =
+        safeMovie.release_date ||
+        safeMovie.first_air_date ||
+        safeMovie.releaseDate ||
+        safeMovie.release_year ||
+        safeMovie.year ||
+        "";
+
+    const yearMatch =
+        String(releaseDate)
+            .match(/\b(19|20)\d{2}\b/);
+
+    const releaseYear =
+        yearMatch
+            ? yearMatch[0]
+            : "";
 
     const values = {
 
@@ -1867,11 +795,7 @@ function (
             "",
 
         YEAR:
-            safeMovie.release_date
-                ? String(
-                    safeMovie.release_date
-                ).slice(0,4)
-                : "",
+            releaseYear,
 
         OVERVIEW:
             safeMovie.overview ||
@@ -1909,10 +833,6 @@ function (
             ""
     };
 
-
-    /*
-     * CTA 1
-     */
     values.CTA1 =
         createCTA(
             $("cta1Text").value,
@@ -1920,10 +840,6 @@ function (
             safeMovie
         );
 
-
-    /*
-     * CTA 2
-     */
     values.CTA2 =
         createCTA(
             $("cta2Text").value,
@@ -1931,10 +847,8 @@ function (
             safeMovie
         );
 
-
     let result =
         String(template ?? "");
-
 
     Object.entries(values)
         .forEach(
@@ -1956,10 +870,8 @@ function (
             }
         );
 
-
     return result.trim();
 }
-
 
 /* =========================================================
    SLUG
@@ -1987,29 +899,16 @@ function slugify(value){
             )
             .toLowerCase();
 
-    if(!text){
-        text = "movie";
-    }
+    if(!text) text = "movie";
 
-    return text.slice(
-        0,
-        80
-    );
+    return text.slice(0,80);
 }
 
-
-function createAudioFilename(
-    index,
-    movie
-){
+function createAudioFilename(index,movie){
 
     const number =
-        String(
-            index + 1
-        ).padStart(
-            3,
-            "0"
-        );
+        String(index+1)
+            .padStart(3,"0");
 
     const slug =
         slugify(
@@ -2021,7 +920,6 @@ function createAudioFilename(
     return `${number}-${slug}-${movie.id}.mp3`;
 }
 
-
 /* =========================================================
    ID PARSER
 ========================================================= */
@@ -2029,40 +927,27 @@ function createAudioFilename(
 function getMovieIds(){
 
     const raw =
-        $("tmdbIds").value ||
-        "";
+        $("tmdbIds").value || "";
 
     const ids =
         raw
-            .split(
-                /[\s,;]+/
-            )
-            .map(
-                x => x.trim()
-            )
+            .split(/[\s,;]+/)
+            .map(x=>x.trim())
             .filter(Boolean);
 
     const unique = [];
+    const seen = new Set();
 
-    const seen =
-        new Set();
+    for(const id of ids){
 
-    for(
-        const id of ids
-    ){
-
-        if(seen.has(id)){
-            continue;
-        }
+        if(seen.has(id)) continue;
 
         seen.add(id);
-
         unique.push(id);
     }
 
     return unique;
 }
-
 
 function updateIDCounter(){
 
@@ -2073,12 +958,10 @@ function updateIDCounter(){
         `${ids.length} / ${MAX_EPISODES_PER_RSS} IDs`;
 
     $("idCounter").style.color =
-        ids.length >
-        MAX_EPISODES_PER_RSS
+        ids.length > MAX_EPISODES_PER_RSS
             ? "var(--danger)"
             : "";
 }
-
 
 /* =========================================================
    TITLE TEMPLATES
@@ -2089,102 +972,65 @@ function renderTitleTemplates(){
     const container =
         $("titleTemplates");
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
     const templates =
         getTitleTemplates();
 
     templates.forEach(
-        (template,index) => {
+        (template,index)=>{
 
             const row =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             row.className =
                 "template-row";
 
             const input =
-                document.createElement(
-                    "input"
-                );
+                document.createElement("input");
 
-            input.type =
-                "text";
-
-            input.value =
-                template;
-
-            input.dataset.template =
-                "title";
+            input.type = "text";
+            input.value = template;
+            input.dataset.template = "title";
 
             input.addEventListener(
                 "input",
-                () => {
-
+                ()=>{
                     updateTitlePreview();
-
                     saveLocalSettings();
                 }
             );
 
-
             const remove =
-                document.createElement(
-                    "button"
-                );
+                document.createElement("button");
 
-            remove.type =
-                "button";
-
-            remove.textContent =
-                "×";
-
-            remove.className =
-                "btn-danger";
+            remove.type = "button";
+            remove.textContent = "×";
+            remove.className = "btn-danger";
 
             remove.addEventListener(
                 "click",
-                () => {
+                ()=>{
 
                     const current =
                         getTitleTemplates();
 
-                    if(
-                        current.length <= 1
-                    ){
-                        return;
-                    }
+                    if(current.length<=1) return;
 
-                    current.splice(
-                        index,
-                        1
-                    );
+                    current.splice(index,1);
 
-                    setTitleTemplates(
-                        current
-                    );
-
-                    renderTitleTemplates();
-
+                    setTitleTemplates(current);
                     updateTitlePreview();
-
                     saveLocalSettings();
                 }
             );
 
-
             row.appendChild(input);
-
             row.appendChild(remove);
-
             container.appendChild(row);
         }
     );
 }
-
 
 function getTitleTemplates(){
 
@@ -2193,119 +1039,79 @@ function getTitleTemplates(){
             '#titleTemplates input[data-template="title"]'
         )
     )
-    .map(
-        input => input.value.trim()
-    )
+    .map(input=>input.value.trim())
     .filter(Boolean);
 }
 
-
-function setTitleTemplates(
-    templates
-){
+function setTitleTemplates(templates){
 
     const container =
         $("titleTemplates");
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
     templates.forEach(
-        template => {
+        template=>{
 
             const row =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             row.className =
                 "template-row";
 
             const input =
-                document.createElement(
-                    "input"
-                );
+                document.createElement("input");
 
-            input.type =
-                "text";
-
-            input.value =
-                template;
-
-            input.dataset.template =
-                "title";
+            input.type = "text";
+            input.value = template;
+            input.dataset.template = "title";
 
             input.addEventListener(
                 "input",
-                () => {
-
+                ()=>{
                     updateTitlePreview();
-
                     saveLocalSettings();
                 }
             );
 
-
             const remove =
-                document.createElement(
-                    "button"
-                );
+                document.createElement("button");
 
-            remove.type =
-                "button";
-
-            remove.textContent =
-                "×";
-
-            remove.className =
-                "btn-danger";
+            remove.type = "button";
+            remove.textContent = "×";
+            remove.className = "btn-danger";
 
             remove.addEventListener(
                 "click",
-                () => {
+                ()=>{
 
                     const current =
                         getTitleTemplates();
 
-                    if(
-                        current.length <= 1
-                    ){
-                        return;
-                    }
+                    if(current.length<=1) return;
 
                     const index =
-                        current.indexOf(
-                            template
-                        );
+                        Array.from(
+                            document.querySelectorAll(
+                                '#titleTemplates input[data-template="title"]'
+                            )
+                        ).indexOf(input);
 
-                    if(index >= 0){
+                    if(index>=0)
+                        current.splice(index,1);
 
-                        current.splice(
-                            index,
-                            1
-                        );
-                    }
-
-                    setTitleTemplates(
-                        current
-                    );
-
+                    setTitleTemplates(current);
                     updateTitlePreview();
-
                     saveLocalSettings();
                 }
             );
 
-
             row.appendChild(input);
-
             row.appendChild(remove);
-
             container.appendChild(row);
         }
     );
 }
-
 
 function updateTitlePreview(){
 
@@ -2320,27 +1126,19 @@ function updateTitlePreview(){
         return;
     }
 
-    const template =
-        templates[0];
-
     const sample = {
-
         id:"550",
-
         title:"Fight Club",
-
         original_title:"Fight Club",
-
         release_date:"1999-10-15"
     };
 
     $("titlePreview").textContent =
         replaceVariables(
-            template,
+            templates[0],
             sample
         );
 }
-
 
 /* =========================================================
    SETTINGS
@@ -2355,12 +1153,6 @@ function getSettings(){
 
         voiceId:
             $("voiceId").value.trim(),
-
-        modelId:
-            $("modelId").value,
-
-        outputFormat:
-            $("outputFormat").value,
 
         randomTitle:
             $("randomTitle").checked,
@@ -2388,7 +1180,6 @@ function getSettings(){
     };
 }
 
-
 function getPodcastSettings(){
 
     return {
@@ -2397,53 +1188,37 @@ function getPodcastSettings(){
             $("podcastTitle").value.trim(),
 
         podcast_description:
-            $("podcastDescription")
-                .value
-                .trim(),
+            $("podcastDescription").value.trim(),
 
         author:
-            $("podcastAuthor")
-                .value
-                .trim(),
+            $("podcastAuthor").value.trim(),
 
         email:
-            $("podcastEmail")
-                .value
-                .trim(),
+            $("podcastEmail").value.trim(),
 
         artwork_url:
-            $("podcastArtwork")
-                .value
-                .trim() ||
+            $("podcastArtwork").value.trim() ||
             DEFAULT_ARTWORK,
 
         website_url:
-            $("podcastWebsite")
-                .value
-                .trim() ||
+            $("podcastWebsite").value.trim() ||
             location.origin,
 
         category:
-            $("podcastCategory")
-                .value
-                .trim() ||
+            $("podcastCategory").value.trim() ||
             "TV & Film",
 
         language:
-            $("podcastLanguage")
-                .value
-                .trim() ||
+            $("podcastLanguage").value.trim() ||
             "en-us",
 
         explicit:
-            $("podcastExplicit")
-                .value === "true",
+            $("podcastExplicit").value === "true",
 
         podcast_type:
             $("podcastType").value
     };
 }
-
 
 /* =========================================================
    LOCAL STORAGE
@@ -2454,11 +1229,8 @@ function saveLocalSettings(){
     try{
 
         const data = {
-
             ...getSettings(),
-
-            podcast:
-                getPodcastSettings()
+            podcast:getPodcastSettings()
         };
 
         localStorage.setItem(
@@ -2467,14 +1239,12 @@ function saveLocalSettings(){
         );
 
     }catch(error){
-
         console.warn(
             "Could not save settings:",
             error
         );
     }
 }
-
 
 function loadLocalSettings(){
 
@@ -2485,89 +1255,51 @@ function loadLocalSettings(){
                 LOCAL_STORAGE_KEY
             );
 
-        if(!raw){
-            return;
-        }
+        if(!raw) return;
 
         const data =
             JSON.parse(raw);
-
 
         if(data.tmdbLanguage)
             $("tmdbLanguage").value =
                 data.tmdbLanguage;
 
-
         if(data.voiceId)
             $("voiceId").value =
                 data.voiceId;
 
-
-        if(data.modelId)
-            $("modelId").value =
-                data.modelId;
-
-
-        if(data.outputFormat)
-            $("outputFormat").value =
-                data.outputFormat;
-
-
-        if(
-            typeof data.randomTitle ===
-            "boolean"
-        ){
-
+        if(typeof data.randomTitle==="boolean")
             $("randomTitle").checked =
                 data.randomTitle;
-        }
 
-
-        if(
-            Array.isArray(
-                data.titleTemplates
-            )
-        ){
-
-            setTitleTemplates(
-                data.titleTemplates
-            );
-        }
-
+        if(Array.isArray(data.titleTemplates))
+            setTitleTemplates(data.titleTemplates);
 
         if(data.cta1Text)
             $("cta1Text").value =
                 data.cta1Text;
 
-
         if(data.cta1Url)
             $("cta1Url").value =
                 data.cta1Url;
-
 
         if(data.cta2Text)
             $("cta2Text").value =
                 data.cta2Text;
 
-
         if(data.cta2Url)
             $("cta2Url").value =
                 data.cta2Url;
-
 
         if(data.descriptionTemplate)
             $("descriptionTemplate").value =
                 data.descriptionTemplate;
 
-
         if(data.ttsTemplate)
             $("ttsTemplate").value =
                 data.ttsTemplate;
 
-
-        const p =
-            data.podcast;
-
+        const p = data.podcast;
 
         if(p){
 
@@ -2603,16 +1335,9 @@ function loadLocalSettings(){
                 $("podcastLanguage").value =
                     p.language;
 
-            if(
-                typeof p.explicit ===
-                "boolean"
-            ){
-
+            if(typeof p.explicit==="boolean")
                 $("podcastExplicit").value =
-                    p.explicit
-                        ? "true"
-                        : "false";
-            }
+                    p.explicit ? "true" : "false";
 
             if(p.podcast_type)
                 $("podcastType").value =
@@ -2628,61 +1353,46 @@ function loadLocalSettings(){
     }
 }
 
-
 /* =========================================================
    PODCAST CONFIG API
 ========================================================= */
 
-async function savePodcastSettings(
-    showStatus=true
-){
+async function savePodcastSettings(showStatus=true){
 
     const podcast =
         getPodcastSettings();
 
     if(!podcast.podcast_title){
 
-        if(showStatus){
-
+        if(showStatus)
             setStatus(
                 "Podcast Title is required.",
                 "error"
             );
-        }
 
         throw new Error(
             "Podcast Title is required."
         );
     }
 
-
     const response =
         await fetch(
             "/api/podcast-config",
             {
-
                 method:"POST",
-
                 headers:{
                     "Content-Type":
                         "application/json"
                 },
-
                 body:
-                    JSON.stringify(
-                        podcast
-                    )
+                    JSON.stringify(podcast)
             }
         );
 
-
     const data =
-        await readJSONResponse(
-            response
-        );
+        await readJSONResponse(response);
 
-
-    if(data.success === false){
+    if(data.success===false){
 
         throw new Error(
             data.error ||
@@ -2690,22 +1400,16 @@ async function savePodcastSettings(
         );
     }
 
-
     saveLocalSettings();
 
-
-    if(showStatus){
-
+    if(showStatus)
         setStatus(
             "Podcast settings saved successfully.",
             "success"
         );
-    }
-
 
     return data;
 }
-
 
 async function loadPodcastSettings(){
 
@@ -2720,86 +1424,58 @@ async function loadPodcastSettings(){
                 }
             );
 
-
-        if(!response.ok){
-            return;
-        }
-
+        if(!response.ok) return;
 
         const data =
             await response.json();
-
 
         const p =
             data?.config ||
             data?.podcast ||
             data;
 
-
-        if(
-            !p ||
-            typeof p !== "object"
-        ){
+        if(!p || typeof p!=="object")
             return;
-        }
-
 
         if(p.podcast_title)
             $("podcastTitle").value =
                 p.podcast_title;
 
-
         if(p.podcast_description)
             $("podcastDescription").value =
                 p.podcast_description;
-
 
         if(p.author)
             $("podcastAuthor").value =
                 p.author;
 
-
         if(p.email)
             $("podcastEmail").value =
                 p.email;
-
 
         if(p.artwork_url)
             $("podcastArtwork").value =
                 p.artwork_url;
 
-
         if(p.website_url)
             $("podcastWebsite").value =
                 p.website_url;
-
 
         if(p.category)
             $("podcastCategory").value =
                 p.category;
 
-
         if(p.language)
             $("podcastLanguage").value =
                 p.language;
 
-
-        if(
-            typeof p.explicit ===
-            "boolean"
-        ){
-
+        if(typeof p.explicit==="boolean")
             $("podcastExplicit").value =
-                p.explicit
-                    ? "true"
-                    : "false";
-        }
-
+                p.explicit ? "true" : "false";
 
         if(p.podcast_type)
             $("podcastType").value =
                 p.podcast_type;
-
 
         saveLocalSettings();
 
@@ -2812,254 +1488,15 @@ async function loadPodcastSettings(){
     }
 }
 
-
-/* =========================================================
-   ELEVENLABS CREDIT
-========================================================= */
-
-function extractCreditPayload(data){
-
-    let source =
-        data;
-
-
-    if(
-        data &&
-        data.data &&
-        typeof data.data === "object"
-    ){
-
-        source =
-            data.data;
-    }
-
-
-    /*
-     * IMPORTANT:
-     *
-     * Terpakai = character_count
-     * Limit    = character_limit
-     * Sisa     = character_limit - character_count
-     */
-
-    const usedRaw =
-        source?.character_count ??
-        source?.used ??
-        source?.characters_used;
-
-
-    const limitRaw =
-        source?.character_limit ??
-        source?.limit ??
-        source?.characters_limit;
-
-
-    const explicitRemaining =
-        source?.remaining_characters ??
-        source?.remaining ??
-        source?.characters_remaining;
-
-
-    const used =
-        Number(usedRaw);
-
-
-    const limit =
-        Number(limitRaw);
-
-
-    let remaining;
-
-
-    if(
-        explicitRemaining !== undefined &&
-        Number.isFinite(
-            Number(explicitRemaining)
-        )
-    ){
-
-        remaining =
-            Number(
-                explicitRemaining
-            );
-
-    }else if(
-        Number.isFinite(limit) &&
-        Number.isFinite(used)
-    ){
-
-        remaining =
-            Math.max(
-                0,
-                limit - used
-            );
-
-    }else{
-
-        remaining =
-            NaN;
-    }
-
-
-    return {
-
-        used:
-            Number.isFinite(used)
-                ? used
-                : null,
-
-        remaining:
-            Number.isFinite(remaining)
-                ? remaining
-                : null,
-
-        limit:
-            Number.isFinite(limit)
-                ? limit
-                : null
-    };
-}
-
-
-async function refreshElevenLabsCredit(
-    silent=false
-){
-
-    if(creditLoading){
-        return;
-    }
-
-
-    creditLoading =
-        true;
-
-
-    $("creditUsedBox")
-        .classList
-        .add("loading");
-
-    $("creditRemainingBox")
-        .classList
-        .add("loading");
-
-    $("creditLimitBox")
-        .classList
-        .add("loading");
-
-
-    if(!silent){
-
-        $("creditStatus")
-            .textContent =
-            "Refreshing ElevenLabs credit...";
-    }
-
-
-    try{
-
-        const response =
-            await fetch(
-                "/api/elevenlabs-credits?t=" +
-                Date.now(),
-                {
-
-                    method:"GET",
-
-                    cache:"no-store",
-
-                    headers:{
-                        "Cache-Control":
-                            "no-cache"
-                    }
-                }
-            );
-
-
-        const data =
-            await readJSONResponse(
-                response
-            );
-
-
-        if(data.success === false){
-
-            throw new Error(
-                data.error ||
-                "ElevenLabs credit request failed."
-            );
-        }
-
-
-        const credit =
-            extractCreditPayload(
-                data
-            );
-
-
-        latestCredit =
-            credit;
-
-
-        $("creditUsed")
-            .textContent =
-            formatNumber(
-                credit.used
-            );
-
-
-        $("creditRemaining")
-            .textContent =
-            formatNumber(
-                credit.remaining
-            );
-
-
-        $("creditLimit")
-            .textContent =
-            formatNumber(
-                credit.limit
-            );
-
-
-        $("creditStatus")
-            .textContent =
-            "Credit updated successfully.";
-
-
-    }finally{
-
-        creditLoading =
-            false;
-
-
-        $("creditUsedBox")
-            .classList
-            .remove("loading");
-
-        $("creditRemainingBox")
-            .classList
-            .remove("loading");
-
-        $("creditLimitBox")
-            .classList
-            .remove("loading");
-    }
-}
-
-
 /* =========================================================
    TMDB API
 ========================================================= */
 
-async function fetchMovie(
-    id,
-    language
-){
+async function fetchMovie(id,language){
 
     const url =
         `/api/movie?id=${encodeURIComponent(id)}` +
         `&language=${encodeURIComponent(language)}`;
-
 
     const response =
         await fetch(
@@ -3070,14 +1507,10 @@ async function fetchMovie(
             }
         );
 
-
     const data =
-        await readJSONResponse(
-            response
-        );
+        await readJSONResponse(response);
 
-
-    if(data.success === false){
+    if(data.success===false){
 
         throw new Error(
             data.error ||
@@ -3085,28 +1518,20 @@ async function fetchMovie(
         );
     }
 
-
     const movie =
         data.movie ||
         data.data ||
         data;
 
-
-    if(
-        !movie ||
-        typeof movie !== "object"
-    ){
+    if(!movie || typeof movie!=="object"){
 
         throw new Error(
             `Invalid movie response for ID ${id}`
         );
     }
 
-
     movie.id =
-        movie.id ??
-        id;
-
+        movie.id ?? id;
 
     movie.title =
         movie.title ||
@@ -3114,73 +1539,50 @@ async function fetchMovie(
         movie.original_title ||
         `Movie ${id}`;
 
-
     movie.original_title =
         movie.original_title ||
         movie.title;
-
 
     movie.release_date =
         movie.release_date ||
         movie.first_air_date ||
         "";
 
-
     movie.overview =
         movie.overview ||
         "";
 
-
     movie.vote_average =
-        movie.vote_average ??
-        0;
-
+        movie.vote_average ?? 0;
 
     movie.runtime =
-        movie.runtime ??
-        0;
-
+        movie.runtime ?? 0;
 
     movie.director =
         movie.director ||
         "Unknown";
 
+    if(!Array.isArray(movie.cast)){
 
-    if(
-        !Array.isArray(
-            movie.cast
-        )
-    ){
-
-        if(
-            Array.isArray(
-                movie.credits?.cast
-            )
-        ){
+        if(Array.isArray(movie.credits?.cast)){
 
             movie.cast =
                 movie.credits.cast
                     .slice(0,10)
-                    .map(
-                        person =>
-                            person.name
-                    )
+                    .map(person=>person.name)
                     .filter(Boolean);
 
         }else{
 
-            movie.cast =
-                [];
+            movie.cast = [];
         }
     }
-
 
     return movie;
 }
 
-
 /* =========================================================
-   TTS API
+   EDGE TTS API
 ========================================================= */
 
 async function generateTTS(
@@ -3192,7 +1594,6 @@ async function generateTTS(
     let narration =
         normalizeText(text);
 
-
     if(!narration){
 
         throw new Error(
@@ -3200,11 +1601,7 @@ async function generateTTS(
         );
     }
 
-
-    if(
-        narration.length >
-        MAX_TTS_TEXT
-    ){
+    if(narration.length>MAX_TTS_TEXT){
 
         narration =
             narration.slice(
@@ -3213,19 +1610,19 @@ async function generateTTS(
             );
     }
 
+    const voice =
+        settings.voiceId ||
+        "vi-VN-HoaiMyNeural";
 
     const response =
         await fetch(
             "/api/tts",
             {
-
                 method:"POST",
-
                 headers:{
                     "Content-Type":
                         "application/json"
                 },
-
                 body:
                     JSON.stringify({
 
@@ -3233,13 +1630,16 @@ async function generateTTS(
                             narration,
 
                         voiceId:
-                            settings.voiceId,
+                            voice,
+
+                        voice:
+                            voice,
 
                         modelId:
-                            settings.modelId,
+                            "edge-tts",
 
                         outputFormat:
-                            settings.outputFormat,
+                            "mp3",
 
                         fileName:
                             fileName
@@ -3247,19 +1647,15 @@ async function generateTTS(
             }
         );
 
-
     if(!response.ok){
 
         let errorText =
             await response.text();
 
-
         try{
 
             const json =
-                JSON.parse(
-                    errorText
-                );
+                JSON.parse(errorText);
 
             errorText =
                 json.error ||
@@ -3268,24 +1664,20 @@ async function generateTTS(
 
         }catch{}
 
-
         throw new Error(
-            `TTS HTTP ${response.status}: ${errorText.slice(0,800)}`
+            `Edge TTS HTTP ${response.status}: ${errorText.slice(0,800)}`
         );
     }
-
 
     const audio =
         await response.arrayBuffer();
 
-
     if(!audio.byteLength){
 
         throw new Error(
-            "TTS returned an empty audio file."
+            "Edge TTS returned an empty audio file."
         );
     }
-
 
     return {
 
@@ -3312,30 +1704,23 @@ async function generateTTS(
         outputFormat:
             response.headers.get(
                 "X-Output-Format"
-            ) ||
-            settings.outputFormat,
+            ) || "mp3",
 
         modelId:
             response.headers.get(
                 "X-Model-ID"
-            ) ||
-            settings.modelId
+            ) || "edge-tts"
     };
 }
-
 
 /* =========================================================
    EPISODE
 ========================================================= */
 
-function selectTitleTemplate(
-    settings
-){
+function selectTitleTemplate(settings){
 
     const templates =
-        settings.titleTemplates ||
-        [];
-
+        settings.titleTemplates || [];
 
     if(!templates.length){
 
@@ -3343,7 +1728,6 @@ function selectTitleTemplate(
             "At least one title template is required."
         );
     }
-
 
     if(settings.randomTitle){
 
@@ -3356,15 +1740,10 @@ function selectTitleTemplate(
         return templates[index];
     }
 
-
     return templates[0];
 }
 
-
-function createEpisodeDescription(
-    settings,
-    movie
-){
+function createEpisodeDescription(settings,movie){
 
     return replaceVariables(
         settings.descriptionTemplate,
@@ -3372,11 +1751,7 @@ function createEpisodeDescription(
     );
 }
 
-
-function createNarration(
-    settings,
-    movie
-){
+function createNarration(settings,movie){
 
     let text =
         replaceVariables(
@@ -3384,23 +1759,15 @@ function createNarration(
             movie
         );
 
-
-    if(
-        text.length >
-        MAX_TTS_TEXT
-    ){
-
+    if(text.length>MAX_TTS_TEXT)
         text =
             text.slice(
                 0,
                 MAX_TTS_TEXT
             );
-    }
-
 
     return text;
 }
-
 
 async function generateEpisode(
     index,
@@ -3409,10 +1776,7 @@ async function generateEpisode(
 ){
 
     const titleTemplate =
-        selectTitleTemplate(
-            settings
-        );
-
+        selectTitleTemplate(settings);
 
     const title =
         replaceVariables(
@@ -3420,13 +1784,11 @@ async function generateEpisode(
             movie
         );
 
-
     const description =
         createEpisodeDescription(
             settings,
             movie
         );
-
 
     const narration =
         createNarration(
@@ -3434,13 +1796,11 @@ async function generateEpisode(
             movie
         );
 
-
     const fileName =
         createAudioFilename(
             index,
             movie
         );
-
 
     const tts =
         await generateTTS(
@@ -3449,19 +1809,15 @@ async function generateEpisode(
             fileName
         );
 
-
     const now =
         new Date();
-
 
     const audioUrl =
         tts.audioUrl ||
         `https://audio.onsports.online/episodes/${encodeURIComponent(fileName)}`;
 
-
     const guid =
         `movie-${movie.id}-${fileName}`;
-
 
     return {
 
@@ -3530,14 +1886,11 @@ async function generateEpisode(
     };
 }
 
-
 /* =========================================================
    MANIFEST
 ========================================================= */
 
-function createManifestEpisode(
-    episode
-){
+function createManifestEpisode(episode){
 
     return {
 
@@ -3591,15 +1944,10 @@ function createManifestEpisode(
     };
 }
 
-
 async function syncManifest(){
 
-    if(
-        !generatedEpisodes.length
-    ){
+    if(!generatedEpisodes.length)
         return null;
-    }
-
 
     const payload = {
 
@@ -3615,34 +1963,24 @@ async function syncManifest(){
             )
     };
 
-
     const response =
         await fetch(
             "/api/manifest",
             {
-
                 method:"POST",
-
                 headers:{
                     "Content-Type":
                         "application/json"
                 },
-
                 body:
-                    JSON.stringify(
-                        payload
-                    )
+                    JSON.stringify(payload)
             }
         );
 
-
     const data =
-        await readJSONResponse(
-            response
-        );
+        await readJSONResponse(response);
 
-
-    if(data.success === false){
+    if(data.success===false){
 
         throw new Error(
             data.error ||
@@ -3650,39 +1988,27 @@ async function syncManifest(){
         );
     }
 
-
     return data;
 }
 
-
 /* =========================================================
    RSS XML
+   KEEP THIS RSS LOGIC
 ========================================================= */
 
-function formatRSSDate(
-    dateString
-){
+function formatRSSDate(dateString){
 
     const date =
-        new Date(
-            dateString
-        );
+        new Date(dateString);
 
-
-    if(
-        Number.isNaN(
-            date.getTime()
-        )
-    ){
+    if(Number.isNaN(date.getTime())){
 
         return new Date()
             .toUTCString();
     }
 
-
     return date.toUTCString();
 }
-
 
 function normalizeArtworkUrl(){
 
@@ -3694,7 +2020,6 @@ function normalizeArtworkUrl(){
     );
 }
 
-
 function buildRSSXML(
     episodes = generatedEpisodes
 ){
@@ -3702,20 +2027,16 @@ function buildRSSXML(
     const podcast =
         getPodcastSettings();
 
-
     const artwork =
         podcast.artwork_url ||
         DEFAULT_ARTWORK;
-
 
     const website =
         podcast.website_url ||
         location.origin;
 
-
     const feedUrl =
         `${location.origin}/rss.xml`;
-
 
     const lastBuildDate =
         episodes.length
@@ -3731,7 +2052,6 @@ function buildRSSXML(
             : new Date()
                 .toUTCString();
 
-
     const items =
         episodes
             .map(
@@ -3742,17 +2062,14 @@ function buildRSSXML(
                             episode.generated_at
                         );
 
-
                     const description =
                         episode.description ||
                         "";
-
 
                     const enclosureLength =
                         Number(
                             episode.audio_size
                         ) || 0;
-
 
                     return `
     <item>
@@ -3775,7 +2092,6 @@ function buildRSSXML(
                 }
             )
             .join("\n");
-
 
     return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
@@ -3864,41 +2180,25 @@ ${items}
 </rss>`;
 }
 
-
 /* =========================================================
    RSS GENERATION
 ========================================================= */
 
 async function generateRSS(){
 
-    if(
-        !generatedEpisodes.length
-    ){
+    if(!generatedEpisodes.length){
 
         throw new Error(
             "Generate at least one episode first."
         );
     }
 
-
-    await savePodcastSettings(
-        false
-    );
-
-
-    /*
-     * IMPORTANT:
-     *
-     * No /api/rss/create call.
-     * No server RSS snapshot.
-     */
-
+    await savePodcastSettings(false);
 
     latestRSSXML =
         buildRSSXML(
             generatedEpisodes
         );
-
 
     latestRSS = {
 
@@ -3915,9 +2215,7 @@ async function generateRSS(){
             generatedEpisodes.length
     };
 
-
     showRSSInfo();
-
 
     setRSSStatus(
         `rss.xml generated locally for ${generatedEpisodes.length} episode(s). ` +
@@ -3925,10 +2223,8 @@ async function generateRSS(){
         "success"
     );
 
-
     return latestRSSXML;
 }
-
 
 function showRSSInfo(){
 
@@ -3936,25 +2232,18 @@ function showRSSInfo(){
 
         $("rssInfo")
             .classList
-            .remove(
-                "visible"
-            );
+            .remove("visible");
 
         return;
     }
 
-
     $("rssInfo")
         .classList
-        .add(
-            "visible"
-        );
-
+        .add("visible");
 
     $("liveRSSUrl")
         .textContent =
         latestRSS.url;
-
 
     $("rssMeta")
         .textContent =
@@ -3964,35 +2253,23 @@ function showRSSInfo(){
         ).toLocaleString()}`;
 }
 
-
 /* =========================================================
    ZIP
 ========================================================= */
 
 async function buildZip(){
 
-    if(
-        !generatedEpisodes.length
-    ){
+    if(!generatedEpisodes.length)
         return null;
-    }
-
 
     const zip =
         new JSZip();
 
-
     const episodesFolder =
-        zip.folder(
-            "episodes"
-        );
-
+        zip.folder("episodes");
 
     const metadataFolder =
-        zip.folder(
-            "metadata"
-        );
-
+        zip.folder("metadata");
 
     for(
         const episode of generatedEpisodes
@@ -4002,7 +2279,6 @@ async function buildZip(){
             episode.audio_filename,
             episode.audio
         );
-
 
         const metadata = {
 
@@ -4058,7 +2334,6 @@ async function buildZip(){
                 episode.narration
         };
 
-
         metadataFolder.file(
             `${episode.audio_filename}.json`,
             JSON.stringify(
@@ -4069,7 +2344,6 @@ async function buildZip(){
         );
     }
 
-
     if(!latestRSSXML){
 
         latestRSSXML =
@@ -4078,12 +2352,10 @@ async function buildZip(){
             );
     }
 
-
     zip.file(
         "rss.xml",
         latestRSSXML
     );
-
 
     zip.file(
         "podcast-data.json",
@@ -4093,7 +2365,6 @@ async function buildZip(){
             2
         )
     );
-
 
     zip.file(
         "rss-episodes.json",
@@ -4106,7 +2377,6 @@ async function buildZip(){
         )
     );
 
-
     const cta1Template =
         $("cta1Url")
             .value
@@ -4116,7 +2386,6 @@ async function buildZip(){
         $("cta2Url")
             .value
             .trim();
-
 
     zip.file(
         "README.txt",
@@ -4182,7 +2451,6 @@ https://example.com/movie/550
 `
     );
 
-
     generatedZip =
         await zip.generateAsync({
 
@@ -4196,15 +2464,12 @@ https://example.com/movie/550
 
         });
 
-
     $("downloadZipBtn")
         .disabled =
         false;
 
-
     return generatedZip;
 }
-
 
 /* =========================================================
    RENDER EPISODES
@@ -4215,10 +2480,7 @@ function renderEpisodes(){
     const container =
         $("episodeList");
 
-
-    if(
-        !generatedEpisodes.length
-    ){
+    if(!generatedEpisodes.length){
 
         container.innerHTML =
             `<div class="status">
@@ -4228,23 +2490,16 @@ function renderEpisodes(){
         return;
     }
 
-
-    container.innerHTML =
-        "";
-
+    container.innerHTML = "";
 
     generatedEpisodes.forEach(
-        (episode,index) => {
+        (episode,index)=>{
 
             const item =
-                document.createElement(
-                    "div"
-                );
-
+                document.createElement("div");
 
             item.className =
                 "episode";
-
 
             item.innerHTML = `
 
@@ -4301,24 +2556,20 @@ function renderEpisodes(){
                 </div>
             `;
 
-
-            container.appendChild(
-                item
-            );
+            container.appendChild(item);
         }
     );
-
 
     container
         .querySelectorAll(
             "[data-download-index]"
         )
         .forEach(
-            button => {
+            button=>{
 
                 button.addEventListener(
                     "click",
-                    () => {
+                    ()=>{
 
                         const index =
                             Number(
@@ -4326,17 +2577,12 @@ function renderEpisodes(){
                                     .downloadIndex
                             );
 
-
                         const episode =
                             generatedEpisodes[
                                 index
                             ];
 
-
-                        if(!episode){
-                            return;
-                        }
-
+                        if(!episode) return;
 
                         downloadBlob(
                             new Blob(
@@ -4353,7 +2599,6 @@ function renderEpisodes(){
             }
         );
 }
-
 
 /* =========================================================
    PREVIEWS
@@ -4390,16 +2635,13 @@ function createPreviewMovie(){
     };
 }
 
-
 function updateTTSPreview(){
 
     const movie =
         createPreviewMovie();
 
-
     const settings =
         getSettings();
-
 
     const text =
         createNarration(
@@ -4407,12 +2649,10 @@ function updateTTSPreview(){
             movie
         );
 
-
     $("ttsPreview")
         .textContent =
         text;
 }
-
 
 /* =========================================================
    GENERATION
@@ -4427,22 +2667,18 @@ function updateProgress(
     const percent =
         total
             ? Math.round(
-                (current / total) *
-                100
+                (current/total)*100
             )
             : 0;
-
 
     $("progressBar")
         .style
         .width =
         `${percent}%`;
 
-
     $("progressPercent")
         .textContent =
         `${percent}%`;
-
 
     $("progressText")
         .textContent =
@@ -4450,58 +2686,31 @@ function updateProgress(
         `${current} / ${total}`;
 }
 
-
 async function startGeneration(){
 
-    if(generationRunning){
+    if(generationRunning)
         return;
-    }
 
+    generationRunning = true;
 
-    generationRunning =
-        true;
-
-
-    $("generateBtn")
-        .disabled =
-        true;
-
-
-    $("rssBtn")
-        .disabled =
-        true;
-
-
-    $("downloadZipBtn")
-        .disabled =
-        true;
-
+    $("generateBtn").disabled = true;
+    $("rssBtn").disabled = true;
+    $("downloadZipBtn").disabled = true;
 
     $("progressWrap")
         .classList
         .add("show");
 
-
-    generatedEpisodes =
-        [];
-
-
-    generatedZip =
-        null;
-
-
-    latestRSSXML =
-        "";
-
+    generatedEpisodes = [];
+    generatedZip = null;
+    latestRSSXML = "";
 
     renderEpisodes();
-
 
     try{
 
         const ids =
             getMovieIds();
-
 
         if(!ids.length){
 
@@ -4510,77 +2719,57 @@ async function startGeneration(){
             );
         }
 
-
-        if(
-            ids.length >
-            MAX_EPISODES_PER_RSS
-        ){
+        if(ids.length>MAX_EPISODES_PER_RSS){
 
             throw new Error(
                 `Maximum ${MAX_EPISODES_PER_RSS} movie IDs per generation.`
             );
         }
 
-
         const settings =
             getSettings();
-
 
         if(!settings.voiceId){
 
             throw new Error(
-                "ElevenLabs Voice ID is required."
+                "Edge TTS Voice is required."
             );
         }
 
-
-        if(
-            !settings.titleTemplates.length
-        ){
+        if(!settings.titleTemplates.length){
 
             throw new Error(
                 "At least one title template is required."
             );
         }
 
-
         const podcast =
             getPodcastSettings();
 
-
-        if(
-            !podcast.podcast_title
-        ){
+        if(!podcast.podcast_title){
 
             throw new Error(
                 "Podcast Title is required."
             );
         }
 
-
         setStatus(
             "Saving podcast settings..."
         );
 
-
-        await savePodcastSettings(
-            false
-        );
-
+        await savePodcastSettings(false);
 
         const language =
             settings.tmdbLanguage;
 
-
         for(
-            let index = 0;
-            index < ids.length;
+            let index=0;
+            index<ids.length;
             index++
         ){
 
             const id =
                 ids[index];
-
 
             updateProgress(
                 index,
@@ -4588,11 +2777,9 @@ async function startGeneration(){
                 `Fetching TMDB movie ${id}...`
             );
 
-
             setStatus(
                 `Fetching movie ${index+1}/${ids.length}: TMDB ${id}`
             );
-
 
             const movie =
                 await fetchMovie(
@@ -4600,18 +2787,15 @@ async function startGeneration(){
                     language
                 );
 
-
             updateProgress(
                 index,
                 ids.length,
-                `Generating TTS: ${movie.title}`
+                `Generating Edge TTS: ${movie.title}`
             );
-
 
             setStatus(
                 `Generating audio ${index+1}/${ids.length}: ${movie.title}`
             );
-
 
             const episode =
                 await generateEpisode(
@@ -4620,68 +2804,39 @@ async function startGeneration(){
                     settings
                 );
 
-
             generatedEpisodes.push(
                 episode
             );
 
-
             renderEpisodes();
 
-
-            /*
-             * Refresh credit after
-             * every successful TTS.
-             */
-            await refreshElevenLabsCredit(
-                true
-            );
-
-
             updateProgress(
-                index + 1,
+                index+1,
                 ids.length,
                 `Completed: ${movie.title}`
             );
         }
-
 
         setStatus(
             `Successfully generated ${generatedEpisodes.length} episode(s). Syncing manifest...`,
             "success"
         );
 
-
-        /*
-         * Manifest is saved.
-         *
-         * RSS itself is NOT saved.
-         */
         await syncManifest();
-
 
         setStatus(
             "Episodes generated and manifest synchronized. Creating rss.xml...",
             "success"
         );
 
-
         await generateRSS();
-
 
         setStatus(
             `Generation complete: ${generatedEpisodes.length} episode(s).`,
             "success"
         );
 
-
         await buildZip();
-
-
-        await refreshElevenLabsCredit(
-            true
-        );
-
 
     }catch(error){
 
@@ -4690,41 +2845,32 @@ async function startGeneration(){
             error
         );
 
-
         setStatus(
             error.message ||
             "Generation failed.",
             "error"
         );
 
-
     }finally{
 
-        generationRunning =
-            false;
-
+        generationRunning = false;
 
         $("generateBtn")
-            .disabled =
-            false;
-
+            .disabled = false;
 
         $("rssBtn")
             .disabled =
-            generatedEpisodes.length === 0;
-
+            generatedEpisodes.length===0;
 
         $("downloadZipBtn")
             .disabled =
-            generatedEpisodes.length === 0;
-
+            generatedEpisodes.length===0;
 
         $("progressWrap")
             .classList
             .remove("show");
     }
 }
-
 
 /* =========================================================
    BUTTONS
@@ -4736,79 +2882,63 @@ $("generateBtn")
         startGeneration
     );
 
-
 $("rssBtn")
     .addEventListener(
         "click",
-        async () => {
+        async ()=>{
 
             try{
 
                 $("rssBtn")
-                    .disabled =
-                    true;
-
+                    .disabled = true;
 
                 await generateRSS();
 
-
                 await syncManifest();
 
-
                 await buildZip();
-
 
                 setStatus(
                     "rss.xml generated successfully. The live RSS URL is ready.",
                     "success"
                 );
 
-
             }catch(error){
 
-                console.error(
-                    error
-                );
-
+                console.error(error);
 
                 setRSSStatus(
                     error.message,
                     "error"
                 );
 
-
             }finally{
 
                 $("rssBtn")
                     .disabled =
-                    generatedEpisodes.length === 0;
+                    generatedEpisodes.length===0;
             }
         }
     );
 
-
 $("downloadZipBtn")
     .addEventListener(
         "click",
-        async () => {
+        async ()=>{
 
             try{
 
-                if(!generatedZip){
-
+                if(!generatedZip)
                     generatedZip =
                         await buildZip();
-                }
-
 
                 if(generatedZip){
 
                     downloadBlob(
                         generatedZip,
-                        "movie-podcast-v2.9.zip"
+                        "movie-podcast-v3.0.zip"
                     );
                 }
-
 
             }catch(error){
 
@@ -4820,17 +2950,14 @@ $("downloadZipBtn")
         }
     );
 
-
 $("downloadRSSBtn")
     .addEventListener(
         "click",
-        () => {
+        ()=>{
 
             if(!latestRSSXML){
 
-                if(
-                    !generatedEpisodes.length
-                ){
+                if(!generatedEpisodes.length){
 
                     setRSSStatus(
                         "Generate episodes first.",
@@ -4840,13 +2967,11 @@ $("downloadRSSBtn")
                     return;
                 }
 
-
                 latestRSSXML =
                     buildRSSXML(
                         generatedEpisodes
                     );
             }
-
 
             downloadText(
                 latestRSSXML,
@@ -4856,16 +2981,13 @@ $("downloadRSSBtn")
         }
     );
 
-
 $("copyRSSBtn")
     .addEventListener(
         "click",
-        async () => {
+        async ()=>{
 
-            if(!latestRSS.url){
+            if(!latestRSS.url)
                 return;
-            }
-
 
             try{
 
@@ -4873,23 +2995,18 @@ $("copyRSSBtn")
                     latestRSS.url
                 );
 
-
                 $("copyRSSBtn")
                     .textContent =
                     "Copied!";
 
-
                 setTimeout(
-                    () => {
-
+                    ()=>{
                         $("copyRSSBtn")
                             .textContent =
                             "Copy RSS URL";
-
                     },
                     1500
                 );
-
 
             }catch{
 
@@ -4901,11 +3018,10 @@ $("copyRSSBtn")
         }
     );
 
-
 $("openRSSBtn")
     .addEventListener(
         "click",
-        () => {
+        ()=>{
 
             if(latestRSS.url){
 
@@ -4918,35 +3034,17 @@ $("openRSSBtn")
         }
     );
 
-
-$("refreshCreditBtn")
-    .addEventListener(
-        "click",
-        () => {
-
-            refreshElevenLabsCredit(
-                false
-            );
-        }
-    );
-
-
 $("savePodcastBtn")
     .addEventListener(
         "click",
-        async () => {
+        async ()=>{
 
             try{
 
                 $("savePodcastBtn")
-                    .disabled =
-                    true;
+                    .disabled = true;
 
-
-                await savePodcastSettings(
-                    true
-                );
-
+                await savePodcastSettings(true);
 
             }catch(error){
 
@@ -4955,62 +3053,52 @@ $("savePodcastBtn")
                     "error"
                 );
 
-
             }finally{
 
                 $("savePodcastBtn")
-                    .disabled =
-                    false;
+                    .disabled = false;
             }
         }
     );
 
-
 $("addTitleTemplate")
     .addEventListener(
         "click",
-        () => {
+        ()=>{
 
             const templates =
                 getTitleTemplates();
-
 
             templates.push(
                 "{TITLE} ({YEAR}) MOVIE REVIEW"
             );
 
-
             setTitleTemplates(
                 templates
             );
 
-
             updateTitlePreview();
-
-
             saveLocalSettings();
         }
     );
-
 
 $("tmdbIds")
     .addEventListener(
         "input",
-        () => {
-
+        ()=>{
             updateIDCounter();
-
             saveLocalSettings();
         }
     );
 
-
 $("voiceId")
     .addEventListener(
         "input",
-        saveLocalSettings
+        ()=>{
+            updateTTSPreview();
+            saveLocalSettings();
+        }
     );
-
 
 $("tmdbLanguage")
     .addEventListener(
@@ -5018,32 +3106,14 @@ $("tmdbLanguage")
         saveLocalSettings
     );
 
-
-$("modelId")
-    .addEventListener(
-        "change",
-        saveLocalSettings
-    );
-
-
-$("outputFormat")
-    .addEventListener(
-        "change",
-        saveLocalSettings
-    );
-
-
 $("randomTitle")
     .addEventListener(
         "change",
-        () => {
-
+        ()=>{
             updateTitlePreview();
-
             saveLocalSettings();
         }
     );
-
 
 /* =========================================================
    CTA EVENTS
@@ -5052,58 +3122,42 @@ $("randomTitle")
 $("cta1Text")
     .addEventListener(
         "input",
-        () => {
-
+        ()=>{
             updateFixedCTAHTML();
-
             updateTTSPreview();
-
             saveLocalSettings();
         }
     );
-
 
 $("cta1Url")
     .addEventListener(
         "input",
-        () => {
-
+        ()=>{
             updateFixedCTAHTML();
-
             updateTTSPreview();
-
             saveLocalSettings();
         }
     );
-
 
 $("cta2Text")
     .addEventListener(
         "input",
-        () => {
-
+        ()=>{
             updateFixedCTAHTML();
-
             updateTTSPreview();
-
             saveLocalSettings();
         }
     );
-
 
 $("cta2Url")
     .addEventListener(
         "input",
-        () => {
-
+        ()=>{
             updateFixedCTAHTML();
-
             updateTTSPreview();
-
             saveLocalSettings();
         }
     );
-
 
 $("descriptionTemplate")
     .addEventListener(
@@ -5111,18 +3165,14 @@ $("descriptionTemplate")
         saveLocalSettings
     );
 
-
 $("ttsTemplate")
     .addEventListener(
         "input",
-        () => {
-
+        ()=>{
             updateTTSPreview();
-
             saveLocalSettings();
         }
     );
-
 
 [
     "podcastTitle",
@@ -5134,8 +3184,7 @@ $("ttsTemplate")
     "podcastCategory",
     "podcastLanguage"
 ].forEach(
-    id => {
-
+    id=>{
         $(id).addEventListener(
             "input",
             saveLocalSettings
@@ -5143,20 +3192,17 @@ $("ttsTemplate")
     }
 );
 
-
 [
     "podcastType",
     "podcastExplicit"
 ].forEach(
-    id => {
-
+    id=>{
         $(id).addEventListener(
             "change",
             saveLocalSettings
         );
     }
 );
-
 
 /* =========================================================
    INIT
@@ -5168,144 +3214,94 @@ function initializeDefaults(){
         DEFAULT_TITLE_TEMPLATES
     );
 
-
     $("descriptionTemplate")
         .value =
         DEFAULT_DESCRIPTION_TEMPLATE;
-
 
     $("ttsTemplate")
         .value =
         DEFAULT_TTS_TEMPLATE;
 
+    $("voiceId")
+        .value =
+        "vi-VN-HoaiMyNeural";
 
     $("podcastTitle")
         .value =
         "Movie Review Podcast";
 
-
     $("podcastAuthor")
         .value =
         "Movie Podcast";
-
 
     $("podcastDescription")
         .value =
         "Movie reviews, stories, cast details and everything you need to know about popular movies.";
 
-
     $("podcastCategory")
         .value =
         "TV & Film";
-
 
     $("podcastLanguage")
         .value =
         "en-us";
 
-
     $("podcastType")
         .value =
         "episodic";
-
 
     $("podcastExplicit")
         .value =
         "false";
 
-
     $("podcastArtwork")
         .value =
         DEFAULT_ARTWORK;
-
 
     $("podcastWebsite")
         .value =
         location.origin;
 
-
-    /*
-     * Default CTA URL templates.
-     */
     $("cta1Url")
         .value =
-        "https://onpreps.live/movie/{ID}";
-
+        "https://onpreps.live/vi/movie/{ID}";
 
     $("cta2Url")
         .value =
-        "https://onpreps.live/movie/{ID}";
-
+        "https://onpreps.live/vi/movie/{ID}";
 
     updateFixedCTAHTML();
-
     updateTitlePreview();
-
     updateTTSPreview();
-
     updateIDCounter();
 }
-
 
 async function init(){
 
     initializeDefaults();
 
-
-    /*
-     * Load browser settings.
-     */
     loadLocalSettings();
 
-
-    /*
-     * Fixed CTA HTML is always restored.
-     * User cannot accidentally modify it.
-     */
     updateFixedCTAHTML();
-
-
     updateTitlePreview();
-
     updateTTSPreview();
-
     updateIDCounter();
 
     renderEpisodes();
-
     showRSSInfo();
 
-
-    /*
-     * Load server-side podcast config
-     * if available.
-     */
     await loadPodcastSettings();
 
-
-    /*
-     * Refresh ElevenLabs credit
-     * on startup.
-     */
-    await refreshElevenLabsCredit(
-        true
-    );
-
-
     updateTTSPreview();
-
     updateFixedCTAHTML();
-
 
     setStatus(
         "Ready. Configure your movie IDs and click Generate Podcast."
     );
 }
 
-
 init();
 
 </script>
-
 </body>
 </html>
