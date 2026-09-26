@@ -2684,37 +2684,12 @@ function renderEpisodes(){
    RSS DESCRIPTION
 ========================================================= */
 
-function buildRSSDescription(
-    description
-){
+function buildRSSDescription(description){
 
-    const raw =
-        String(description ?? "");
-
-
-    const parts =
-        raw.split(
-            /(<p><a\b[^>]*>.*?<\/a><\/p>)/gis
-        );
-
-
-    return parts
-        .map(
-            part => {
-
-                if(
-                    /^<p><a\b[^>]*>.*?<\/a><\/p>$/is
-                        .test(part)
-                ){
-
-                    return part;
-                }
-
-
-                return escapeXML(part);
-            }
-        )
-        .join("");
+    return String(description ?? "")
+        .replace(/\r?\n+/g, " ")
+        .replace(/\s{2,}/g, " ")
+        .trim();
 }
 
 
