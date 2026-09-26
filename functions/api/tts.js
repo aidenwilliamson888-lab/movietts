@@ -1,326 +1,150 @@
 export async function onRequestPost(context) {
-  const { request, env } = context;
-
   try {
-    if (!env.ELEVENLABS_API_KEY) {
-      return jsonResponse(
-        {
-          success: false,
-          error: "ELEVENLABS_API_KEY is not configured."
-        },
-        500
-      );
-    }
-
-    if (!env.R2_UPLOAD_URL) {
-      return jsonResponse(
-        {
-          success: false,
-          error: "R2_UPLOAD_URL is not configured."
-        },
-        500
-      );
-    }
-
-    if (!env.R2_UPLOAD_SECRET) {
-      return jsonResponse(
-        {
-          success: false,
-          error: "R2_UPLOAD_SECRET is not configured."
-        },
-        500
-      );
-    }
-
-    const body = await request.json();
+    const body = await context.request.json();
 
     const text = String(body?.text || "").trim();
-    const voiceId = String(body?.voiceId || "").trim();
-    const modelId =
-      String(body?.modelId || "eleven_multilingual_v2").trim();
-
-    const outputFormat =
-      String(body?.outputFormat || "mp3_22050_32").trim();
-
-    const fileName =
-      String(body?.fileName || "episode.mp3").trim();
-
 
     if (!text) {
-      return jsonResponse(
-        {
+      return new Response(
+        JSON.stringify({
           success: false,
           error: "TTS text is required."
-        },
-        400
-      );
-    }
-
-    if (!voiceId) {
-      return jsonResponse(
+        }),
         {
-          success: false,
-          error: "ElevenLabs voiceId is required."
-        },
-        400
+          status: 400,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
       );
     }
 
     if (text.length > 1500) {
-      return jsonResponse(
-        {
+      return new Response(
+        JSON.stringify({
           success: false,
           error: "TTS text must be 1500 characters or less."
-        },
-        400
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
       );
     }
 
-
     /*
-     * Sanitize filename
-     */
-
-    const safeFileName =
-      fileName
-        .replace(/[^a-zA-Z0-9._-]/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, "");
-
-
-    const finalFileName =
-      safeFileName.toLowerCase().endsWith(".mp3")
-        ? safeFileName
-        : `${safeFileName}.mp3`;
-
-
-    /*
-     * R2 object key
+     * Temporary Edge-TTS test
      *
-     * IMPORTANT:
-     * Keep "/" literal.
+     * No ElevenLabs.
+     * No R2.
      */
 
-    const r2Key =
-      `episodes/${finalFileName}`;
+    const voice =
+      String(body?.voiceId || "").trim() ||
+      "en-US-AvaNeural";
 
+    const response =
+      await fetch(
+        "https://tts.travisvn.com/v1/audio/speech",
+        {
+          method: "POST",
 
-    /*
-     * ElevenLabs
-     */
+          headers: {
+            "Content-Type":
+              "application/json",
 
-    const elevenLabsUrl =
-      `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}`;
+            "Authorization":
+              "Bearer test"
+          },
 
+          body: JSON.stringify({
+            model: "tts-1",
+            input: text,
+            voice: voice,
+            response_format: "mp3"
+          })
+        }
+      );
 
-    const elevenLabsResponse =
-      await fetch(elevenLabsUrl, {
-        method: "POST",
-
-        headers: {
-          "xi-api-key": env.ELEVENLABS_API_KEY,
-          "Content-Type": "application/json",
-          "Accept": "audio/mpeg"
-        },
-
-        body: JSON.stringify({
-          text,
-          model_id: modelId,
-          output_format: outputFormat
-        })
-      });
-
-
-    if (!elevenLabsResponse.ok) {
-
+    if (!response.ok) {
       const errorText =
-        await elevenLabsResponse.text();
+        await response.text();
 
-      return jsonResponse(
-        {
+      return new Response(
+        JSON.stringify({
           success: false,
           error:
-            `ElevenLabs error (${elevenLabsResponse.status}): ${errorText}`
-        },
-        elevenLabsResponse.status
+            `Edge-TTS HTTP ${response.status}: ${errorText.slice(0, 1000)}`
+        }),
+        {
+          status: response.status,
+          headers: {
+            "Content-Type":
+              "application/json"
+          }
+        }
       );
     }
 
+    const audio =
+      await response.arrayBuffer();
 
-    /*
-     * We need the same audio stream twice:
-     *
-     * Stream #1 → Worker → R2
-     * Stream #2 → Browser → ZIP
-     *
-     * tee() duplicates the ReadableStream.
-     */
-
-    if (!elevenLabsResponse.body) {
-      return jsonResponse(
-        {
+    if (!audio.byteLength) {
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: "ElevenLabs returned an empty audio body."
-        },
-        502
-      );
-    }
-
-
-    const [uploadStream, browserStream] =
-      elevenLabsResponse.body.tee();
-
-
-    /*
-     * Upload to Account A Worker
-     */
-
-    const uploadUrl =
-      env.R2_UPLOAD_URL.replace(/\/$/, "") +
-      `/upload/${r2Key}`;
-
-
-    const uploadResponse =
-      await fetch(uploadUrl, {
-
-        method: "PUT",
-
-        headers: {
-          "Authorization":
-            `Bearer ${env.R2_UPLOAD_SECRET}`,
-
-          "Content-Type":
-            "audio/mpeg"
-        },
-
-        body: uploadStream
-
-      });
-
-
-    if (!uploadResponse.ok) {
-
-      const uploadError =
-        await uploadResponse.text();
-
-      return jsonResponse(
-        {
-          success: false,
-
           error:
-            `R2 upload failed (${uploadResponse.status}): ${uploadError}`
-        },
-        502
+            "Edge-TTS returned an empty audio file."
+        }),
+        {
+          status: 502,
+          headers: {
+            "Content-Type":
+              "application/json"
+          }
+        }
       );
-
     }
-
-
-    /*
-     * Public R2 URL
-     *
-     * IMPORTANT:
-     * Replace this with your actual R2 custom domain.
-     */
-
-    const audioBaseUrl =
-      "https://audio.onsports.online";
-
-
-    const audioUrl =
-      `${audioBaseUrl}/${r2Key}`;
-
-
-    /*
-     * Return MP3 directly to browser.
-     *
-     * Metadata is passed through response headers.
-     *
-     * Browser is same-origin with /api/tts,
-     * so it does not need R2 CORS just to receive this MP3.
-     */
-
-    const headers =
-      new Headers();
-
-    headers.set(
-      "Content-Type",
-      "audio/mpeg"
-    );
-
-    headers.set(
-      "Content-Disposition",
-      `inline; filename="${finalFileName}"`
-    );
-
-    headers.set(
-      "X-Audio-URL",
-      audioUrl
-    );
-
-    headers.set(
-      "X-Audio-Key",
-      r2Key
-    );
-
-    headers.set(
-      "X-File-Name",
-      finalFileName
-    );
-
-    headers.set(
-      "X-Output-Format",
-      outputFormat
-    );
-
-    headers.set(
-      "X-Model-ID",
-      modelId
-    );
-
 
     return new Response(
-      browserStream,
+      audio,
       {
         status: 200,
-        headers
+
+        headers: {
+          "Content-Type":
+            "audio/mpeg",
+
+          "X-Output-Format":
+            "mp3",
+
+          "X-Model-ID":
+            "edge-tts",
+
+          "X-File-Name":
+            "test-edge-tts.mp3"
+        }
       }
     );
-
 
   } catch (error) {
 
-    return jsonResponse(
-      {
+    return new Response(
+      JSON.stringify({
         success: false,
-
         error:
           error?.message ||
-          "Unknown TTS error."
-      },
-      500
-    );
-
-  }
-}
-
-
-/*
- * JSON helper
- */
-
-function jsonResponse(data, status = 200) {
-
-  return new Response(
-    JSON.stringify(data, null, 2),
-    {
-      status,
-
-      headers: {
-        "Content-Type":
-          "application/json; charset=utf-8"
+          "Unknown Edge-TTS error."
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type":
+            "application/json"
+        }
       }
-    }
-  );
-
+    );
+  }
 }
