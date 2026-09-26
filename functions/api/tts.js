@@ -42,6 +42,11 @@ export async function onRequestPost(context) {
 
     const apiKey = context.env.REALWAY_API_KEY;
 
+console.log(
+  "REALWAY_API_KEY exists:",
+  !!apiKey
+);
+
     if (!apiKey) {
       return new Response(
         JSON.stringify({
